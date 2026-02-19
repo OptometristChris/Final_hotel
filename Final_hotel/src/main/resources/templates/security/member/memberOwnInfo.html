@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::div.container})}" 
+      lang="ko" 
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org"> <!--/* Spring Security sec 를 사용하기 위해 HTML 네임스페이스 sec 를 추가 해야 함 */--> 
+<!-- ::title 은   현재 페이지의 title   태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 첫번째 파라미터로 전달한다. -->
+<!-- ::link  는   현재 페이지의 link    태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 두번째 파라미터로 전달한다. -->
+<!-- ::style 은   현재 페이지의 style   태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 세번째 파라미터로 전달한다. -->
+<!-- ::script 는  현재 페이지의 script  태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 네번째 파라미터로 전달한다. -->
+<!-- ::div.container 은 현재 페이지의 div.container 태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 다섯번째 파라미터로 전달한다. --> 
+<!-- 타임리프는 백엔드 서버에서 HTML을 동적으로 렌더링하는 용도로 사용된다. -->
+
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<link rel="stylesheet" href="">
+
+<style type="text/css"></style>
+
+<!--/* 
+      자바스크립트 인라인 
+      th:inline="javascript" 은 스크립트 태그 내에서 Thymeleaf 문법([[...]])을 해석할 수 있게 해주는 설정이다.
+      JavaScript 안에서 Thymeleaf 값을 넣을 때는 th:inline="javascript" 와 /*[[뭐뭐뭐]]*/ 구문을 사용해야 한다. 
+*/-->
+<script th:inline="javascript">
+ /*<![CDATA[*/
+ /*]]>*/	
+</script>
+
+<body>
+  <div class="container">
+	<div class="h2 text-center text-info mb-4">회원 나의정보 페이지</div>
+	
+	<table class="table" style="width: 50%; margin: 0 auto;">
+	     <tr>
+	        <th>아이디</th> 
+	        
+	        <!--/* Principal 객체의 username 속성에 직접 접근할 때 */-->
+	        <!--/* Principal 객체의 아이디와 암호는 무조건 아이디 속성은 username 이고, 암호는 password 이다. 나머지 속성은 MemberDTO 의 필드명을 사용한다. */-->
+	        <!--/* principal.username 대신에 MemberDTO 의 principal.memberid 를 사용하면 오류가 발생한다. */-->
+	        <td sec:authentication="principal.username"></td>
+	        <td th:text="${#authentication.principal.username}"></td>
+	        <td th:text="${#authentication.name}"></td>
+	        <!--/* principal 은 Spring Security 에서 인증받은(즉, 로그인되어진) 사용자인 UserDetails 구현한 CustomUserDetails 클래스 객체이다. */-->   
+	     
+	     </tr>
+	        
+	     <tr>
+	        <th>회원명</th>
+	        <td sec:authentication="principal.memberName"></td> <!-- CustomUserDetails 의 getter 이름 -->
+	        <td th:text="${#authentication.principal.memberName}"></td> <!-- Authentication 객체 -->
+	     </tr>   
+	        
+	     <tr>
+	        <th>이메일</th>
+	        <td sec:authentication="principal.email"></td>
+	        <td th:text="${#authentication.principal.email}"></td> <!-- Authentication 객체 -->
+	     </tr> 
+	     
+	     <tr>
+	        <th>휴대폰</th>
+	        <td sec:authentication="principal.mobile"></td>
+	        <td th:text="${#authentication.principal.mobile}"></td> <!-- Authentication 객체 -->
+	     </tr> 
+	     
+	     <tr>
+	        <th>집주소</th>
+	        <td sec:authentication="principal.address"></td>
+	        <td th:text="${#authentication.principal.address}"></td> <!-- Authentication 객체 -->
+	     </tr> 
+	     
+	     <tr>
+	        <th>가입일자</th>
+	        <td sec:authentication="principal.registerday"></td>
+	        <td th:text="${#authentication.principal.registerday}"></td> <!-- Authentication 객체 -->
+	     </tr>
+	     
+	     <tr>
+	        <th>마지막로그인</th>
+	        <td sec:authentication="principal.lastLoginDate"></td>
+	        <td th:text="${#authentication.principal.lastLoginDate}"></td> <!-- Authentication 객체 -->
+	     </tr>
+	     
+	     <tr>
+	        <th>권한</th>
+	        <td sec:authentication="principal.authorities"></td>
+	        <td th:text="${#authentication.principal.authorities}"></td> <!-- Authentication 객체 -->
+	     </tr>
+	</table>   
+  </div>
+</body>
+</html> 

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::div.container})}" 
+      lang="ko" 
+      xmlns:th="http://www.thymeleaf.org"> 
+<!-- ::title 은   현재 페이지의 title   태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 첫번째 파라미터로 전달한다. -->
+<!-- ::link  는   현재 페이지의 link    태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 두번째 파라미터로 전달한다. -->
+<!-- ::style 은   현재 페이지의 style   태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 세번째 파라미터로 전달한다. -->
+<!-- ::script 는  현재 페이지의 script  태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 네번째 파라미터로 전달한다. -->
+<!-- ::div.container 은 현재 페이지의 div.container 태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 다섯번째 파라미터로 전달한다. --> 
+<!-- 타임리프는 백엔드 서버에서 HTML을 동적으로 렌더링하는 용도로 사용된다. -->
+
+<head>
+<meta charset="UTF-8">
+<title>스프링 시큐리티 회원가입 결과</title>
+
+<link rel="stylesheet" href="">
+
+<style type="text/css"></style>
+
+<!--/* 
+      자바스크립트 인라인 
+      th:inline="javascript" 은 스크립트 태그 내에서 Thymeleaf 문법([[...]])을 해석할 수 있게 해주는 설정이다.
+      JavaScript 안에서 Thymeleaf 값을 넣을 때는 th:inline="javascript" 와 /*[[뭐뭐뭐]]*/ 구문을 사용해야 한다. 
+*/-->
+<script th:inline="javascript">
+ /*<![CDATA[*/
+ /*]]>*/	
+</script>
+
+<body>
+	<div class="container text-center">
+ <!--/* <div th:text="${message}"></div> */-->
+		<div th:utext="${message}"></div>
+		<!--/*
+		  th:text: 변수 안의 내용을 순수 텍스트로 처리한다. 예를 들어 내용이 <b>성공</b>이라면 브라우저 화면에 그대로 <b>성공</b>이라고 표시된다.
+          th:utext: 변수 안의 HTML 태그를 브라우저가 인식할 수 있는 코드로 변환하여 출력한다. <b>성공</b>이 실제 성공처럼 굵은 글씨로 표현된다.
+          
+          !! 주의사항 !!
+          th:utext는 외부 사용자가 입력한 내용을 그대로 출력할 경우 XSS(크로스 사이트 스크립팅) 공격에 취약할 수 있다.!! 
+          현재처럼 관리자가 직접 작성한 알림 메시지 등을 출력하는 용도로만 안전하게 사용해야 한다. 
+		*/-->
+		
+		<div class="mt-3">    
+		    <a th:href="@{/index}" class="btn btn-secondary">메인페이지로 이동</a>          
+		</div>  
+	</div>
+</body>
+</html> 

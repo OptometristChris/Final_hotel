@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ==== mapper 기본설정 ==== -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- ===== (#스프링시큐리티11) =====  -->
+
+<!-- ==== 루트 엘리먼트 & 네임스페이스 설정(프로젝트 전체내에서 유일해야 한다.) ==== -->
+<mapper namespace="security_member">
+
+	<!-- 회원가입시 아이디 중복확인 -->
+	<select id="member_id_check" parameterType="String" resultType="Integer">
+		select count(*)
+		from tbl_member_security
+		where memberid = #{memberid}
+	</select>
+	
+	
+	<!-- 회원가입시 이메일 중복확인 -->
+	<select id="emailDuplicateCheck" parameterType="String" resultType="Integer">
+		select count(*)
+		from tbl_member_security
+		where email = #{email}
+	</select>
+	
+	<!-- 회원가입 -->
+   <insert id="insert_member" parameterType="MemberDTO">
+        INSERT INTO tbl_member_security(memberid, passwd, enabled, name, birthday, email, mobile, postcode, address, detail_address, extra_address, point, registerday, passwd_modify_date, last_login_date) 
+        VALUES(#{memberid}, #{passwd}, default, #{name}, #{birthday}, #{email}, #{mobile}, #{postcode}, #{address}, #{detail_address}, #{extra_address}, default, default, default, default)  
+   </insert>
+   <!-- 권한체크 -->
+   <insert id="insert_member_authority" parameterType="MemberDTO">
+        INSERT INTO tbl_authorities(num, memberid, authority) 
+        VALUES(seq_tbl_authorities.nextval, #{memberid}, 'ROLE_USER') 
+   </insert> <!-- ROLE_USER 는 기본값이다. ROLE_ 접두어는 필수 규칙이고, 뒤에는 자기 마음 -->
+   
+   
+   
+   <!-- !!!! 로그인 처리를 위해 사용되어지는 것임. !!!!  -->
+   <select id="findByUsername" parameterType="String" resultType="MemberDTO">
+        SELECT memberid, passwd, enabled, name, birthday, email, mobile, postcode, address, detail_address, extra_address, point, 
+               registerday, passwd_modify_date, last_login_date 
+        FROM tbl_member_security
+        WHERE memberid = #{memberid}
+   </select>
+   
+   <select id="authorityList" parameterType="String" resultType="String">
+        SELECT authority 
+        FROM tbl_authorities
+        WHERE memberid = #{memberid}
+   </select>
+   
+   <!-- // 로그인한 사용자 정보에서 비밀번호를 변경한 날짜가 현재일로 부터 몇개월 전 인지 그 개월차이를 알아온다. -->
+   <select id="lastPasswdChangeMonth" parameterType="String" resultType="Integer">
+      select trunc(months_between(sysdate, passwd_modify_date)) AS PASSWD_MODIFY_MONTH 
+      from tbl_member_security
+      where memberid = #{memberid}
+   </select>
+   
+   <!--  // 로그인한 사용자 정보에서 로그인한 날짜를 현재일자로 업데이트 하도록 함. -->
+   <update id="update_last_login" parameterType="String">
+         UPDATE tbl_member_security SET last_login_date = SYSDATE 
+         WHERE memberid = #{memberid}
+   </update>
+    
+   <insert id="insertLoginhistory" parameterType="HashMap">
+        INSERT INTO tbl_loginhistory(historyno, memberid, logindate, clientip) 
+          VALUES(seq_historyno.nextval, #{memberid}, default, #{clientip}) 
+   </insert>
+   
+   <!-- 비밀번호 변경 하기 -->
+    <update id="passwdChange" parameterType="HashMap">
+        UPDATE tbl_member_security SET passwd = #{passwd}
+        WHERE memberid = #{memberid}
+    </update>
+    
+    <!-- 비밀번호 변경한 날짜를 SYSDATE 로 수정하기 -->
+    <update id="passwdModifyDate" parameterType="HashMap">
+        UPDATE tbl_member_security SET passwd_modify_date = SYSDATE
+        WHERE memberid = #{memberid}
+    </update>
+    
+    
+    <select id="getAllMember" resultType="MemberDTO">
+    	SELECT memberid, passwd, enabled, name, birthday, email, mobile, postcode, address, detail_address, extra_address, point, 
+               registerday, passwd_modify_date, last_login_date 
+        FROM tbl_member_security
+        ORDER BY memberid ASC
+    </select>
+    
+    
+    
+   
+	
+</mapper>
