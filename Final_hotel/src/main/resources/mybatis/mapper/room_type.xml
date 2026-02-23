@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="room">
+
+    <!-- ===============================
+         1. 전체 객실 목록 조회
+         =============================== -->
+    <select id="selectRoomTypeList"
+            resultType="RoomTypeDTO">
+
+        SELECT
+            rt.room_type_id,
+            rt.room_name,
+            rt.room_grade,
+            rt.bed_type,
+            rt.view_type,
+            rt.base_price,
+            ri.image_url
+        FROM room_type rt
+        LEFT JOIN room_image ri
+            ON rt.room_type_id = ri.room_type_id
+            AND ri.is_main = 'Y'
+        ORDER BY rt.room_type_id DESC
+
+    </select>
+
+
+    <!-- ===============================
+         2. 필터 검색
+         =============================== -->
+    <select id="selectRoomTypeByFilter"
+            parameterType="map"
+            resultType="RoomTypeDTO">
+
+        SELECT
+            rt.room_type_id,
+            rt.room_name,
+            rt.room_grade,
+            rt.bed_type,
+            rt.view_type,
+            rt.base_price,
+            ri.image_url
+        FROM room_type rt
+        LEFT JOIN room_image ri
+            ON rt.room_type_id = ri.room_type_id
+            AND ri.is_main = 'Y'
+        WHERE 1=1
+
+        <if test="room_grade != null and room_grade != ''">
+            AND rt.room_grade = #{room_grade}
+        </if>
+
+        <if test="bed_type != null and bed_type != ''">
+            AND rt.bed_type = #{bed_type}
+        </if>
+
+        <if test="view_type != null and view_type != ''">
+            AND rt.view_type = #{view_type}
+        </if>
+
+        ORDER BY rt.room_type_id DESC
+
+    </select>
+
+
+    <!-- ===============================
+         3. 객실 상세 조회
+         =============================== -->
+    <select id="selectRoomDetail"
+            parameterType="long"
+            resultType="RoomTypeDTO">
+
+        SELECT
+            rt.room_type_id,
+            rt.room_name,
+            rt.room_grade,
+            rt.bed_type,
+            rt.view_type,
+            rt.base_price,
+            ri.image_url
+        FROM room_type rt
+        LEFT JOIN room_image ri
+            ON rt.room_type_id = ri.room_type_id
+            AND ri.is_main = 'Y'
+        WHERE rt.room_type_id = #{roomId}
+
+    </select>
+
+</mapper>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>객실 목록</title>
+
+<style>
+body { font-family: Arial; }
+
+.room-card {
+    border-bottom: 1px solid #ddd;
+    padding: 30px 0;
+    display: flex;
+    gap: 30px;
+}
+
+.room-image {
+    width: 300px;
+    height: 200px;
+    background-color: #eee;
+}
+
+.room-info {
+    flex: 1;
+}
+
+.room-name {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.price {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 15px;
+}
+</style>
+
+</head>
+<body>
+
+<h1>객실</h1>
+
+<!-- ===============================
+      필터 (AJAX)
+     =============================== -->
+<form id="filterForm">
+
+    객실등급:
+    <select name="room_grade">
+        <option value="">전체</option>
+        <option value="DELUXE">DELUXE</option>
+        <option value="PREMIER">PREMIER</option>
+        <option value="SUITE">SUITE</option>
+        <option value="STANDARD">STANDARD</option>
+    </select>
+
+    침대타입:
+    <select name="bed_type">
+        <option value="">전체</option>
+        <option value="DOUBLE">DOUBLE</option>
+        <option value="TWIN">TWIN</option>
+        <option value="KING">KING</option>
+    </select>
+
+    전망:
+    <select name="view_type">
+        <option value="">전체</option>
+        <option value="CITY">CITY</option>
+        <option value="RIVER">RIVER</option>
+    </select>
+
+    <button type="submit">검색</button>
+</form>
+
+<hr>
+
+<!-- ===============================
+     객실 목록 영역
+     =============================== -->
+<div id="roomListArea">
+
+    <div th:each="room : ${roomList}" class="room-card">
+
+        <div class="room-image">
+            <img th:src="@{${room.image_url}}"
+                 style="width:100%; height:100%; object-fit:cover;">
+        </div>
+
+        <div class="room-info">
+            <div class="room-name">
+                <a th:href="@{/room/detail(room_id=${room.room_type_id})}"
+                   th:text="${room.room_name}"
+                   style="text-decoration:none; color:black;"></a>
+            </div>
+
+            <div>등급: <span th:text="${room.room_grade}"></span></div>
+            <div>침대: <span th:text="${room.bed_type}"></span></div>
+            <div>전망: <span th:text="${room.view_type}"></span></div>
+
+            <div class="price">
+                ₩ <span th:text="${room.base_price}"></span>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ===============================
+     AJAX 스크립트
+     =============================== -->
+<script>
+document.getElementById("filterForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const roomGrade = document.querySelector("[name='room_grade']").value;
+    const bedType = document.querySelector("[name='bed_type']").value;
+    const viewType = document.querySelector("[name='view_type']").value;
+
+    fetch(`/final_hotel/room/filter?room_grade=${roomGrade}&bed_type=${bedType}&view_type=${viewType}`)
+        .then(response => response.json())
+        .then(data => {
+
+            const area = document.getElementById("roomListArea");
+            area.innerHTML = "";
+
+            if(data.length === 0){
+                area.innerHTML = "<p>검색 결과가 없습니다.</p>";
+                return;
+            }
+
+            data.forEach(room => {
+                area.innerHTML += `
+                    <div class="room-card">
+                        <div class="room-image">
+                            <img src="/final_hotel${room.image_url}" 
+                                 style="width:100%; height:100%; object-fit:cover;">
+                        </div>
+                        <div class="room-info">
+                            <div class="room-name">
+                                <a href="/room/detail?room_id=${room.room_type_id}">
+                                    ${room.room_name}
+                                </a>
+                            </div>
+                            <div>등급: ${room.room_grade}</div>
+                            <div>침대: ${room.bed_type}</div>
+                            <div>전망: ${room.view_type}</div>
+                            <div class="price">₩ ${room.base_price}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+        });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>객실 상세</title>
+
+<style>
+.container {
+    width: 1000px;
+    margin: 50px auto;
+}
+
+.room-image {
+    width: 100%;
+    height: 400px;
+    background-color: #eee;
+}
+
+.room-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.room-name {
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.info {
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+.price {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="room-image">
+        <img th:src="@{${room.image_url}}">
+    </div>
+
+    <div class="room-name" th:text="${room.room_name}"></div>
+
+    <div class="info">
+        등급: <span th:text="${room.room_grade}"></span>
+    </div>
+
+    <div class="info">
+        침대 타입: <span th:text="${room.bed_type}"></span>
+    </div>
+
+    <div class="info">
+        전망: <span th:text="${room.view_type}"></span>
+    </div>
+
+    <div class="price">
+        ₩ <span th:text="${room.base_price}"></span>
+    </div>
+
+    <div style="margin-top:30px;">
+        <a href="/room/list">← 목록으로</a>
+    </div>
+
+</div>
+
+</body>
+</html>
