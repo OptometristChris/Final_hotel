@@ -28,6 +28,7 @@ public class MemberDAO_imple implements MemberDAO {
 	// jh.com.spring.app.common.AES256 의 bean 은 별도의 Configuration 클래스에서 Bean 으로 등록되어 있어야 한다.
 	// (수업용과 동일하게 @Component를 붙이면 기본생성자 문제로 오류가 날 수 있으므로 Configuration Bean 등록 방식을 사용한다.)
 
+	
 	@Override
 	public MemberDTO findByUsername(String username) {
 

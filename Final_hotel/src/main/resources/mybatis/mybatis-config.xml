@@ -6,9 +6,9 @@
     <!-- domain(DTO) package -->
 	<typeAliases>
 	
-		<typeAlias type="jh.com.spring.app.security.domain.MemberDTO" alias="MemberDTO"/>
+		<typeAlias type="com.spring.app.jh.security.domain.MemberDTO" alias="MemberDTO"/>
 		
-		<typeAlias type="jh.com.spring.app.security.domain.AdminDTO" alias="AdminDTO"/>
+		<typeAlias type="com.spring.app.jh.security.domain.AdminDTO" alias="AdminDTO"/>
 		
 	
 	</typeAliases>

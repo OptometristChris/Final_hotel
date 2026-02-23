@@ -168,7 +168,7 @@
 	</update>
 
 	<!-- 회원 비활성(탈퇴/정지): enabled='0' -->
-	<update id="disable_member" parameterType="Long">
+	<update id="disable_member" parameterType="Integer">
 		UPDATE tbl_member_security
 		   SET enabled = '0'
 		 WHERE member_no = #{member_no}
