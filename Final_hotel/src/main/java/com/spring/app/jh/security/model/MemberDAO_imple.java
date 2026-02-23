@@ -32,7 +32,7 @@ public class MemberDAO_imple implements MemberDAO {
 	public MemberDTO findByUsername(String username) {
 
 		// username 은 아이디(회원 memberid) 를 뜻한다.
-		MemberDTO memberDto = sqlSessionTemplate.selectOne("security_member.findByUsername", username);
+		MemberDTO memberDto = sqlSessionTemplate.selectOne("jh_security_member.findByUsername", username);
 
 		if (memberDto != null) {
 
@@ -52,7 +52,7 @@ public class MemberDAO_imple implements MemberDAO {
 			// === 권한(ROLE_*) 조회 및 세팅 ===
 			// 우리 프로젝트는 권한 테이블이 memberid 기반이 아니라 member_no 기반이다.
 			List<String> authorityList =
-					sqlSessionTemplate.selectList("security_member.authorityListByMemberNo", memberDto.getMemberNo());
+					sqlSessionTemplate.selectList("jh_security_member.authorityListByMemberNo", memberDto.getMemberNo());
 
 			memberDto.setAuthorities(authorityList); // 권한부여
 		}
@@ -63,7 +63,7 @@ public class MemberDAO_imple implements MemberDAO {
 	@Override
 	public int member_id_check(String memberid) {
 
-		int n = sqlSessionTemplate.selectOne("security_member.member_id_check", memberid);
+		int n = sqlSessionTemplate.selectOne("jh_security_member.member_id_check", memberid);
 
 		return n;
 	}
@@ -71,7 +71,7 @@ public class MemberDAO_imple implements MemberDAO {
 	@Override
 	public int emailDuplicateCheck(String email) {
 
-		int n = sqlSessionTemplate.selectOne("security_member.emailDuplicateCheck", email);
+		int n = sqlSessionTemplate.selectOne("jh_security_member.emailDuplicateCheck", email);
 
 		return n;
 	}
@@ -80,13 +80,13 @@ public class MemberDAO_imple implements MemberDAO {
 	public void insert_member(MemberDTO memberdto) {
 		// security_member.insert_member 는 selectKey 로 memberNo 를 채워준다.
 		// 따라서 insert 후 memberdto.getMemberNo() 를 바로 사용할 수 있다.
-		sqlSessionTemplate.insert("security_member.insert_member", memberdto);
+		sqlSessionTemplate.insert("jh_security_member.insert_member", memberdto);
 	}
 
 	@Override
 	public int passwdChange(Map<String, String> paraMap) {
 
-		int n = sqlSessionTemplate.update("security_member.passwdChange", paraMap);
+		int n = sqlSessionTemplate.update("jh_security_member.passwdChange", paraMap);
 
 		return n;
 	}
@@ -94,7 +94,7 @@ public class MemberDAO_imple implements MemberDAO {
 	@Override
 	public List<MemberDTO> getAllMember() {
 
-		List<MemberDTO> memberDtoList = sqlSessionTemplate.selectList("security_member.getAllMember");
+		List<MemberDTO> memberDtoList = sqlSessionTemplate.selectList("jh_security_member.getAllMember");
 
 		List<MemberDTO> list = null;
 
@@ -118,7 +118,7 @@ public class MemberDAO_imple implements MemberDAO {
 
 				// === 권한 조회(우리 프로젝트는 member_no 기반) ===
 				List<String> authorityList =
-						sqlSessionTemplate.selectList("security_member.authorityListByMemberNo", memberDto.getMemberNo());
+						sqlSessionTemplate.selectList("jh_security_member.authorityListByMemberNo", memberDto.getMemberNo());
 
 				memberDto.setAuthorities(authorityList); // 권한부여
 
@@ -132,7 +132,7 @@ public class MemberDAO_imple implements MemberDAO {
 	@Override
 	public int lastPasswdChangeMonth(String memberid) {
 
-		int n = sqlSessionTemplate.selectOne("security_member.lastPasswdChangeMonth", memberid);
+		int n = sqlSessionTemplate.selectOne("jh_security_member.lastPasswdChangeMonth", memberid);
 
 		return n;
 	}
@@ -140,7 +140,7 @@ public class MemberDAO_imple implements MemberDAO {
 	@Override
 	public void update_last_login(String memberid) {
 
-		sqlSessionTemplate.update("security_member.update_last_login", memberid);
+		sqlSessionTemplate.update("jh_security_member.update_last_login", memberid);
 	}
 
 	@Override
@@ -152,7 +152,7 @@ public class MemberDAO_imple implements MemberDAO {
 		paramMap.put("member_no", memberNo);
 		paramMap.put("clientip", clientip);
 
-		sqlSessionTemplate.insert("security_member.insertLoginhistory", paramMap);
+		sqlSessionTemplate.insert("jh_security_member.insertLoginhistory", paramMap);
 	}
 
 }
