@@ -1,4 +1,4 @@
-package fp.com.spring.app.common;
+package com.spring.app.common;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;

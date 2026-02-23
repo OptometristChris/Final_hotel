@@ -1,4 +1,4 @@
-package jh.com.spring.app.security.domain;
+package com.spring.app.jh.security.domain;
 
 import lombok.Data;
 
