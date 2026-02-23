@@ -7,8 +7,12 @@
 	<typeAliases>
 	
 		<typeAlias type="jh.com.spring.app.security.domain.MemberDTO" alias="MemberDTO"/>
+
 		<typeAlias type="fp.com.spring.app.room.domain.RoomTypeDTO" alias="RoomTypeDTO"/>
-	
+		
+		<typeAlias type="jh.com.spring.app.security.domain.AdminDTO" alias="AdminDTO"/>
+		
+
 	
 	</typeAliases>
 

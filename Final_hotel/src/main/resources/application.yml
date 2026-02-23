@@ -28,7 +28,7 @@ spring: # 주의할 점은 내용작성시 들여쓰기 내어쓰기시 공백�
 
   datasource-finalorauser1: #첫번째 DB 접속. 이름을 다르게 해서 쓰되 _ 가 들어가면 작동안됨.
     driver-class-name: oracle.jdbc.OracleDriver
-    jdbc-url: jdbc:oracle:thin:@211.63.89.70:1521:xe    # SID 방식  
+    jdbcUrl: jdbc:oracle:thin:@211.63.89.70:1521:xe    # SID 방식  
     username: final_orauser1
     password: sistsix
     type: com.zaxxer.hikari.HikariDataSource

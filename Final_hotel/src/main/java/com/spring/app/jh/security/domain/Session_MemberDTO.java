@@ -1,4 +1,4 @@
-package jh.com.spring.app.security.domain;
+package com.spring.app.jh.security.domain;
 
 import lombok.Data;
 // import lombok.Getter;
@@ -25,5 +25,6 @@ public class Session_MemberDTO {
  
 	private String memberid;
 	private String name;
+	private Integer memberNo;
 		
 }

@@ -1,4 +1,4 @@
-package jh.com.spring.app.security.domain;
+package com.spring.app.jh.security.domain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,7 +18,10 @@ import lombok.Data;
 public class MemberDTO {
 
     // PK
-    private String memberid;
+    private Integer memberNo;   // ✅ 회원 PK(member_no) 추가
+    
+    // ID : 유니크
+    private String memberid; 
 
     // 인증
     private String passwd;
@@ -38,7 +41,7 @@ public class MemberDTO {
     private String detail_address;
     private String extra_address;
 
-    // 포인트/등급 (✅ 최종 DB 기준으로 추가)
+    // 포인트/등급 (✅ 최종 DB 기준)
     private int point;
     private int point_earned_total;
     private String grade_code;

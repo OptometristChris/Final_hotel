@@ -2,27 +2,37 @@
 <html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::div#divRegisterFrm})}" 
       lang="ko" 
       xmlns:th="http://www.thymeleaf.org"> 
-<!-- ::title 은   현재 페이지의 title   태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 첫번째 파라미터로 전달한다. -->
-<!-- ::link  는   현재 페이지의 link    태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 두번째 파라미터로 전달한다. -->
-<!-- ::style 은   현재 페이지의 style   태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 세번째 파라미터로 전달한다. -->
-<!-- ::script 는  현재 페이지의 script  태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 네번째 파라미터로 전달한다. -->
-<!-- ::div#divRegisterFrm 은 현재 페이지의 div#divRegisterFrm 태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 다섯번째 파라미터로 전달한다. --> 
-<!-- 타임리프는 백엔드 서버에서 HTML을 동적으로 렌더링하는 용도로 사용된다. -->
+
 
 <head>
 <meta charset="UTF-8">
 <!--/* #스프링시큐리티08 */-->
-<title>스프링 시큐리티 회원가입</title> 
+<title>회원가입</title> 
 
 <link rel="stylesheet" th:href="@{/css/security/memberRegisterForm.css}">
 
+<!-- =========================================================
+     [임시 테스트용 의존성 로딩 - 헤더 추가시 삭제 가능]
+     - datepicker 사용을 위한 jQuery / jQuery UI (JS + CSS)
+     - daum.Postcode 사용을 위한 Kakao(daum) postcode API
+     ========================================================= -->
+
+<!-- [헤더 추가시 삭제 가능] jQuery UI CSS (datepicker 스타일) -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+
+<!-- [헤더 추가시 삭제 가능] jQuery (반드시 먼저) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- [헤더 추가시 삭제 가능] jQuery UI (datepicker 포함) -->
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<!-- [헤더 추가시 삭제 가능] Daum/Kakao 우편번호 API -->
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+<!-- ========================================================= -->
+
 <style type="text/css"></style>
 
-<!--/* 
-      자바스크립트 인라인 
-      th:inline="javascript" 은 스크립트 태그 내에서 Thymeleaf 문법([[...]])을 해석할 수 있게 해주는 설정이다.
-      JavaScript 안에서 Thymeleaf 값을 넣을 때는 th:inline="javascript" 와 /*[[뭐뭐뭐]]*/ 구문을 사용해야 한다. 
-*/-->
 <script th:inline="javascript">
  /*<![CDATA[*/
 
@@ -48,17 +58,10 @@
 			const name = $target.val().trim();
 			
 			if(name == "") {
-				// 입력하지 않거나 공백만 입력했을 경우 
-				/*	
-				   >>>> .prop() 와 .attr() 의 차이 <<<<	         
-			            .prop() ==> form 태그내에 사용되어지는 엘리먼트의 disabled, selected, checked 의 속성값 확인 또는 변경하는 경우에 사용함. 
-			            .attr() ==> 그 나머지 엘리먼트의 속성값 확인 또는 변경하는 경우에 사용함.
-			    */ 
+				
 				$("table#tblMemberRegister :input").prop("disabled", true);
 				$target.prop("disabled", false);
 				
-			//  $target.next().show();
-			//  또는
 			    $target.parent().find("span.error").show();
 				
 				$target.focus();
@@ -67,8 +70,6 @@
 				// 공백이 아닌 글자를 입력했을 경우
 				$("table#tblMemberRegister :input").prop("disabled", false);
 				
-            //	$target.next().hide();
-			//  또는
 			    $target.parent().find("span.error").hide();
 			}
 			
@@ -86,8 +87,6 @@
 				$("table#tblMemberRegister :input").prop("disabled", true);
 				$target.prop("disabled", false);
 				
-			//	$target.next().show();
-			//  또는
 			    $target.parent().find("span.error").show();
 				
 				$target.focus();
@@ -96,8 +95,6 @@
 				// 공백이 아닌 글자를 입력했을 경우
 				$("table#tblMemberRegister :input").prop("disabled", false);
 				
-            //	$target.next().hide();
-			//  또는
 			    $target.parent().find("span.error").hide();
 			}
 			
@@ -108,10 +105,7 @@
 			
 			const $target = $(e.target);
 			
-		//	const regExp = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).*$/g; 
-		//  또는
 		    const regExp = new RegExp(/^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).*$/g); 
-            //  숫자/문자/특수문자 포함 형태의 8~15자리 이내의 암호 정규표현식 객체 생성 
             
             const bool = regExp.test($target.val());
 			
@@ -120,8 +114,6 @@
 				$("table#tblMemberRegister :input").prop("disabled", true);
 				$target.prop("disabled", false);
 				
-			//	$target.next().show();
-			//  또는
 			    $target.parent().find("span.error").show();
 				
 				$target.focus();
@@ -130,8 +122,6 @@
 				// 암호가 정규표현식에 맞는 경우 
 				$("table#tblMemberRegister :input").prop("disabled", false);
 				
-            //	$target.next().hide();
-			//  또는
 			    $target.parent().find("span.error").hide();
 			}
 			
@@ -151,8 +141,6 @@
 				$target.prop("disabled", false);
 				$("input#passwd").prop("disabled", false);
 				
-			//	$target.next().show();
-			//  또는
 			    $target.parent().find("span.error").show();
 				
 			    $("input#passwd").focus();
@@ -161,8 +149,6 @@
 				// 암호와 암호확인값이 같은 경우 
 				$("table#tblMemberRegister :input").prop("disabled", false);
 				
-            //	$target.next().hide();
-			//  또는
 			    $target.parent().find("span.error").hide();
 			}
 			
@@ -173,8 +159,6 @@
 			
 			const $target = $(e.target);
 			
-		//	const regExp = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;  
-		//  또는
 		    const regExp = new RegExp(/^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i);  
             //  이메일 정규표현식 객체 생성 
             
@@ -185,8 +169,6 @@
 				$("table#tblMemberRegister :input").prop("disabled", true);
 				$target.prop("disabled", false);
 				
-			//	$target.next().show();
-			//  또는
 			    $target.parent().find("span.error").show();
 				
 				$target.focus();
@@ -195,8 +177,6 @@
 				// 이메일이 정규표현식에 맞는 경우 
 				$("table#tblMemberRegister :input").prop("disabled", false);
 				
-            //	$target.next().hide();
-			//  또는
 			    $target.parent().find("span.error").hide();
 			}
 			
@@ -207,8 +187,6 @@
 			
 			const $target = $(e.target);
 			
-		//	const regExp = /^[1-9][0-9]{2,3}$/g;  
-		//  또는
 		    const regExp = new RegExp(/^[1-9][0-9]{2,3}$/g);  
             //  숫자 3자리 또는 4자리만 들어오도록 검사해주는 정규표현식 객체 생성 
             
@@ -219,8 +197,6 @@
 				$("table#tblMemberRegister :input").prop("disabled", true);
 				$target.prop("disabled", false);
 				
-			//	$target.next().show();
-			//  또는
 			    $target.parent().find("span.error").show();
 				
 				$target.focus();
@@ -229,8 +205,6 @@
 				// 국번이 정규표현식에 맞는 경우 
 				$("table#tblMemberRegister :input").prop("disabled", false);
 				
-            //	$target.next().hide();
-			//  또는
 			    $target.parent().find("span.error").hide();
 			}
 			
@@ -241,8 +215,6 @@
 			
 			const $target = $(e.target);
 			
-		//	const regExp = /^\d{4}$/g;  
-		//  또는
 		    const regExp = new RegExp(/^\d{4}$/g);  
             //  숫자 4자리만 들어오도록 검사해주는 정규표현식 객체 생성 
             
@@ -253,8 +225,6 @@
 				$("table#tblMemberRegister :input").prop("disabled", true);
 				$target.prop("disabled", false);
 				
-			//	$target.next().show();
-			//  또는
 			    $target.parent().find("span.error").show();
 				
 				$target.focus();
@@ -263,8 +233,6 @@
 				// 마지막 전화번호 4자리가 정규표현식에 맞는 경우 
 				$("table#tblMemberRegister :input").prop("disabled", false);
 				
-            //	$target.next().hide();
-			//  또는
 			    $target.parent().find("span.error").hide();
 			}
 			
@@ -357,7 +325,7 @@
 			
 		}// end of for---------------------
 		
-     //	console.log("확인용 dd_html => " + dd_html);
+     
 		$("select#birthdd").html(dd_html);
 	 ///////////////////////////////////////////////////////////////////////////////
 	 
@@ -440,8 +408,6 @@
          
          
          // 우편번호 입력란에 키보드로 입력할 경우 이벤트 처리하기
-     //  $("input:text[id='postcode']").bind("keyup", function(){ });
-     //  또는    
          $("input:text[id='postcode']").keyup(function(){
         	 alert("우편번호 입력은 \"우편번호찾기\" 를 클릭으로만 하셔야 합니다."); 
         	 $(this).val("");
@@ -552,17 +518,6 @@
 		// **** 필수입력사항에 모두 입력이 되었는지 검사한다. **** //
 		let b_Flag_requiredInfo = false;
 	
-	/*	
-		$("input.requiredInfo").each( (index, item)=>{
-			const data = $(item).val().trim();
-			if(data == "") {
-				alert("*표시된 필수입력사항은 모두 입력하셔야 합니다.");
-				b_Flag_requiredInfo = true;
-				return false; // break; 라는 뜻이다.
-			}
-		});
-	*/
-	//  또는
 	    const requiredInfo_list = document.querySelectorAll("input.requiredInfo"); 
 	    for(let i=0; i<requiredInfo_list.length; i++) {
 	    	const val = requiredInfo_list[i].value.trim();
@@ -588,8 +543,6 @@
 	    else {
 	    	// "우편번호찾기" 을 클릭을 했을 경우 
 	    	
-            //	const regExp = /^\d{5}$/g;  
-			//  또는
 			    const regExp = new RegExp(/^\d{5}$/g);  
 	            //  숫자 5자리만 들어오도록 검사해주는 정규표현식 객체 생성 
 	            
@@ -604,7 +557,8 @@
 	            	return; // 종료
 	            }
 	            
-	            // 주소 및 상세주소 입력에 대한 유효성 검사하기는 생략합니다. 여러분들이 하세요!!!
+	            // 주소 및 상세주소 입력에 대한 유효성 검사하기 구현 필요 !!!!!
+	            
 	    }
 	    ///////////////////////////////////////////////////////
 	    
@@ -642,12 +596,6 @@
 	    frm.method = "post";
 	    frm.submit();
 	    
-	 // 또는
-	 // 현재 앱의 root 경로를 변수로 선언 (예: /myspringboot)
-	 // const contextPath = /*[[@{/}]]*/ '';
-	 // frm.action = contextPath + "security/memberRegisterEnd";
-	 // frm.method = "post";
-	 // frm.submit();
 	    
 	}// end of function goRegister()----------------------
 	
@@ -774,13 +722,7 @@
 					</td>
 				</tr>
 			</tbody>
-		<!--/* 
-			<div>
-				<button onclick="goTest()">type이 없으면 submit임</button>&nbsp;
-				<button type="button" onclick="goTest()">type이 button 인것</button>&nbsp;
-				<button type="submit">type이 submit 인것</button>&nbsp;
-			</div>
-		*/-->
+		
 		</table>
 		</form>
 	  </div>
