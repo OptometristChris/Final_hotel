@@ -1,12 +1,13 @@
-package fp.com.spring.app.room.service;
+package com.spring.app.hk.room.service;
 
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import fp.com.spring.app.room.domain.RoomTypeDTO;
-import fp.com.spring.app.room.model.RoomTypeDAO;
+import com.spring.app.hk.room.domain.RoomTypeDTO;
+import com.spring.app.hk.room.model.RoomTypeDAO;
+
 import lombok.RequiredArgsConstructor;
 
 @Service

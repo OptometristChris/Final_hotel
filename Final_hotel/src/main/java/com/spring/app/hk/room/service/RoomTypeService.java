@@ -1,9 +1,9 @@
-package fp.com.spring.app.room.service;
+package com.spring.app.hk.room.service;
 
 import java.util.List;
 import java.util.Map;
 
-import fp.com.spring.app.room.domain.RoomTypeDTO;
+import com.spring.app.hk.room.domain.RoomTypeDTO;
 
 public interface RoomTypeService {
 

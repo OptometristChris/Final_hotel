@@ -1,9 +1,9 @@
-package fp.com.spring.app.room.model;
+package com.spring.app.hk.room.model;
 
 import java.util.List;
 import java.util.Map;
 
-import fp.com.spring.app.room.domain.RoomTypeDTO;
+import com.spring.app.hk.room.domain.RoomTypeDTO;
 
 public interface RoomTypeDAO {
 

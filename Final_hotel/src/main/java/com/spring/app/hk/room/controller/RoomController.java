@@ -1,4 +1,4 @@
-package fp.com.spring.app.room.controller;
+package com.spring.app.hk.room.controller;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,8 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import fp.com.spring.app.room.domain.RoomTypeDTO;
-import fp.com.spring.app.room.service.RoomTypeService;
+import com.spring.app.hk.room.domain.RoomTypeDTO;
+import com.spring.app.hk.room.service.RoomTypeService;
+
 import lombok.RequiredArgsConstructor;
 
 @Controller

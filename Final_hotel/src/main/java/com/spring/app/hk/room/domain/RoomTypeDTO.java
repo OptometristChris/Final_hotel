@@ -1,4 +1,4 @@
-package fp.com.spring.app.room.domain;
+package com.spring.app.hk.room.domain;
 
 import lombok.Data;
 

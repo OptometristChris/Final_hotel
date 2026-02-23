@@ -1,4 +1,4 @@
-package fp.com.spring.app.room.model;
+package com.spring.app.hk.room.model;
 
 import java.util.List;
 import java.util.Map;
@@ -7,7 +7,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import fp.com.spring.app.room.domain.RoomTypeDTO;
+import com.spring.app.hk.room.domain.RoomTypeDTO;
 
 @Repository
 public class RoomTypeDAO_imple implements RoomTypeDAO {
