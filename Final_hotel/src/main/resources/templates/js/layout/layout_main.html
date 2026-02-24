@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ko" 
+      xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout(title, link, style, script, content)">
+<head>
+    <meta charset="UTF-8">
+    <title th:replace="${title}">CIEL HOTEL</title>
+
+    <link rel="stylesheet" th:href="@{/bootstrap-4.6.2-dist/css/bootstrap.min.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <th:block th:replace="${link}"></th:block>
+    <th:block th:replace="${style}"></th:block>
+
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; margin: 0; padding: 0; }
+
+        /* --- 헤더 스타일 --- */
+        .ciel-header { 
+            width: 100%; 
+            position: absolute; 
+            top: 0; 
+            z-index: 1000; 
+            background: rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .top-util { 
+            font-size: 0.75rem; 
+            color: #eee; 
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .top-util a { color: #eee; margin-left: 15px; text-decoration: none; }
+
+        .nav-section {
+            width: 100%;
+            transition: all 0.4s ease;
+            padding: 15px 0;
+        }
+
+        .nav-section.scrolled {
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.9) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            padding: 10px 0;
+            z-index: 1001;
+        }
+
+        .nav-link { color: #fff !important; font-weight: 500; margin: 0 15px; }
+        
+        .navbar-brand { display: flex; align-items: center; transition: all 0.3s ease; }
+        .navbar-brand img { height: 100px; width: auto; transition: all 0.3s ease; }
+        .navbar-brand strong { color: #d4af37; font-size: 1.4rem; letter-spacing: 2px; font-weight: 700; transition: all 0.3s ease; }
+
+        .nav-section.scrolled .navbar-brand img { height: 80px; }
+        .nav-section.scrolled .navbar-brand strong { font-size: 1rem; }
+
+        /* --- [핵심] 예약 플로팅 버튼 스타일 --- */
+        .fixed-reserve-btn {
+            position: fixed;
+            right: 40px;
+            bottom: 40px;
+            width: 110px;
+            height: 110px;
+            background-color: rgba(70, 60, 50, 0.85); /* 럭셔리 브라운 톤 */
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 2500;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .fixed-reserve-btn:hover { transform: scale(1.05); background-color: rgba(50, 40, 30, 0.95); }
+        .fixed-reserve-btn i { font-size: 2rem; margin-bottom: 5px; }
+        .fixed-reserve-btn span { font-size: 0.85rem; font-weight: 500; letter-spacing: 1px; }
+
+        /* --- [핵심] 예약 퀵 탭 스타일 --- */
+        .reserve-quick-tab {
+            position: fixed;
+            right: 40px;
+            bottom: 160px; /* 버튼 위 위치 */
+            width: 360px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: none; /* 초기 숨김 */
+            z-index: 2400;
+            overflow: hidden;
+            animation: slideUp 0.4s ease;
+        }
+
+        .reserve-quick-tab.active { display: block; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-header { display: flex; background: #f4f4f4; }
+        .tab-btn { flex: 1; padding: 18px; border: none; font-weight: 700; color: #666; transition: 0.3s; }
+        .tab-btn.active { background: #1a1a1a; color: #fff; } /* 활성 탭 */
+
+        .tab-body { padding: 30px; }
+        .reserve-field { 
+            width: 100%; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            background: #f8f9fa; 
+            border: 1px solid #eee; 
+            border-radius: 5px; 
+            text-align: left;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .search-submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #1a1a1a;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-weight: 700;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        .search-submit-btn:hover { background: #d4af37; }
+
+        /* 푸터 */
+        .footer { background-color: #000; color: #fff; padding: 60px 0; }
+        .footer-logo { font-size: 1.5rem; letter-spacing: 5px; margin-bottom: 20px; color: #d4af37; }
+    </style>
+</head>
+<body>
+
+    <header class="ciel-header">
+        <div class="top-util">
+            <div class="container-fluid py-2 px-md-5 d-flex justify-content-end">
+                <a href="#"><i class="fas fa-headset mr-1"></i> 고객지원</a>
+                <a th:href="@{#}">로그인</a>
+                <a th:href="@{#}">회원가입</a>
+                <a href="#">예약조회</a>
+            </div>
+        </div>
+        
+        <div class="nav-section">
+            <div class="container-fluid px-md-5">
+                <nav class="navbar navbar-expand-lg justify-content-center p-0">
+                    <a class="navbar-brand position-absolute" href="/final_hotel/" style="left: 0;">
+					    <img th:src="@{/js_images/ciel_logo.png}" alt="CIEL 로고">
+					    <strong>CIEL</strong>
+					</a>
+                    <ul class="navbar-nav">
+                    	<li class="nav-item"><a class="nav-link" href="#">브랜드</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">객실</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">다이닝</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">프로모션</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">부대시설</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">호텔 위치</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="fixed-reserve-btn" onclick="toggleReserveTab()">
+        <i class="far fa-calendar-alt"></i>
+        <span>예약하기</span>
+    </div>
+
+    <div id="reserveQuickTab" class="reserve-quick-tab">
+	    <div class="tab-header">
+	        <button class="tab-btn active" id="tab-room-btn" onclick="switchReserveTab('room')">객실</button>
+	        <button class="tab-btn" id="tab-dining-btn" onclick="switchReserveTab('dining')">다이닝</button>
+	    </div>
+	    <div class="tab-body">
+	        <div id="room-fields">
+	            <button class="reserve-field"><i class="far fa-calendar mr-2"></i> 체크인 / 체크아웃</button>
+	            <button class="reserve-field"><i class="fas fa-bed mr-2"></i> 호텔 선택</button>
+	        </div>
+	
+	        <div id="dining-fields" style="display: none;">
+	            <button class="reserve-field"><i class="far fa-calendar-alt mr-2"></i> 방문 날짜</button>
+	            <button class="reserve-field"><i class="fas fa-utensils mr-2"></i> 레스토랑 선택</button>
+	        </div>
+	
+	        <button class="reserve-field"><i class="fas fa-user-friends mr-2"></i> 인원수</button>
+	        <button class="search-submit-btn">검색 하기</button>
+	    </div>
+	</div>
+
+    <main>
+        <th:block th:replace="${content}"></th:block>
+    </main>
+
+    <footer class="footer mt-0 text-center">
+        <div class="container">
+            <div class="footer-logo">CIEL LECIEL</div>
+            <p class="small text-muted mb-4">
+                서울특별시 송파구 잠실로 313 (잠실동) CIEL HOTEL<br>
+                TEL: 02-4982-5177 | EMAIL: ciel0209@gmail.com
+            </p>
+            <p class="small text-muted mb-0">© 2026 CIEL HOTEL. ALL RIGHTS RESERVED.</p>
+        </div>
+    </footer>
+
+    <script th:src="@{/jquery-ui-1.13.1.custom/external/jquery/jquery.js}"></script>
+    <script th:src="@{/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js}"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // 헤더 스크롤 제어
+            var $navSection = $('.nav-section');
+            var threshold = $('.top-util').outerHeight();
+
+            $(window).scroll(function() {
+                if ($(window).scrollTop() > threshold) {
+                    $navSection.addClass('scrolled');
+                } else {
+                    $navSection.removeClass('scrolled');
+                }
+            });
+        });
+
+        /* 예약 탭 토글 함수 */
+        function toggleReserveTab() {
+            $('#reserveQuickTab').toggleClass('active');
+        }
+
+        /* 객실/다이닝 전환 함수 */
+        function switchReserveTab(type) {
+            $('.tab-btn').removeClass('active');
+            if(type === 'room') {
+                $('#tab-room').addClass('active');
+            } else {
+                $('#tab-dining').addClass('active');
+            }
+        }
+
+        /* 외부 클릭 시 닫기 */
+        $(document).mouseup(function(e) {
+            var container = $("#reserveQuickTab");
+            var btn = $(".fixed-reserve-btn");
+            if (!container.is(e.target) && container.has(e.target).length === 0 && !btn.is(e.target) && btn.has(e.target).length === 0) {
+                container.removeClass('active');
+            }
+        });
+        
+        function switchReserveTab(type) {
+            // 1. 버튼 활성화 상태 변경
+            $('.tab-btn').removeClass('active');
+            
+            // 2. 탭 내용 변경
+            if(type === 'room') {
+                $('#tab-room-btn').addClass('active');
+                $('#room-fields').show();    // 객실 필드 보이기
+                $('#dining-fields').hide();  // 다이닝 필드 숨기기
+            } else {
+                $('#tab-dining-btn').addClass('active');
+                $('#room-fields').hide();    // 객실 필드 숨기기
+                $('#dining-fields').show();  // 다이닝 필드 보이기
+            }
+        }
+        
+    </script>
+    
+    <th:block th:replace="${script}"></th:block>
+</body>
+</html>
