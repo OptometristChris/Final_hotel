@@ -93,8 +93,10 @@ local.properties
 hs_err_pid*
 replay_pid*
 
+
+
+# End of https://www.toptal.com/developers/gitignore/api/java,eclipse
+
 #깃이그노어
 /Final_hotel/src/main/resources/mybatis/mybatis-config.xml
 /Final_hotel/src/main/resources/static/SQL/FinalProject.sql
-
-# End of https://www.toptal.com/developers/gitignore/api/java,eclipse
