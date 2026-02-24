@@ -36,6 +36,9 @@ body { font-family: Arial; }
 }
 </style>
 
+<!-- FullCalendar CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+
 </head>
 <body>
 
@@ -101,16 +104,46 @@ body { font-family: Arial; }
             <div class="price">
                 ₩ <span th:text="${room.base_price}"></span>
             </div>
+            
+            <div style="margin-top:20px;">
+			    <button th:onclick="'openCalendar(' + ${room.room_type_id} + ')'">
+				    예약하기
+				</button>
+			</div>
         </div>
-
-    </div>
-
+    </div>	
 </div>
+
+
+<!-- =======================
+	 예약 모달
+	======================= -->
+<div id="calendarModal"
+     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+
+    <div style="background:white; width:900px; margin:80px auto; padding:30px; position:relative;">
+        <button onclick="closeModal()" style="position:absolute; right:10px; top:10px;">X</button>
+
+        <h2>날짜 선택</h2>
+
+        <!-- 실제 달력 -->
+        <div id="calendar"></div>
+    </div>
+</div>
+
 
 <!-- ===============================
      AJAX 스크립트
      =============================== -->
+
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
 <script>
+
+// ===============================
+// 필터 AJAX
+// ===============================
 document.getElementById("filterForm").addEventListener("submit", function(e){
     e.preventDefault();
 
@@ -147,6 +180,13 @@ document.getElementById("filterForm").addEventListener("submit", function(e){
                             <div>침대: ${room.bed_type}</div>
                             <div>전망: ${room.view_type}</div>
                             <div class="price">₩ ${room.base_price}</div>
+
+                            <div style="margin-top:20px;">
+                                <button onclick="openCalendar(${room.room_type_id})">
+                                    예약하기
+                                </button>
+                            </div>
+
                         </div>
                     </div>
                 `;
@@ -154,6 +194,47 @@ document.getElementById("filterForm").addEventListener("submit", function(e){
 
         });
 });
+
+
+// ===============================
+// 달력 모달
+// ===============================
+let calendarInstance = null;
+
+function openCalendar(roomId) {
+
+    document.getElementById("calendarModal").style.display = "block";
+
+    fetch(`/final_hotel/room/calendar?room_id=${roomId}`)
+        .then(res => res.json())
+        .then(data => {
+
+            const events = data.map(day => ({
+                title: "₩ " + day.FINAL_PRICE,
+                start: day.STAY_DATE,
+                allDay: true
+            }));
+
+            const calendarEl = document.getElementById("calendar");
+
+            if(calendarInstance !== null){
+                calendarInstance.destroy();
+            }
+
+            calendarInstance = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: 650,
+                events: events
+            });
+
+            calendarInstance.render();
+        });
+}
+
+function closeModal(){
+    document.getElementById("calendarModal").style.display = "none";
+}
+
 </script>
 
 </body>

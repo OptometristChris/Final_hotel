@@ -89,4 +89,42 @@
 
     </select>
 
+    
+    <!-- 날짜별 가격 조회 -->
+    <select id="selectCalendarPrice"
+        parameterType="int"
+        resultType="map">
+
+	    SELECT
+	        TO_CHAR(s.stay_date, 'YYYY-MM-DD') AS stay_date,
+	
+	        ROUND(
+	            rt.base_price
+	            * NVL((
+	                SELECT se.price_rate
+	                FROM SEASON se
+	                WHERE s.stay_date BETWEEN se.start_date AND se.end_date
+	                ORDER BY se.priority DESC
+	                FETCH FIRST 1 ROWS ONLY
+	            ), 1)
+	            * NVL(wr.rate_multiplier, 1)
+	        ) AS final_price,
+	
+	        s.available_count
+	
+	    FROM ROOM_STOCK s
+	    JOIN ROOM_TYPE rt
+	      ON s.room_type_id = rt.room_type_id
+	
+	    LEFT JOIN WEEKDAY_RATE wr
+	      ON wr.fk_hotel_id = rt.fk_hotel_id
+	     AND wr.day_of_week = TO_NUMBER(TO_CHAR(s.stay_date, 'D'))
+	
+	    WHERE s.room_type_id = #{value}
+	      AND s.stay_date BETWEEN TRUNC(SYSDATE)
+                    AND ADD_MONTHS(TRUNC(SYSDATE), 12)
+	
+	    ORDER BY s.stay_date
+	
+	</select>
 </mapper>

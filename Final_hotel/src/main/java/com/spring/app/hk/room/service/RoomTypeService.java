@@ -15,4 +15,7 @@ public interface RoomTypeService {
 
     // 객실 상세 페이지 조회
     RoomTypeDTO getRoomDetail(Long roomId);
+
+    // 날짜별 가격 조회
+	List<Map<String, Object>> getCalendarPrice(int room_id);
 }

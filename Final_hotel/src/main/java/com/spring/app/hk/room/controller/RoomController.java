@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,16 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class RoomController {
 
     private final RoomTypeService roomService;
-    private final DataSource dataSource;
 
-    /* ==============================
-       🔎 DB 연결 확인용
-       ============================== */
-    @GetMapping("/dbcheck")
-    @ResponseBody
-    public String dbCheck() throws Exception {
-        return dataSource.getConnection().getMetaData().getURL();
-    }
 
     /* ==============================
        1. 객실 목록 페이지 조회
@@ -82,5 +72,14 @@ public class RoomController {
         mav.setViewName("room/detail");
 
         return mav;
+    }
+    
+    // 달력 모달 띄우기
+    @GetMapping("/room/calendar")
+    @ResponseBody
+    public List<Map<String,Object>> getCalendar(
+            @RequestParam(name="room_id")  int room_id) {
+
+        return roomService.getCalendarPrice(room_id);
     }
 }

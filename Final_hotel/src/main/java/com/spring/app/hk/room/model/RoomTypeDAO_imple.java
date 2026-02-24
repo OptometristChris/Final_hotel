@@ -33,4 +33,10 @@ public class RoomTypeDAO_imple implements RoomTypeDAO {
         return sqlsession.selectOne("room.selectRoomDetail", roomId);
     }
 
+    // 날짜별 가격 조회
+    @Override
+    public List<Map<String, Object>> selectCalendarPrice(int room_id) {
+        return sqlsession.selectList("room.selectCalendarPrice", room_id);
+    }
+
 }

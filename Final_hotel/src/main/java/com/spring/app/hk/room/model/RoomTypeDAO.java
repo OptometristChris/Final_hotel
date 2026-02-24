@@ -16,5 +16,7 @@ public interface RoomTypeDAO {
     // 객실 상세 페이지 조회
 	RoomTypeDTO selectRoomDetail(Long roomId);
 
+	// 날짜별 가격 조회
+	List<Map<String, Object>> selectCalendarPrice(int room_id);
 	
 }
