@@ -5,6 +5,7 @@ import javax.sql.DataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
   - @Transactional 을 인식하여 트랜잭션 AOP 프록시를 적용한다.
   - 서비스 계층에서 여러 DB 작업을 "한 단위 작업"으로 묶어 커밋/롤백을 자동 처리할 수 있게 한다.
 */
+@MapperScan(basePackages= {"com.spring.app.jh.security.model"}, sqlSessionFactoryRef="sqlSessionFactory")
 public class DataSourceConfig {
 
     /*

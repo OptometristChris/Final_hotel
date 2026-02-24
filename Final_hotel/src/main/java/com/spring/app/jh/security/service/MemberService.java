@@ -9,7 +9,7 @@ public interface MemberService {
 	
 	
 
-	// ===== MemberAuthenticationSuccessHandler 에서 사용하는 메서드들 ==== //
+	// ===== MemberController 에서 사용하는 메서드들 ==== //
 	// id 중복 검사
 	int member_id_check(String memberid);
 
@@ -17,14 +17,24 @@ public interface MemberService {
 	int emailDuplicateCheck(String email);
 
 	// 회원가입
-	void insert_member(MemberDTO memberdto);
+	int insert_member(MemberDTO memberdto) throws Exception;
 
 	// 비밀번호 변경
 	int passwdChange(Map<String, String> paraMap);
 
 	// 전체 회원 조회
 	List<MemberDTO> getAllMember();
+	
+	// 회원정보 수정 저장
+	int update_member_profile(MemberDTO memberdto);
+	
+	// 로그인한 사용자 정보(아이디와 성명)를 세션에 저장
+	MemberDTO findByMemberid(String memberid);
+	// ===== MemberController 에서 사용하는 메서드들 ==== //
 
+	
+	
+	// ===== MemberAuthenticationSuccessHandler 에서 사용하는 메서드들 ==== //
 	// 가장 최근 비밀번호 변경일자 조회
 	int lastPasswdChangeMonth(String memberid);
 
@@ -33,10 +43,15 @@ public interface MemberService {
 
 	// 로그인 기록 테이블에 최근 로그인 기록 저장
 	void insertLoginhistory(Integer memberNo, String clientip);
-
-	// 로그인한 사용자 정보(아이디와 성명)를 세션에 저장
-	MemberDTO findByUsername(String memberid);
 	// ===== MemberAuthenticationSuccessHandler 에서 사용하는 메서드들 ==== //
+	
+	
+	
+	
+	
+
+	
+	
 
 	
 	
