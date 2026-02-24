@@ -124,7 +124,51 @@
 	      AND s.stay_date BETWEEN TRUNC(SYSDATE)
                     AND ADD_MONTHS(TRUNC(SYSDATE), 12)
 	
-	    ORDER BY s.stay_date
+	    ORDER BY s.stay_date	
 	
 	</select>
+	
+	<!-- room stock -->
+	<select id="selectStockForUpdate" parameterType="map" resultType="int">
+		SELECT available_count
+		FROM ROOM_STOCK
+		WHERE room_type_id = #{room_type_id}
+		AND stay_date = #{stay_date}
+		FOR UPDATE
+	</select>
+	
+	<!-- decrese stock -->
+	<update id="decreaseStock" parameterType="map">
+	    UPDATE ROOM_STOCK
+	    SET available_count = available_count - 1
+	    WHERE room_type_id = #{room_type_id}
+	    AND stay_date = #{stay_date}
+	</update>
+	
+	
+	
+	
+	<select id="selectFinalPrice"
+        parameterType="map"
+        resultType="int">
+
+    SELECT
+        ROUND(
+            rt.base_price
+            * NVL((SELECT se.price_rate
+                   FROM SEASON se
+                   WHERE #{stay_date} BETWEEN se.start_date AND se.end_date
+                   ORDER BY se.priority DESC
+                   FETCH FIRST 1 ROWS ONLY), 1)
+            * NVL(wr.rate_multiplier, 1)
+        ) AS final_price
+
+    FROM ROOM_TYPE rt
+    LEFT JOIN WEEKDAY_RATE wr
+        ON wr.fk_hotel_id = rt.fk_hotel_id
+       AND wr.day_of_week = TO_NUMBER(TO_CHAR(#{stay_date}, 'D'))
+    WHERE rt.room_type_id = #{room_type_id}
+
+</select>
+	
 </mapper>

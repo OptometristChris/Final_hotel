@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="reservation">
+
+   <insert id="insertReservation">
+		INSERT INTO RESERVATION (
+		    reservation_id,
+		    member_no,
+		    room_type_id,
+		    checkin_date,
+		    checkout_date,
+		    guest_count,
+		    total_price,
+		    reservation_status
+		)
+		VALUES (
+		    SEQ_RESERVATION.NEXTVAL,
+		    #{member_no},
+		    #{room_type_id},
+		    #{checkin_date},
+		    #{checkout_date},
+		    #{guest_count},
+		    #{total_price},
+		    #{reservation_status}
+		)
+	</insert>
+
+</mapper>

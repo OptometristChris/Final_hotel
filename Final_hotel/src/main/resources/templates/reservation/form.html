@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>예약 정보 입력</title>
+</head>
+<body>
+
+<h2>예약 정보 입력</h2>
+
+<hr>
+
+<!-- 선택한 날짜 정보 표시 -->
+<p>
+    체크인: <span th:text="${check_in}"></span><br>
+    체크아웃: <span th:text="${check_out}"></span>
+</p>
+
+<hr>
+
+<form th:action="@{/reservation/create}" method="post">
+
+    <!-- 🔥 hidden으로 값 유지 (중요) -->
+    <input type="hidden" name="room_type_id" th:value="${room_type_id}">
+    <input type="hidden" name="check_in" th:value="${check_in}">
+    <input type="hidden" name="check_out" th:value="${check_out}">
+
+    <!-- 투숙 인원 (나중에 DTO에 연결 가능) -->
+    <label>투숙 인원:</label>
+    <input type="number" name="guest_count" value="2" min="1" max="4">
+
+    <br><br>
+
+    <!-- 조식 옵션 (나중에 확장 가능) -->
+    <label>
+        <input type="checkbox" name="breakfast" value="Y">
+        조식 추가
+    </label>
+
+    <br><br>
+
+    <button type="submit">예약 확정</button>
+
+</form>
+
+</body>
+</html>
