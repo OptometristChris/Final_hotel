@@ -1,4 +1,4 @@
-package fp.com.spring.app.common;
+package com.spring.app.common;
 
 public class SecretMyKey {
 	
