@@ -153,7 +153,7 @@
             }, speed, 'linear');
         }
 
-        // 3. 슬라이더 이벤트 연결
+        // 3. 슬라이더 이벤트 연결	
         $slider.on('init reInit afterChange', function() {
             startProgressBar();
             $slider.slick('slickPlay'); /* [추가] 사용자가 넘긴 후에도 자동 재생 강제 실행 */
@@ -184,10 +184,30 @@
 <section>
     <div class="main-visual">
         <div class="main-slider">
-            <div class="slide-item"><img th:src="@{/js_images/cielHotel.png}" alt="배너 1"></div>
-            <div class="slide-item"><img th:src="@{/js_images/leCiel.png}" alt="배너 2"></div>
-            <div class="slide-item"><img th:src="@{/js_images/room3.jpg}" alt="배너 3"></div>
-        </div>
+	    <div class="slide-item-wrapper">
+	        <div class="slide-item">
+	            <img th:src="@{/js_images/cielHotel.png}" alt="배너 1">
+	        </div>
+	        <div class="room-info-overlay position-absolute" style="bottom: 25%; left: 10%; z-index: 10;">
+	            <h6 class="text-white font-weight-bold mb-2" style="opacity:0.9; font-size: 1.5rem; letter-spacing: 2px;">hotelCiel</h6>
+	            <h5 class="text-white font-weight-bold mb-0" style="font-size: 3.5rem; line-height: 1.2; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);">
+	                비스타 디럭스 패밀리 <br> 트윈 룸
+	            </h5>
+	        </div>
+	    </div>
+	    
+	    <div class="slide-item-wrapper">
+	        <div class="slide-item">
+	            <img th:src="@{/js_images/leCiel.png}" alt="배너 2">
+	        </div>
+	        <div class="room-info-overlay position-absolute" style="bottom: 25%; left: 10%; z-index: 10;">
+	            <h6 class="text-white font-weight-bold mb-2" style="opacity:0.9; font-size: 1.5rem; letter-spacing: 2px;">leCiel</h6>
+	            <h5 class="text-white font-weight-bold mb-0" style="font-size: 3.5rem; line-height: 1.2; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);">
+	                고품격 휴식의 완성 <br> 그랜드 디럭스 룸
+	            </h5>
+	        </div>
+	    </div>
+	</div>
 
         <div class="slider-progress-container">
             <div class="progress-bar-bg">
