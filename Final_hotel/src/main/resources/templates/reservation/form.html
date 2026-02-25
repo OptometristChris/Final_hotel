@@ -18,9 +18,9 @@
 
 <hr>
 
-<form th:action="@{/reservation/create}" method="post">
+<form id="reservationForm">
 
-    <!-- 🔥 hidden으로 값 유지 (중요) -->
+    <!--  hidden으로 값 유지 (중요) -->
     <input type="hidden" name="room_type_id" th:value="${room_type_id}">
     <input type="hidden" name="check_in" th:value="${check_in}">
     <input type="hidden" name="check_out" th:value="${check_out}">
@@ -39,9 +39,44 @@
 
     <br><br>
 
-    <button type="submit">예약 확정</button>
+    <button type="button" onclick="requestPay()">결제하기</button>
 
 </form>
 
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+
+<script>
+    var IMP = window.IMP;
+    IMP.init("imp76388561"); 
+
+    function requestPay() {
+
+        var amount = 100;
+
+        var merchantUid = "order_" + new Date().getTime();
+
+        IMP.request_pay({
+            pg: "html5_inicis",   // 테스트 PG
+            pay_method: "card",
+            merchant_uid: merchantUid,
+            name: "호텔 예약 결제",
+            amount: amount,
+            buyer_name: "테스트사용자",
+            buyer_tel: "01012345678"
+        }, function (rsp) {
+
+            if (rsp.success) {
+                console.log("결제 성공");
+                console.log("imp_uid:", rsp.imp_uid);
+                console.log("merchant_uid:", rsp.merchant_uid);
+                alert("결제 성공!");
+            } else {
+                console.log("결제 실패:", rsp.error_msg);
+                alert("결제 실패: " + rsp.error_msg);
+            }
+
+        });
+    }
+</script>
 </body>
 </html>

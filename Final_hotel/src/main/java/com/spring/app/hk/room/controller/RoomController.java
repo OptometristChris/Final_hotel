@@ -22,7 +22,6 @@ public class RoomController {
 
     private final RoomTypeService roomService;
 
-
     /* ==============================
        1. 객실 목록 페이지 조회
        ============================== */
@@ -74,7 +73,9 @@ public class RoomController {
         return mav;
     }
     
-    // 달력 모달 띄우기
+    /* ==============================
+       4. 달력 모달 띄우기
+       ============================== */
     @GetMapping("/room/calendar")
     @ResponseBody
     public List<Map<String,Object>> getCalendar(

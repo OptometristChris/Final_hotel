@@ -254,7 +254,8 @@ public class SecurityConfig {
             "/images/**",
             "/product/list",
             "/room/**",
-            "/reservation/**"
+            "/reservation/**",
+            "/payment/**"
         };
 
         httpSecurity
