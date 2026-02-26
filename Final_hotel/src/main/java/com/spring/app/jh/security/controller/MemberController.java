@@ -1,11 +1,14 @@
 package com.spring.app.jh.security.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
+// import org.springframework.security.crypto.password.PasswordEncoder;  // ★ 제거
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.spring.app.common.AES256;
 import com.spring.app.jh.security.domain.MemberDTO;
 import com.spring.app.jh.security.domain.Session_MemberDTO;
 import com.spring.app.jh.security.service.MemberService;
@@ -29,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberController {
 	
 	private final MemberService memberService;	
-	private final PasswordEncoder passwordEncoder; 	
+	// private final PasswordEncoder passwordEncoder; 	// ★ 제거
 	
 	// 회원가입 form 페이지
 	@GetMapping("memberRegister")
@@ -89,8 +93,6 @@ public class MemberController {
     @PostMapping("memberRegisterEnd")
     public String memberRegisterEnd(MemberDTO memberdto, Model model) {
 
-        String hashedUserPwd = passwordEncoder.encode(memberdto.getPasswd());
-        memberdto.setPasswd(hashedUserPwd);
 
         try {
             int n = memberService.insert_member(memberdto); 
@@ -118,8 +120,7 @@ public class MemberController {
     }
     
     
-    
- // 로그인 인증 form 페이지 보여주기
+    // 로그인 인증 form 페이지 보여주기
     @GetMapping(value="login")
     public String login(HttpServletRequest request){
 
@@ -130,7 +131,7 @@ public class MemberController {
             SavedRequest 를 읽어 원래 가려던 페이지로 자동 redirect 한다.
           - 따라서 여기서 referer 를 세션에 prevURLPage 로 저장하는 방식은 제거한다.
        */
-
+    	
        // login 실패여부 체크하기
        String loginFail = request.getParameter("loginFail");
 
@@ -184,8 +185,8 @@ public class MemberController {
     @PostMapping(value="passwdChange")
     public String passwdChange(@RequestParam Map<String, String> paraMap, Model model){
        
-       String hashedUserPwd = passwordEncoder.encode(paraMap.get("passwd"));
-       paraMap.put("passwd", hashedUserPwd);
+       // String hashedUserPwd = passwordEncoder.encode(paraMap.get("passwd"));  // ★ 제거
+       // paraMap.put("passwd", hashedUserPwd);                                  // ★ 제거
        
        int result = memberService.passwdChange(paraMap);
        model.addAttribute("result", result);
@@ -227,6 +228,8 @@ public class MemberController {
 
         return "security/member/profileEditResult";
     }
+    
+    
     
     
     
@@ -286,8 +289,6 @@ public class MemberController {
        return "security/special_memberOnly";
     // src/main/resources/templates/security/special_memberOnly.html 파일 생성해줘야 함
     }
-    
-    
     
     
     

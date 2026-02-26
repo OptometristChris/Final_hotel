@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::div.container})}"
+      lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>지점관리자 대시보드 | CIEL</title>
+
+  <link rel="stylesheet" href="">
+
+  <style type="text/css">
+    .dash-wrap{max-width:1100px;margin:0 auto}
+    .dash-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:16px 0}
+    .dash-title{font-size:24px;font-weight:800}
+    .muted{opacity:.7}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .card{border:1px solid #e8ddd7;border-radius:18px;padding:16px;background:#fff;box-shadow:0 18px 38px rgba(0,0,0,.06)}
+    .card h3{margin:0 0 8px 0;font-size:16px}
+    .kpi{font-size:28px;font-weight:800;line-height:1.1}
+    .chip{display:inline-block;padding:6px 10px;border-radius:999px;background:#efe7e2;color:#2b2420;font-size:12px}
+    .table{width:100%;border-collapse:collapse}
+    .table th,.table td{padding:10px;border-bottom:1px solid #eee;text-align:left;font-size:14px}
+  </style>
+
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    /*]]>*/
+  </script>
+</head>
+
+<body>
+<div class="container">
+  <div class="dash-wrap">
+
+    <div class="dash-top">
+      <div>
+        <div class="dash-title">지점관리자 대시보드</div>
+
+        <!-- 실데이터: 세션 -->
+        <div class="muted" th:if="${session.sessionAdminDTO != null}">
+          <span class="chip" th:text="${session.sessionAdminDTO.admin_type}">BRANCH</span>
+          <span style="margin-left:8px" th:text="${session.sessionAdminDTO.name}">관리자명</span>
+          <span style="margin-left:8px" th:if="${session.sessionAdminDTO.fk_hotel_id != null}"
+                th:text="'호텔ID: ' + ${session.sessionAdminDTO.fk_hotel_id}">호텔ID: 1</span>
+        </div>
+
+        <!-- [DUMMY] 세션이 아직 세팅 안된 경우 더미 -->
+        <!-- [DUMMY-START] -->
+        <div class="muted" th:unless="${session.sessionAdminDTO != null}">
+          <span class="chip">BRANCH</span>
+          <span style="margin-left:8px">지점관리자 홍길동</span>
+          <span style="margin-left:8px">호텔ID: 1</span>
+        </div>
+        <!-- [DUMMY-END] -->
+
+      </div>
+
+      <div>
+        <a class="chip" th:href="@{/admin/branch/account/myInfo}">내 정보</a>
+        <a class="chip" th:href="@{/admin/branch/account/profileEdit}" style="margin-left:6px">정보 수정</a>
+      </div>
+    </div>
+
+
+    <div class="grid">
+
+      <div class="card" style="grid-column: span 4;">
+        <h3>객실 가동률</h3>
+
+        <!-- [DUMMY] 지금은 컨트롤러에서 KPI를 안 주므로 더미 -->
+        <!-- 나중에 model에 occupancyRate 주면 아래 th:if 블록만 살리면 됨 -->
+        <!-- [DUMMY-START] -->
+        <div class="kpi" th:if="${occupancyRate != null}" th:text="${occupancyRate} + '%'">78%</div>
+        <div class="kpi" th:unless="${occupancyRate != null}">78%</div>
+        <div class="muted">기간: 오늘/주/월</div>
+        <!-- [DUMMY-END] -->
+      </div>
+
+      <div class="card" style="grid-column: span 4;">
+        <h3>체크인/체크아웃</h3>
+
+        <!-- [DUMMY-START] -->
+        <div class="kpi" th:if="${checkinCount != null}" th:text="${checkinCount}">12</div>
+        <div class="kpi" th:unless="${checkinCount != null}">12</div>
+        <div class="muted">
+          체크아웃:
+          <span th:if="${checkoutCount != null}" th:text="${checkoutCount}">8</span>
+          <span th:unless="${checkoutCount != null}">8</span>
+        </div>
+        <!-- [DUMMY-END] -->
+      </div>
+
+      <div class="card" style="grid-column: span 4;">
+        <h3>미처리 업무</h3>
+
+        <!-- [DUMMY-START] -->
+        <div class="muted">결제대기 / 미답변 QnA / 기타</div>
+        <div style="margin-top:10px">
+          <span class="chip">결제대기 2</span>
+          <span class="chip" style="margin-left:6px">미답변 QnA 1</span>
+        </div>
+        <!-- [DUMMY-END] -->
+      </div>
+
+
+      <div class="card" style="grid-column: span 12;">
+        <h3>오늘 예약 현황</h3>
+
+        <!-- 실데이터(예시: reservationList 제공 시) -->
+        <div th:if="${reservationList != null and !#lists.isEmpty(reservationList)}">
+          <table class="table">
+            <thead>
+            <tr>
+              <th>상태</th><th>예약자</th><th>객실</th><th>기간</th><th>금액</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${reservationList}">
+              <td th:text="${r.status}">CONFIRMED</td>
+              <td th:text="${r.memberName}">홍길동</td>
+              <td th:text="${r.roomTypeName}">디럭스</td>
+              <td th:text="${r.stayText}">02/26~02/27</td>
+              <td th:text="${r.totalPrice}">200,000</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- [DUMMY] 아직 데이터 없으면 목업 텍스트 -->
+        <!-- [DUMMY-START] -->
+        <div th:unless="${reservationList != null and !#lists.isEmpty(reservationList)}" class="muted">
+          (더미) 오늘 예약 테이블 영역 — 백엔드에서 reservationList를 내려주면 자동으로 실데이터로 치환됩니다.
+        </div>
+        <!-- [DUMMY-END] -->
+      </div>
+
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

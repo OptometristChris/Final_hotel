@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::div.container})}"
+      lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>총괄관리자 대시보드 | CIEL</title>
+
+  <link rel="stylesheet" href="">
+
+  <style type="text/css">
+    .wrap{max-width:1100px;margin:0 auto}
+    .top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin:16px 0}
+    .title{font-size:24px;font-weight:800}
+    .muted{opacity:.7}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .card{border:1px solid #e8ddd7;border-radius:18px;padding:16px;background:#fff;box-shadow:0 18px 38px rgba(0,0,0,.06)}
+    .kpi{font-size:28px;font-weight:800;line-height:1.1}
+    .chip{display:inline-block;padding:6px 10px;border-radius:999px;background:#efe7e2;color:#2b2420;font-size:12px}
+    .card-head{display:flex;align-items:center;justify-content:space-between}
+    .link-btn{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #e8ddd7;text-decoration:none}
+  </style>
+
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    /*]]>*/
+  </script>
+</head>
+
+<body>
+<div class="container">
+  <div class="wrap">
+
+    <div class="top">
+      <div>
+        <div class="title">총괄관리자 대시보드</div>
+
+        <div class="muted" th:if="${session.sessionAdminDTO != null}">
+          <span class="chip" th:text="${session.sessionAdminDTO.admin_type}">HQ</span>
+          <span style="margin-left:8px" th:text="${session.sessionAdminDTO.name}">총괄관리자명</span>
+        </div>
+
+        <!-- [DUMMY] -->
+        <!-- [DUMMY-START] -->
+        <div class="muted" th:unless="${session.sessionAdminDTO != null}">
+          <span class="chip">HQ</span>
+          <span style="margin-left:8px">총괄관리자 홍길동</span>
+        </div>
+        <!-- [DUMMY-END] -->
+      </div>
+
+      <div>
+        <a class="chip" th:href="@{/admin/hq/account/myInfo}">내 정보</a>
+        <a class="chip" th:href="@{/admin/hq/admins}" style="margin-left:6px">지점 관리자 관리</a>
+      </div>
+    </div>
+
+
+    <div class="grid">
+
+      <div class="card" style="grid-column: span 3;">
+        <h3>객실 가동률</h3>
+        <!-- [DUMMY-START] -->
+        <div class="kpi" th:if="${kpi_occupancy != null}" th:text="${kpi_occupancy} + '%'">72%</div>
+        <div class="kpi" th:unless="${kpi_occupancy != null}">72%</div>
+        <div class="muted">기간: 최근 1개월/6개월</div>
+        <!-- [DUMMY-END] -->
+      </div>
+
+      <div class="card" style="grid-column: span 3;">
+        <h3>월간 매출(결제완료)</h3>
+        <!-- [DUMMY-START] -->
+        <div class="kpi" th:if="${kpi_sales != null}" th:text="${kpi_sales}">₩ 120,000,000</div>
+        <div class="kpi" th:unless="${kpi_sales != null}">₩ 120,000,000</div>
+        <!-- [DUMMY-END] -->
+      </div>
+
+      <div class="card" style="grid-column: span 3;">
+        <h3>월간 취소/환불률</h3>
+        <!-- [DUMMY-START] -->
+        <div class="kpi" th:if="${kpi_cancelRate != null}" th:text="${kpi_cancelRate} + '%'">4.2%</div>
+        <div class="kpi" th:unless="${kpi_cancelRate != null}">4.2%</div>
+        <!-- [DUMMY-END] -->
+      </div>
+
+      <div class="card" style="grid-column: span 3;">
+        <h3>RevPAR</h3>
+        <!-- [DUMMY-START] -->
+        <div class="kpi" th:if="${kpi_revpar != null}" th:text="${kpi_revpar}">₩ 168,000</div>
+        <div class="kpi" th:unless="${kpi_revpar != null}">₩ 168,000</div>
+        <!-- [DUMMY-END] -->
+      </div>
+
+
+      <div class="card" style="grid-column: span 8;">
+        <div class="card-head">
+          <h3 style="margin:0">예약 현황 요약</h3>
+
+          <!-- “전체보기” → 예약 그리드로 이동(아직 URL 없으니 임시 링크) -->
+          <!-- 나중에 /admin/hq/reservations/grid 같은 실제 URL로 바꿔도 됨 -->
+          <a class="link-btn" th:href="@{/admin/hq/dashboard}">전체보기</a>
+        </div>
+
+        <!-- 실데이터(예: reservationSummaryMap) -->
+        <div style="margin-top:10px" th:if="${reservationSummary != null}">
+          <span class="chip" th:text="'결제완료 ' + ${reservationSummary.paid}">결제완료 0</span>
+          <span class="chip" style="margin-left:6px" th:text="'홀드 ' + ${reservationSummary.hold}">홀드 0</span>
+          <span class="chip" style="margin-left:6px" th:text="'취소 ' + ${reservationSummary.cancel}">취소 0</span>
+        </div>
+
+        <!-- [DUMMY] -->
+        <!-- [DUMMY-START] -->
+        <div style="margin-top:10px" th:unless="${reservationSummary != null}">
+          <span class="chip">결제완료 128</span>
+          <span class="chip" style="margin-left:6px">홀드 9</span>
+          <span class="chip" style="margin-left:6px">취소/환불 6</span>
+          <div class="muted" style="margin-top:8px">
+            (더미) “오늘”이 아니라 기간 기반 요약 카드. 우측 상단 전체보기 클릭 시 예약 그리드로 이동(추후 연결).
+          </div>
+        </div>
+        <!-- [DUMMY-END] -->
+      </div>
+
+
+      <div class="card" style="grid-column: span 4;">
+        <h3>미처리 업무</h3>
+
+        <div th:if="${todoSummary != null}">
+          <div><span class="chip" th:text="'결제대기 ' + ${todoSummary.payWait}">결제대기 0</span></div>
+          <div style="margin-top:6px"><span class="chip" th:text="'미답변 QnA ' + ${todoSummary.qna}">미답변 QnA 0</span></div>
+          <div style="margin-top:6px"><span class="chip" th:text="'검수대기 ' + ${todoSummary.review}">검수대기 0</span></div>
+        </div>
+
+        <!-- [DUMMY-START] -->
+        <div th:unless="${todoSummary != null}">
+          <div><span class="chip">결제대기 3</span></div>
+          <div style="margin-top:6px"><span class="chip">미답변 QnA 2</span></div>
+          <div style="margin-top:6px"><span class="chip">검수대기(제휴) 1</span></div>
+        </div>
+        <!-- [DUMMY-END] -->
+      </div>
+
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

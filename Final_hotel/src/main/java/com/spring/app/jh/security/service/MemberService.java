@@ -7,8 +7,6 @@ import com.spring.app.jh.security.domain.MemberDTO;
 
 public interface MemberService {
 	
-	
-
 	// ===== MemberController 에서 사용하는 메서드들 ==== //
 	// id 중복 검사
 	int member_id_check(String memberid);
@@ -27,11 +25,13 @@ public interface MemberService {
 	
 	// 회원정보 수정 저장
 	int update_member_profile(MemberDTO memberdto);
-	
-	// 로그인한 사용자 정보(아이디와 성명)를 세션에 저장
-	MemberDTO findByMemberid(String memberid);
 	// ===== MemberController 에서 사용하는 메서드들 ==== //
-
+	
+	
+	// ===== MemberUserDetailsService 에서 사용하는 메서드들 ==== //
+	// !!!! 로그인 처리를 위해 사용되어지는 것임. !!!! //
+	MemberDTO findByMemberid(String memberid);
+	// ===== MemberUserDetailsService 에서 사용하는 메서드들 ==== //
 	
 	
 	// ===== MemberAuthenticationSuccessHandler 에서 사용하는 메서드들 ==== //

@@ -80,7 +80,7 @@ public class SecurityConfig {
     // 1) 관리자 체인(adminChain): /admin/** 전용 보안 규칙
     // =====================================================================
     /*
-        [왜 체인을 분리하나?]
+        [왜 체인을 분리하나?] 
         - 너 DB는 “회원 테이블”과 “관리자 테이블”이 물리적으로 분리되어 있다.
           tbl_member_security / tbl_member_authorities
           tbl_admin_security  / tbl_admin_authorities

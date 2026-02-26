@@ -20,8 +20,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   
   <!-- 직접 만든 메인 CSS --> 
-                        <!-- 소스위치 resources/static/css/mainstyle.css -->
-  <link rel="stylesheet" type="text/css" th:href="@{/css/mainstyle.css}" />
+                        <!-- 소스위치 resources/static/css/mainstyle.css 
+  <link rel="stylesheet" type="text/css" th:href="@{/css/mainstyle.css}" />-->
   
   <!-- 2. 맨 위의 layout fragment 의 link 내용으로 교체 되어짐 -->
   <link th:replace="${link}" rel="stylesheet" href="">
@@ -54,17 +54,17 @@
 		<!-- >>> 템플릿 조각 <<< 
 		     공통부분을 템플릿화 하여 필요한 부분에서 해당 템플릿을 불러와 설정하는 기능.
 		     <예> 좌측 카테고리영역, 상단 영역, 하단 영역 등 공통으로 사용되는 영역을 모듈화 시킨다. 
-		-->
-		<div id="myheader" th:insert="~{fragment/header :: main_header}"></div>
+		
+		<div id="myheader" th:insert="~{fragment/header :: main_header}"></div> -->
 		
 		<!-- 5. 맨 위의 layout fragment 의 content 내용으로 교체 되어짐 -->
-		<div id="mycontent" th:insert="${content}"></div>
+		<div id="mycontent" th:insert="${content}"></div> 
 		
 		<!-- >>> 템플릿 조각 <<< 
 		     공통부분을 템플릿화 하여 필요한 부분에서 해당 템플릿을 불러와 설정하는 기능.
 		     <예> 좌측 카테고리영역, 상단 영역, 하단 영역 등 공통으로 사용되는 영역을 모듈화 시킨다. 
-		-->		
-		<div id="myfooter" th:insert="~{fragment/footer :: footer}"></div>
+				
+		<div id="myfooter" th:insert="~{fragment/footer :: footer}"></div> -->
 	</div>
 </body>
 </html>

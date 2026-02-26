@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.crypto.password.PasswordEncoder; // ★ 추가
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ public class MemberService_imple implements MemberService {
 	
 	private final MemberDAO memberDao;
 	private final AES256 aES256;
+	private final PasswordEncoder passwordEncoder;  
 
 	@Override
 	public int member_id_check(String memberid) {
@@ -44,9 +46,13 @@ public class MemberService_imple implements MemberService {
 
 	
 
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public int insert_member(MemberDTO memberdto) throws Exception {
+		
+		// ★ 비밀번호 해시화(단방향 암호화)는 Service에서 처리한다.
+		String hashedUserPwd = passwordEncoder.encode(memberdto.getPasswd());
+		memberdto.setPasswd(hashedUserPwd);
 		
 		// 양방향 암호화 필요 : email, 휴대폰번호
 		// email
@@ -80,6 +86,11 @@ public class MemberService_imple implements MemberService {
 	@Transactional
 	@Override
 	public int passwdChange(Map<String, String> paraMap) {
+		
+		// ★ 비밀번호 해시화(단방향 암호화)는 Service에서 처리한다.
+		String hashedUserPwd = passwordEncoder.encode(paraMap.get("passwd"));
+		paraMap.put("passwd", hashedUserPwd);
+		
 	    int n = memberDao.passwdChange(paraMap);
 
 	    if(n == 1) {
