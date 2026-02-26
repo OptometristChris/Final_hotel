@@ -111,7 +111,7 @@ public class MemberAuthenticationSuccessHandler extends SavedRequestAwareAuthent
 		// >>> !!! 로그인한 사용자 정보(아이디/성명/회원번호)를 세션에 저장하도록 함. <<< !!!
 		// DDL 기준으로 이후 마이페이지/예약/히스토리 등은 member_no(FK) 중심으로 조회/수정하는 경우가 많으므로
 		// 세션에도 memberNo 를 함께 보관해두는 것이 유지보수에 유리하다.
-		MemberDTO memberDto = memberService.findByUsername(memberid);
+		MemberDTO memberDto = memberService.findByMemberid(memberid);
 
 		Session_MemberDTO sessionMemberDTO = new Session_MemberDTO();
 		sessionMemberDTO.setMemberid(memberDto.getMemberid());

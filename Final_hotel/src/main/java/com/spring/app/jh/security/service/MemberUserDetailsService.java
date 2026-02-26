@@ -36,7 +36,7 @@ public class MemberUserDetailsService implements UserDetailsService {
         (관리자 인증은 AdminUserDetailsService 에서 별도로 처리)
 	*/
 
-	private final MemberDAO memberDao;
+	private final MemberService memberService;
 
 	// !!!! 회원 로그인 처리 메서드 임 !!!! //
 	@Override
@@ -46,8 +46,8 @@ public class MemberUserDetailsService implements UserDetailsService {
 		// 우리는 UserDetails 인터페이스를 구현한 com.spring.app.security.domain.CustomUserDetails 클래스를 만들어 두었다.
 
 		// username = 로그인 폼에서 입력한 아이디(회원 memberid) 를 의미한다고 보면 된다.
-		MemberDTO memberDto = memberDao.findByUsername(username);
-		// !!! 중요함 memberDao.findByUsername(username); 을 잘 봐야 함 !!!
+		MemberDTO memberDto = memberService.findByMemberid(username);
+		// !!! 중요함 memberService.findByMemberid(username); 을 잘 봐야 함 !!!
 		// -> 여기서 DB 조회 시, 비밀번호/enabled 뿐 아니라 권한(ROLE_*)도 함께 채워져 있어야 한다(보통 authorities 테이블 조인/서브쿼리).
 
 		System.out.println("~~ [MEMBER] 확인용 memberDto : " + memberDto);
