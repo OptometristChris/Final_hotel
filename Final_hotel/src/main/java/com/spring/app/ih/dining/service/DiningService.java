@@ -1,20 +1,12 @@
 package com.spring.app.ih.dining.service;
 
-import com.spring.app.ih.dining.model.DiningDTO;
-import com.spring.app.ih.dining.mapper.DiningMapper;
-import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Map;
+import com.spring.app.ih.dining.model.DiningDTO;
 
-@Service
-public class DiningService {
-
-    private final DiningMapper diningMapper;
-
-    public DiningService(DiningMapper diningMapper) {
-        this.diningMapper = diningMapper;
-    }
-
-    public List<DiningDTO> getDiningList() {
-        return diningMapper.getDiningList();
-    }
+public interface DiningService {
+	
+    List<DiningDTO> getDiningList(Map<String, Object> paraMap);
+    
+    DiningDTO getDiningDetail(int dining_id);
 }
