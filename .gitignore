@@ -100,5 +100,6 @@ replay_pid*
 #깃이그노어
 /Final_hotel/src/main/resources/mybatis/mybatis-config.xml
 /Final_hotel/src/main/java/com/spring/app/config/DataSourceConfig.java
+/Final_hotel/src/main/java/com/spring/app/jh/security/config/SecurityConfig.java
 /Final_hotel/src/main/resources/application.yml
 /Final_hotel/src/main/resources/static/SQL/FinalProject.sql
