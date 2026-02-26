@@ -1,6 +1,8 @@
 package com.spring.app.js.notice.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,8 +59,24 @@ public class NoticeServiceimple implements NoticeService {
     }
 
     // 삭제 기능
+    @Override
     public int deleteNotice(Long noticeId) {
         return noticeDao.deleteNotice(noticeId);
+    }
+
+    // 검색 및 필터링 기능이 포함된 목록 조회
+    @Override
+    public List<NoticeDTO> getNoticeList(Long hotelId, String searchType, String keyword) {
+        // 1. 파라미터를 담을 Map 생성
+        Map<String, Object> paraMap = new HashMap<>();
+        
+        // 2. hotelId가 0(전체)이면 검색 조건에서 제외하기 위해 null 처리 혹은 그대로 전달
+        paraMap.put("hotelId", (hotelId == null || hotelId == 0) ? null : hotelId);
+        paraMap.put("searchType", searchType);
+        paraMap.put("keyword", keyword);
+        
+        // 3. DAO에 Map을 전달하여 조회
+        return noticeDao.selectNoticeListWithSearch(paraMap);
     }
 
 }

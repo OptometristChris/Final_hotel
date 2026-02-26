@@ -17,6 +17,9 @@ public interface NoticeService {
     // 4. 수정 및 삭제
     int updateNotice(NoticeDTO dto);
     int deleteNotice(Long noticeId);
+
+    // 검색 및 필터링 기능이 포함된 목록 조회
+	List<NoticeDTO> getNoticeList(Long hotelId, String searchType, String keyword);
 	
     
 }

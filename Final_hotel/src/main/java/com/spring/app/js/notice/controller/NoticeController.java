@@ -22,64 +22,76 @@ public class NoticeController {
     @Autowired
     private NoticeService noticeService;
 
+    // 1. 목록 및 검색 처리
     @GetMapping("/list")
-    public String list(@RequestParam(value = "hotelId",required = false, defaultValue = "0") Long hotelId, Model model) {
-        List<NoticeDTO> list = noticeService.getNoticeList(hotelId);
-        model.addAttribute("notices", list);
+    public String list(
+            @RequestParam(value = "hotelId", required = false, defaultValue = "0") Long hotelId,
+            @RequestParam(value = "searchType", required = false) String searchType, 
+            @RequestParam(value = "keyword", required = false) String keyword,       
+            Model model) {
+        
+        // 검색 조건을 포함하여 서비스 호출
+        // (주의: 기존 getNoticeList(hotelId) 메서드를 getNoticeList(hotelId, searchType, keyword)로 서비스에서 오버로딩하거나 수정해야 합니다)
+        List<NoticeDTO> notices = noticeService.getNoticeList(hotelId, searchType, keyword);
+
+        model.addAttribute("notices", notices);
         model.addAttribute("hotelId", hotelId);
-        return "js/notice/list"; // notice/list.html 로 이동
+        model.addAttribute("searchType", searchType); // html 드롭다운 상태 유지
+        model.addAttribute("keyword", keyword);       // html 입력창 검색어 유지
+        
+        return "js/notice/list"; 
     }
 
+    // 2. 상세 페이지
     @GetMapping("/detail/{id}")
     public String detail(@PathVariable("id") Long id, 
                          @RequestParam(value = "hotelId", defaultValue = "0") Long hotelId, 
                          Model model) {
         model.addAttribute("notice", noticeService.getNoticeDetail(id));
-        model.addAttribute("hotelId", hotelId); // 이 값이 html의 목록보기 버튼에 쓰임
+        model.addAttribute("hotelId", hotelId); 
         return "js/notice/detail";
     }
     
- // 1. 작성 페이지 띄우기
+    // 3. 작성 페이지
     @GetMapping("/write")
     public String showWriteForm(@RequestParam(value = "hotelId", required = false, defaultValue = "1") Long hotelId, Model model) {
-        // 테스트를 위해 임시 호텔 ID 1번 전달
-    	model.addAttribute("hotelId", hotelId);
+        model.addAttribute("hotelId", hotelId);
         return "js/notice/write";
     }
 
-    // 2. 작성 완료 후 데이터 처리
+    // 4. 작성 처리
     @PostMapping("/write")
     public String insertNotice(NoticeDTO dto) {
-        // 세션 구현 전까지 테스트를 위해 관리자 번호 임시 세팅 (DB에 존재하는 관리자 번호여야 함)
         if(dto.getAdminNo() == null) {
             dto.setAdminNo(2L); 
         }
-        
         noticeService.registerNotice(dto);
         return "redirect:/notice/list?hotelId=" + dto.getFkHotelId();
     }
     
-    // 3. 수정 페이지 띄우기
+    // 5. 수정 페이지
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable("id") Long id, Model model) {
         NoticeDTO notice = noticeService.getNoticeDetail(id);
         model.addAttribute("notice", notice);
-        // 💡 중요: 수정을 마치고 돌아갈 때 hotelId가 필요할 수 있으므로 명시적으로 전달
         model.addAttribute("hotelId", notice.getFkHotelId()); 
         return "js/notice/edit"; 
     }
 
-    // 4. 수정 처리
+    // 6. 수정 처리
     @PostMapping("/edit")
     public String updateNotice(NoticeDTO dto) {
         noticeService.updateNotice(dto);
-        // 💡 수정 완료 후 상세페이지로 이동할 때 hotelId를 쿼리스트링으로 붙여주는 것이 안전합니다.
         return "redirect:/notice/detail/" + dto.getNoticeId() + "?hotelId=" + dto.getFkHotelId();
     }
     
+    // 7. 삭제 처리
     @PostMapping("/delete")
     public String deleteNotice(@RequestParam("noticeId") Long noticeId, RedirectAttributes rttr) {
-        
+        // 삭제 전 해당 글의 hotelId를 미리 가져오면 목록 이동 시 편리합니다.
+        NoticeDTO notice = noticeService.getNoticeDetail(noticeId);
+        Long hotelId = (notice != null) ? notice.getFkHotelId() : 0L;
+
         int result = noticeService.deleteNotice(noticeId);
         
         if(result > 0) {
@@ -88,9 +100,7 @@ public class NoticeController {
             rttr.addFlashAttribute("message", "삭제에 실패하였습니다.");
         }
         
-        // 삭제 후 목록 페이지로 이동 (hotelId 파라미터가 필요하다면 추가)
-        return "redirect:/notice/list";
+        // 삭제 후 해당 지점 목록으로 이동하도록 개선
+        return "redirect:/notice/list?hotelId=" + hotelId;
     }
-    
-    
 }
