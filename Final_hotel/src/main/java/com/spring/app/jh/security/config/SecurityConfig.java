@@ -253,7 +253,8 @@ public class SecurityConfig {
             "/emailattachfile/**",
             "/images/**",
             "/product/list",
-            "/js_images/**"
+            "/js_images/**",
+            "/notice/**"
         };
 
         httpSecurity

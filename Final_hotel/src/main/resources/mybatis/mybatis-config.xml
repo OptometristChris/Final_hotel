@@ -10,6 +10,7 @@
 		
 		<typeAlias type="com.spring.app.jh.security.domain.AdminDTO" alias="AdminDTO"/>
 		
+		<typeAlias type="com.spring.app.js.notice.domain.NoticeDTO" alias="NoticeDTO"/>
 	
 	</typeAliases>
 

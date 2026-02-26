@@ -3,231 +3,155 @@
       lang="ko"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>CIEL HOTEL | 공식 홈페이지</title>
+    <meta charset="UTF-8">
+    <title>CIEL HOTEL | 공식 홈페이지</title>
 
-<link rel="stylesheet" th:href="@{/css/index/index.css}">
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+    <th:block th:fragment="link">
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+    </th:block>
 
-<style type="text/css">
-    /* --- 공통 레이아웃 --- */
-    .main-visual { width: 100%; height: 100vh; position: relative; overflow: hidden; }
-    
-    /* 슬라이더 이미지 설정 */
-    .main-slider, .slide-item { width: 100%; height: 100vh; }
-    .slide-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    
-    /* --- 네비게이션 화살표 커스텀 --- */
-    .slick-arrow {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 1000 !important; /* [추가] z-index 상향 */
-        cursor: pointer;
-        background: rgba(0, 0, 0, 0.2) !important; /* [추가] !important */
-        border: none !important;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        color: #fff !important;
-        font-size: 24px;
-        display: flex !important; /* [추가] 사라짐 방지 강제 표시 */
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-    }
-    .slick-arrow:hover { background: rgba(0, 0, 0, 0.5) !important; }
-    .slick-prev { left: 40px; }
-    .slick-next { right: 40px; }
-    .slick-arrow:before { display: none !important; } /* 기본 아이콘 제거 */
-
-    /* --- 중앙 하단 프로그레스 바 --- */
-    .slider-progress-container {
-        position: absolute;
-        bottom: 50px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 150;
-        display: flex;
-        align-items: center;
-    }
-    .progress-bar-bg {
-        width: 300px;
-        height: 3px;
-        background: rgba(255, 255, 255, 0.2);
-        position: relative;
-        overflow: hidden;
-        border-radius: 2px;
-    }
-    .progress-bar-fill {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 0%;
-        height: 100%;
-        background: #fff;
-    }
-
-    /* --- 날씨 버튼 스타일 --- */
-    .weather-info {
-        position: absolute;
-        bottom: 50px;
-        left: 50px;
-        z-index: 100;
-        background: none !important;
-        padding: 0 !important;
-    }
-    .weather-btn {
-        background: rgba(0, 0, 0, 0.5);
-        color: white;
-        padding: 12px 35px;
-        font-size: 16pt;
-        font-weight: bold;
-        border-radius: 50px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        transition: all 0.3s ease;
-        outline: none;
-    }
-    .weather-btn:hover { background: rgba(0, 0, 0, 0.8); transform: scale(1.05); border-color: #d4af37; }
-    .divider { margin: 0 15px; opacity: 0.6; font-weight: normal; }
-
-    /* --- 날씨 팝업 스타일 --- */
-    .weather-side-popup {
-        position: absolute;
-        bottom: 160px;
-        left: 40px;
-        width: 380px;       
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(15px);
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        border-radius: 20px;
-        transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-        z-index: 2400;
-        display: none;
-        overflow: hidden;
-    }
-    .weather-side-popup.active { display: block; animation: slideUpWeather 0.4s ease; }
-    @keyframes slideUpWeather { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .popup-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: #1a1a1a; color: #fff; }
-    .mini-map-wrapper { background-color: #f0f8ff; padding: 20px; text-align: center; }
-
-    /* --- 섹션 공통 스타일 --- */
-    .section-title { font-weight: bold; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
-    .more-btn { font-size: 0.8rem; color: #666; text-decoration: none; }
-    .room-img-container { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; }
-    .room-img-container img { width: 100%; height: 100%; object-fit: cover; }
-</style>
-
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-
-<script th:inline="javascript">
-    $(document).ready(function() {
-        const $slider = $('.main-slider');
-        const $progressBar = $('.progress-bar-fill');
-        const speed = 4000; // 4초
-
-        // 1. 슬라이더 초기화
-        $slider.slick({
-            infinite: true,
-            autoplay: true,
-            autoplaySpeed: speed,
-            fade: true,
-            cssEase: 'linear',
-            dots: false,
-            arrows: true,
-            prevArrow: '<button type="button" class="slick-prev">〈</button>',
-            nextArrow: '<button type="button" class="slick-next">〉</button>',
-            pauseOnHover: false,    /* [추가] 마우스 오버 시 정지 방지 */
-            pauseOnFocus: false,    /* [추가] 클릭/포커스 시 정지 방지 */
-            pauseOnDotsHover: false
-        });
-
-        // 2. 프로그레스 바 애니메이션 함수
-        function startProgressBar() {
-            $progressBar.css('width', '0%').stop().animate({
-                width: '100%'
-            }, speed, 'linear');
+    <style th:fragment="style" type="text/css">
+        /* --- 메인 비주얼 슬라이더 --- */
+        .main-visual { width: 100%; height: 100vh; position: relative; overflow: hidden; }
+        .main-slider, .slide-item { width: 100%; height: 100vh; }
+        .slide-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        
+        /* 슬라이더 화살표 커스텀 */
+        .slick-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%); z-index: 1000 !important;
+            cursor: pointer; background: rgba(0, 0, 0, 0.2) !important; border: none !important;
+            width: 60px; height: 60px; border-radius: 50%; color: #fff !important;
+            font-size: 24px; display: flex !important; align-items: center; justify-content: center;
+            transition: all 0.3s ease;
         }
+        .slick-arrow:hover { background: rgba(0, 0, 0, 0.5) !important; }
+        .slick-prev { left: 40px; }
+        .slick-next { right: 40px; }
+        .slick-arrow:before { display: none !important; }
 
-        // 3. 슬라이더 이벤트 연결	
-        $slider.on('init reInit afterChange', function() {
-            startProgressBar();
-            $slider.slick('slickPlay'); /* [추가] 사용자가 넘긴 후에도 자동 재생 강제 실행 */
-        });
+        /* 하단 프로그레스 바 */
+        .slider-progress-container { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); z-index: 150; display: flex; align-items: center; }
+        .progress-bar-bg { width: 300px; height: 3px; background: rgba(255, 255, 255, 0.2); position: relative; overflow: hidden; border-radius: 2px; }
+        .progress-bar-fill { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background: #fff; }
 
-        $slider.on('beforeChange', function() {
-            $progressBar.stop().css('width', '0%');
-        });
+        /* 날씨 정보 */
+        .weather-info { position: absolute; bottom: 50px; left: 50px; z-index: 100; }
+        .weather-btn {
+            background: rgba(0, 0, 0, 0.5); color: white; padding: 12px 35px; font-size: 1.1rem;
+            font-weight: bold; border-radius: 50px; border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer; display: flex; align-items: center; transition: all 0.3s ease; outline: none;
+        }
+        .weather-btn:hover { background: rgba(0, 0, 0, 0.8); transform: scale(1.05); border-color: #d4af37; }
+        .divider { margin: 0 15px; opacity: 0.6; }
 
-        // 초기 수동 실행 (첫 슬라이드)
-        startProgressBar();
-    });
+        .weather-side-popup {
+            position: fixed; bottom: 160px; left: 40px; width: 380px;       
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(15px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3); border-radius: 20px;
+            z-index: 2400; display: none; overflow: hidden;
+        }
+        .weather-side-popup.active { display: block; animation: slideUpWeather 0.4s ease; }
+        @keyframes slideUpWeather { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .popup-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: #1a1a1a; color: #fff; }
 
-    /* 날씨 팝업 제어 */
-    function toggleWeather() { document.getElementById('weatherSidePopup').classList.toggle('active'); }
-    function closeWeather() { const p = document.getElementById('weatherSidePopup'); if(p) p.classList.remove('active'); }
-    
-    window.addEventListener('scroll', closeWeather, { passive: true });
-    document.addEventListener('mouseup', function(e) {
-        const popup = document.getElementById('weatherSidePopup');
-        const btn = document.querySelector('.weather-btn');
-        if (popup && !popup.contains(e.target) && !btn.contains(e.target)) closeWeather();
-    });
-</script>
+        /* 섹션 스타일 */
+        .section-title { font-weight: bold; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
+        .room-img-container { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; }
+        .room-img-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .room-card:hover .room-img-container img { transform: scale(1.1); }
+        .promo-img-wrapper { overflow: hidden; border-radius: 5px; transition: transform 0.3s ease; width: 100%; }
+        .promo-img-wrapper:hover { transform: translateY(-8px); }
+        .promo-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+    </style>
+
+    <th:block th:fragment="script">
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+        <script th:inline="javascript">
+            $(document).ready(function() {
+                const $slider = $('.main-slider');
+                const $progressBar = $('.progress-bar-fill');
+                const speed = 4000;
+
+                $slider.slick({
+                    infinite: true,
+                    autoplay: true,
+                    autoplaySpeed: speed,
+                    fade: true,
+                    cssEase: 'linear',
+                    dots: false,
+                    arrows: true,
+                    prevArrow: '<button type="button" class="slick-prev">〈</button>',
+                    nextArrow: '<button type="button" class="slick-next">〉</button>',
+                    pauseOnHover: false,
+                    pauseOnFocus: false
+                });
+
+                function startProgressBar() {
+                    $progressBar.css('width', '0%').stop().animate({ width: '100%' }, speed, 'linear');
+                }
+
+                $slider.on('init reInit afterChange', function() {
+                    startProgressBar();
+                    $slider.slick('slickPlay');
+                });
+
+                $slider.on('beforeChange', function() { $progressBar.stop().css('width', '0%'); });
+                startProgressBar();
+            });
+
+            function toggleWeather() { $('#weatherSidePopup').toggleClass('active'); }
+            function closeWeather() { $('#weatherSidePopup').removeClass('active'); }
+            
+            $(window).on('scroll', closeWeather);
+            $(document).on('mouseup', function(e) {
+                const popup = $('#weatherSidePopup');
+                const btn = $('.weather-btn');
+                if (!popup.is(e.target) && popup.has(e.target).length === 0 && !btn.is(e.target)) closeWeather();
+            });
+        </script>
+    </th:block>
 </head>
 
 <body>
 <section>
     <div class="main-visual">
         <div class="main-slider">
-	    <div class="slide-item-wrapper">
-	        <div class="slide-item">
-	            <img th:src="@{/js_images/cielHotel.png}" alt="배너 1">
-	        </div>
-	        <div class="room-info-overlay position-absolute" style="bottom: 25%; left: 10%; z-index: 10;">
-	            <h6 class="text-white font-weight-bold mb-2" style="opacity:0.9; font-size: 1.5rem; letter-spacing: 2px;">hotelCiel</h6>
-	            <h5 class="text-white font-weight-bold mb-0" style="font-size: 3.5rem; line-height: 1.2; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);">
-	                비스타 디럭스 패밀리 <br> 트윈 룸
-	            </h5>
-	        </div>
-	    </div>
-	    
-	    <div class="slide-item-wrapper">
-	        <div class="slide-item">
-	            <img th:src="@{/js_images/leCiel.png}" alt="배너 2">
-	        </div>
-	        <div class="room-info-overlay position-absolute" style="bottom: 25%; left: 10%; z-index: 10;">
-	            <h6 class="text-white font-weight-bold mb-2" style="opacity:0.9; font-size: 1.5rem; letter-spacing: 2px;">leCiel</h6>
-	            <h5 class="text-white font-weight-bold mb-0" style="font-size: 3.5rem; line-height: 1.2; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);">
-	                고품격 휴식의 완성 <br> 그랜드 디럭스 룸
-	            </h5>
-	        </div>
-	    </div>
-	</div>
+            <div class="slide-item-wrapper">
+                <div class="slide-item"><img th:src="@{/js_images/cielHotel.png}" alt="시엘호텔"></div>
+                <div class="room-info-overlay position-absolute" style="bottom: 25%; left: 5%; z-index: 10;">
+                    <h6 class="text-white font-weight-bold mb-2" style="opacity:0.9; font-size: 1.5rem; letter-spacing: 2px;">CIEL HOTEL</h6>
+                    <h5 class="text-white font-weight-bold mb-0" style="font-size: 3.5rem; line-height: 1.2; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);">
+                        도심 속 안락한 휴식의 시작 <br> 세련된 감각과 편안함이 머무는 곳
+                    </h5>
+                </div>
+            </div>
+            <div class="slide-item-wrapper">
+                <div class="slide-item"><img th:src="@{/js_images/leCiel.png}" alt="르시엘"></div>
+                <div class="room-info-overlay position-absolute" style="bottom: 25%; left: 5%; z-index: 10;">
+                    <h6 class="text-white font-weight-bold mb-2" style="opacity:0.9; font-size: 1.5rem; letter-spacing: 2px;">leCiel</h6>
+                    <h5 class="text-white font-weight-bold mb-0" style="font-size: 3.5rem; line-height: 1.2; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);">
+                        당신만을 위한 고귀한 휴식 <br> 차원이 다른 품격, 프라이빗 럭셔리
+                    </h5>
+                </div>
+            </div>
+        </div>
 
         <div class="slider-progress-container">
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill"></div>
-            </div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
         </div>
 
         <div class="weather-info">
             <button type="button" class="weather-btn" onclick="toggleWeather()">
-                <span class="temp">2 ℃</span><span class="divider">|</span>
-                <span class="city">SEOUL</span><span class="divider">|</span>
-                <span class="time">16 : 10</span>
+                2 ℃ <span class="divider">|</span> SEOUL <span class="divider">|</span> 16:10
             </button>
         </div>
-        
+
         <div id="weatherSidePopup" class="weather-side-popup">
             <div class="popup-header"><span class="popup-title">전국 실시간 날씨</span></div>
             <div class="popup-content">
-                <div class="mini-map-wrapper">
-                    <img th:src="@{/js_images/test_weather.png}" alt="전국 날씨" class="img-fluid">
+                <div class="mini-map-wrapper p-4 text-center">
+                    <img th:src="@{/js_images/test_weather.png}" class="img-fluid" alt="날씨정보">
                 </div>
             </div>
         </div>
@@ -237,12 +161,12 @@
         <div class="row mb-5">
             <div class="col-12 d-flex justify-content-between align-items-end mb-3">
                 <h3 class="section-title mb-0">객실</h3>
-                <a href="#" class="more-btn">전체보기 ></a>
+                <a th:href="@{/}" class="more-btn text-muted">전체보기 ></a>
             </div>
             <div class="col-md-6 mb-4">
                 <div class="room-card position-relative overflow-hidden rounded">
                     <div class="room-img-container"><img th:src="@{/js_images/room1.jpg}"></div>
-                    <div class="room-info-overlay position-absolute w-100 p-3" style="bottom: 0; left: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8));">
+                    <div class="room-info-overlay position-absolute w-100 p-4" style="bottom: 0; left: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8));">
                          <h6 class="text-white font-weight-bold mb-1" style="opacity:0.8;">leCiel</h6>
                          <h5 class="text-white font-weight-bold mb-0">그랜드 디럭스 룸</h5>
                     </div>
@@ -251,7 +175,7 @@
             <div class="col-md-6 mb-4">
                 <div class="room-card position-relative overflow-hidden rounded">
                     <div class="room-img-container"><img th:src="@{/js_images/room2.jpg}"></div>
-                    <div class="room-info-overlay position-absolute w-100 p-3" style="bottom: 0; left: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8));">
+                    <div class="room-info-overlay position-absolute w-100 p-4" style="bottom: 0; left: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8));">
                          <h6 class="text-white font-weight-bold mb-1" style="opacity:0.8;">hotelCiel</h6>
                          <h5 class="text-white font-weight-bold mb-0">비스타 디럭스 패밀리 트윈 룸</h5>
                     </div>
@@ -259,51 +183,72 @@
             </div>
         </div>
     </div>
-
+    
     <div class="container-fluid px-md-5">
         <div class="row mb-5 text-center">
-            <div class="col-12 d-flex justify-content-between align-items-end mb-3 text-left">
+            <div class="col-12 d-flex justify-content-between align-items-end mb-4">
                 <h3 class="section-title mb-0 w-100 text-left">다이닝</h3>
-                <a href="#" class="more-btn" style="white-space:nowrap;">전체보기 ></a>
+                <a th:href="@{/}" class="more-btn text-muted" style="white-space:nowrap;">전체보기 ></a>
             </div>
-            <div class="col-md-4 mb-3">
-                <img th:src="@{/images/dining_01.jpg}" class="img-fluid" alt="레스토랑">
-                <p class="mt-2 mb-0 font-weight-bold small text-muted">시그니엘 서울</p>
-                <p class="font-weight-bold">스테이, 모던 레스토랑</p>
+            <div class="col-md-4 mb-4">
+                <div class="overflow-hidden rounded mb-3"><img th:src="@{/js_images/p4.jpg}" class="img-fluid" alt="레스토랑"></div>
+                <p class="mb-1 font-weight-bold small text-muted">Le Ciel</p>
+                <p class="font-weight-bold" style="font-size: 1.2rem;">스탠딩 바</p>
             </div>
-            <div class="col-md-4 mb-3">
-                <img th:src="@{/images/dining_02.jpg}" class="img-fluid" alt="클럽">
-                <p class="mt-2 mb-0 font-weight-bold small text-muted">시그니엘 서울</p>
-                <p class="font-weight-bold">SIGNIEL CLUB</p>
+            <div class="col-md-4 mb-4">
+                <div class="overflow-hidden rounded mb-3"><img th:src="@{/js_images/p2.jpg}" class="img-fluid" alt="클럽"></div>
+                <p class="mb-1 font-weight-bold small text-muted">Ciel Hotel</p>
+                <p class="font-weight-bold" style="font-size: 1.2rem;">더 라운지</p>
             </div>
-            <div class="col-md-4 mb-3">
-                <img th:src="@{/images/dining_03.jpg}" class="img-fluid" alt="라운지">
-                <p class="mt-2 mb-0 font-weight-bold small text-muted">시그니엘 서울</p>
-                <p class="font-weight-bold">더 라운지</p>
+            <div class="col-md-4 mb-4">
+                <div class="overflow-hidden rounded mb-3"><img th:src="@{/js_images/p4.jpg}" class="img-fluid" alt="라운지"></div>
+                <p class="mb-1 font-weight-bold small text-muted">Le Ciel</p>
+                <p class="font-weight-bold" style="font-size: 1.2rem;">스탠딩 바</p>
             </div>
         </div>
-    </div>
+    </div>    
 
-    <div class="container-fluid px-md-5">
-        <div class="row mb-5">
-            <div class="col-12 d-flex justify-content-between align-items-end mb-3">
-                <h3 class="section-title mb-0">프로모션</h3>
-                <a href="#" class="more-btn">전체보기 ></a>
+    <div class="container-fluid px-md-5 mt-5 pb-5">
+        <div class="row">
+            <div class="col-12 d-flex justify-content-between align-items-end mb-4">
+                <h3 class="section-title mb-0 w-100">프로모션</h3>
+                <a th:href="@{/}" class="more-btn text-muted" style="white-space:nowrap;">전체보기 ></a>
             </div>
+        </div>
+        
+        <div class="row align-items-start">
+            <div class="col-md-4 mb-4">
+                <div class="p-4 promo-img-wrapper" style="background-color: #a69689; min-height: 600px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <div style="width: 85%; height: 70%; overflow: hidden; background: #fff; border-radius: 3px;">
+                        <img th:src="@{/js_images/main_p.jpg}" alt="메인 프로모션">
+                    </div>
+                    <p class="text-white mt-4 font-weight-bold text-center">#로맨틱트와일라잇 #야경맛집 #레이트체크아웃</p>
+                </div>
+            </div>
+
+            <div class="col-md-4 px-md-4">
+                <div class="mb-5">
+                    <div class="promo-img-wrapper" style="height: 260px;"><img th:src="@{/js_images/p1.jpg}"></div>
+                    <span class="d-block font-weight-bold mt-3 text-secondary">#워케이션 #업무와휴식 #커피무료</span>
+                </div>
+                <div class="mb-4">
+                    <div class="promo-img-wrapper" style="height: 380px;"><img th:src="@{/js_images/p2.jpg}"></div>
+                    <span class="d-block font-weight-bold mt-3 text-secondary">#럭셔리프라이빗 #스위트익스케이프 #우리만의공간 </span>
+                </div>
+            </div>
+
             <div class="col-md-4">
-                <img th:src="@{/images/promo_main.jpg}" class="img-fluid" alt="메인 프로모션">
-            </div>
-            <div class="col-md-8">
-                <div class="row">
-                    <div class="col-6 mb-3"><img th:src="@{/images/p1.jpg}" class="img-fluid" alt="P1"></div>
-                    <div class="col-6 mb-3"><img th:src="@{/images/p2.jpg}" class="img-fluid" alt="P2"></div>
-                    <div class="col-6"><img th:src="@{/images/p3.jpg}" class="img-fluid" alt="P3"></div>
-                    <div class="col-6"><img th:src="@{/images/p4.jpg}" class="img-fluid" alt="P4"></div>
+                <div class="mb-5">
+                    <div class="promo-img-wrapper" style="height: 340px;"><img th:src="@{/js_images/p3.jpg}"></div>
+                    <span class="d-block font-weight-bold mt-3 text-secondary">#얼리버드할인 #미리준비하는여행 #스마트트래블</span>
+                </div>
+                <div class="mb-4">
+                    <div class="promo-img-wrapper" style="height: 220px;"><img th:src="@{/js_images/p4.jpg}"></div>
+                    <span class="d-block font-weight-bold mt-3 text-secondary">#프리미엄르시엘 #럭셔리스위트 #24시간스테이</span>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
 </body>
 </html>
