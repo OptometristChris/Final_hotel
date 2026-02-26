@@ -36,7 +36,13 @@ public class RoomTypeService_imple implements RoomTypeService {
 
     // 날짜별 가격 조회
     @Override
-    public List<Map<String, Object>> getCalendarPrice(int room_id) {
-        return roomdao.selectCalendarPrice(room_id);
+    public List<Map<String, Object>> getCalendarPrice(int roomId) {
+        return roomdao.selectCalendarPrice(roomId);
+    }
+
+    // 비교 모달용 (비교함에 담긴 객실 id리스트를 기준으로 객실 정보 조회하기) -- 푸터
+	@Override
+	public List<RoomTypeDTO> getRoomsByIds(List<Long> roomIds) {
+		return roomdao.selectRoomsByIds(roomIds);
     }
 }

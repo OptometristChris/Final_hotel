@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -87,4 +89,16 @@ public class RoomController {
 
         return roomService.getCalendarPrice(room_id);
     }
+    
+    
+    /* ==============================
+	    5. 푸터에서 비교하기
+	    ============================== */
+    @PostMapping("/room/compare")
+    @ResponseBody
+    public List<RoomTypeDTO> compareRooms(@RequestBody List<Long> roomIds){
+
+        return roomService.getRoomsByIds(roomIds);
+    }
+    
 }

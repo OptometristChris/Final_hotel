@@ -39,4 +39,10 @@ public class RoomTypeDAO_imple implements RoomTypeDAO {
         return sqlsession.selectList("room.selectCalendarPrice", room_id);
     }
 
+    // 비교 모달용 (비교함에 담긴 객실 id리스트를 기준으로 객실 정보 조회하기) -- 푸터
+	@Override
+	public List<RoomTypeDTO> selectRoomsByIds(List<Long> roomIds) {
+		return sqlsession.selectList("room.selectRoomsByIds", roomIds);
+	}
+
 }
