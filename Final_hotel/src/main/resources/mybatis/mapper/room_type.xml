@@ -45,6 +45,9 @@
             ON rt.room_type_id = ri.room_type_id
             AND ri.is_main = 'Y'
         WHERE 1=1
+		 <if test="hotel != null and hotel != ''">
+	        AND rt.fk_hotel_id = #{hotel}
+	    </if>
 
         <if test="room_grade != null and room_grade != ''">
             AND rt.room_grade = #{room_grade}
@@ -58,7 +61,18 @@
             AND rt.view_type = #{view_type}
         </if>
 
-        ORDER BY rt.room_type_id DESC
+		<!-- 우측 정렬 필터 추가 -->
+        <choose>
+	        <when test="sort == 'priceAsc'">
+	            ORDER BY rt.base_price ASC
+	        </when>
+	        <when test="sort == 'priceDesc'">
+	            ORDER BY rt.base_price DESC
+	        </when>
+	        <otherwise>
+	            ORDER BY rt.room_type_id DESC
+	        </otherwise>
+	    </choose>
 
     </select>
 

@@ -5,35 +5,12 @@
 <title>객실 목록</title>
 
 <style>
-body { font-family: Arial; }
-
-.room-card {
-    border-bottom: 1px solid #ddd;
-    padding: 30px 0;
-    display: flex;
-    gap: 30px;
-}
-
-.room-image {
-    width: 300px;
-    height: 200px;
-    background-color: #eee;
-}
-
-.room-info {
-    flex: 1;
-}
-
-.room-name {
-    font-size: 22px;
-    font-weight: bold;
-}
-
-.price {
-    font-size: 20px;
-    font-weight: bold;
-    margin-top: 15px;
-}
+body {font-family: Arial;}
+.room-card {border-bottom: 1px solid #ddd; padding: 30px 0; display: flex; gap: 30px;}
+.room-image {width: 300px; height: 200px; background-color: #eee;}
+.room-info {flex: 1;}
+.room-name {font-size: 22px; font-weight: bold;}
+.price {font-size: 20px; font-weight: bold; margin-top: 15px;}
 </style>
 
 <!-- FullCalendar CSS -->
@@ -56,34 +33,54 @@ body { font-family: Arial; }
 <!-- ===============================
       필터 (AJAX)
      =============================== -->
-<form id="filterForm">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
 
-    객실등급:
-    <select name="room_grade">
-        <option value="">전체</option>
-        <option value="DELUXE">DELUXE</option>
-        <option value="PREMIER">PREMIER</option>
-        <option value="SUITE">SUITE</option>
-        <option value="STANDARD">STANDARD</option>
-    </select>
-
-    침대타입:
-    <select name="bed_type">
-        <option value="">전체</option>
-        <option value="DOUBLE">DOUBLE</option>
-        <option value="TWIN">TWIN</option>
-        <option value="KING">KING</option>
-    </select>
-
-    전망:
-    <select name="view_type">
-        <option value="">전체</option>
-        <option value="CITY">CITY</option>
-        <option value="RIVER">RIVER</option>
-    </select>
-
-    <button type="submit">검색</button>
-</form>
+	<!-- 좌측 필터 -->
+	<form id="filterForm">
+		호텔:
+		<select name="hotel">
+		   <option value="">전체</option>
+		   <option value="1">호텔 시엘</option>
+		   <option value="2">르시엘</option>
+		</select>
+		
+	    객실등급:
+	    <select name="room_grade">
+	        <option value="">전체</option>
+	        <option value="DELUXE">DELUXE</option>
+	        <option value="PREMIER">PREMIER</option>
+	        <option value="SUITE">SUITE</option>
+	        <option value="STANDARD">STANDARD</option>
+	    </select>
+	
+	    침대타입:
+	    <select name="bed_type">
+	        <option value="">전체</option>
+	        <option value="DOUBLE">DOUBLE</option>
+	        <option value="TWIN">TWIN</option>
+	        <option value="KING">KING</option>
+	    </select>
+	
+	    전망:
+	    <select name="view_type">
+	        <option value="">전체</option>
+	        <option value="CITY">CITY</option>
+	        <option value="RIVER">RIVER</option>
+	    </select>
+	
+	    <button type="submit">검색</button>
+	</form>
+	
+	<!-- 우측 정렬 -->
+    <div>
+        정렬:
+        <select id="sortSelect">
+            <option value="">기본순</option>
+            <option value="priceAsc">가격 낮은순</option>
+            <option value="priceDesc">가격 높은순</option>
+        </select>
+    </div>
+</div>
 
 <hr>
 
@@ -160,9 +157,10 @@ document.getElementById("filterForm").addEventListener("submit", function(e){
     const roomGrade = document.querySelector("[name='room_grade']").value;
     const bedType = document.querySelector("[name='bed_type']").value;
     const viewType = document.querySelector("[name='view_type']").value;
+    const hotel = document.querySelector("[name='hotel']").value;
 
     // 서버에 조건 전달
-    fetch(`/final_hotel/room/filter?room_grade=${roomGrade}&bed_type=${bedType}&view_type=${viewType}`)
+    fetch(`/final_hotel/room/filter?hotel=${hotel}&room_grade=${roomGrade}&bed_type=${bedType}&view_type=${viewType}`)
         .then(response => response.json())
         .then(data => {
 
@@ -383,6 +381,66 @@ function handleReserveClick(roomId) {
     // 날짜 이미 선택됨 → 예약 페이지로 이동
     location.href = `/final_hotel/reservation/form?room_type_id=${roomId}&check_in=${checkIn}&check_out=${checkOut}`;
 }
+
+//======================================
+// 우측 정렬 필터 (js공통함수)
+//======================================
+function loadRooms() {
+
+    const hotel = document.querySelector("[name='hotel']").value;
+    const roomGrade = document.querySelector("[name='room_grade']").value;
+    const bedType = document.querySelector("[name='bed_type']").value;
+    const viewType = document.querySelector("[name='view_type']").value;
+    const sort = document.getElementById("sortSelect").value;
+
+    fetch(`/final_hotel/room/filter?hotel=${hotel}&room_grade=${roomGrade}&bed_type=${bedType}&view_type=${viewType}&sort=${sort}`)
+        .then(res => res.json())
+        .then(data => {
+
+            const area = document.getElementById("roomListArea");
+            area.innerHTML = "";
+
+            if(data.length === 0){
+                area.innerHTML = "<p>검색 결과가 없습니다.</p>";
+                return;
+            }
+
+            data.forEach(room => {
+                area.innerHTML += `
+                    <div class="room-card">
+                        <div class="room-image">
+                            <img src="/final_hotel${room.image_url}"
+                                 style="width:100%; height:100%; object-fit:cover;">
+                        </div>
+                        <div class="room-info">
+                            <div class="room-name">
+                                <a href="/final_hotel/room/detail?room_id=${room.room_type_id}">
+                                    ${room.room_name}
+                                </a>
+                            </div>
+                            <div>등급: ${room.room_grade}</div>
+                            <div>침대: ${room.bed_type}</div>
+                            <div>전망: ${room.view_type}</div>
+                            <div class="price">₩ ${room.base_price}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+        });
+}
+
+//필터 검색
+document.getElementById("filterForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    loadRooms();
+});
+
+// 정렬 변경 시 자동 실행
+document.getElementById("sortSelect").addEventListener("change", function(){
+    loadRooms();
+});
+
 
 </script>
 

@@ -30,7 +30,7 @@ public class RoomController {
 
         List<RoomTypeDTO> roomList = roomService.getRoomList();
 
-        // 🔥 디버깅용
+        // 디버깅용
         System.out.println("roomList size = " + roomList.size());
         System.out.println(roomList);
 
@@ -46,14 +46,18 @@ public class RoomController {
     @GetMapping("/room/filter")
     @ResponseBody
     public List<RoomTypeDTO> filterRoom(
+    		@RequestParam(name="hotel", defaultValue="") String hotel,
             @RequestParam(name="room_grade", defaultValue="") String roomGrade,
             @RequestParam(name="bed_type", defaultValue="") String bedType,
-            @RequestParam(name="view_type", defaultValue="") String viewType) {
+            @RequestParam(name="view_type", defaultValue="") String viewType,
+            @RequestParam(name="sort", defaultValue="") String sort) {
 
         Map<String, String> paraMap = new HashMap<>();
+        paraMap.put("hotel", hotel);
         paraMap.put("room_grade", roomGrade);
         paraMap.put("bed_type", bedType);
         paraMap.put("view_type", viewType);
+        paraMap.put("sort", sort); 
 
         return roomService.getRoomListByFilter(paraMap);
     }
