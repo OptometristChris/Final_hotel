@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html th:fragment="layout(title, link, css, script, content)" 
+      lang="ko" 
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- 1. 맨 위의 layout fragment 의 title 내용으로 교체 되어짐 -->
+  <title th:replace="${title}">레이아웃 타이틀</title>
+
+  <!-- Required meta tags -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> 
+  
+  <!-- Bootstrap CSS --> 
+                        <!-- 소스위치 resources/static/bootstrap-4.6.2-dist/css/bootstrap.min.css -->
+  <link rel="stylesheet" type="text/css" th:href="@{/bootstrap-4.6.2-dist/css/bootstrap.min.css}">
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <!-- 직접 만든 메인 CSS --> 
+                        <!-- 소스위치 resources/static/css/mainstyle.css -->
+  <link rel="stylesheet" type="text/css" th:href="@{/css/mainstyle.css}" />
+  
+  <!-- 2. 맨 위의 layout fragment 의 link 내용으로 교체 되어짐 -->
+  <link th:replace="${link}" rel="stylesheet" href="">
+  
+  <!-- 3. 맨 위의 layout fragment 의 css 내용으로 교체 되어짐 -->
+  <style th:replace="${css}" type="text/css"></style>
+  
+  <!-- Optional JavaScript -->
+                <!-- 소스위치 resources/static/js/jquery-3.7.1.min.js -->
+  <script type="text/javascript" th:src="@{/js/jquery-3.7.1.min.js}"></script>
+  <script type="text/javascript" th:src="@{/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js}"></script>
+  
+  <!-- 네이버스마트 에디터 -->
+  <script type="text/javascript" th:src="@{/smarteditor/js/HuskyEZCreator.js}" charset="utf-8"></script> 
+  
+  <!-- 주소찾기 -->
+  <script type="text/javascript" src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+  
+  <!--  ===== 스피너 및 datepicker 를 사용하기 위해  jquery-ui 사용하기 ===== -->
+  <link rel="stylesheet" type="text/css" th:href="@{/jquery-ui-1.13.1.custom/jquery-ui.css}" />
+  <script type="text/javascript" th:src="@{/jquery-ui-1.13.1.custom/jquery-ui.js}"></script>
+  
+  <!-- 4. 맨 위의 layout fragment 의 script 내용으로 교체 되어짐 -->
+  <script th:replace="${script}" th:inline="javascript"></script>
+  
+</head>
+<body>
+	<div id="mycontainer">
+	
+		<!-- >>> 템플릿 조각 <<< 
+		     공통부분을 템플릿화 하여 필요한 부분에서 해당 템플릿을 불러와 설정하는 기능.
+		     <예> 좌측 카테고리영역, 상단 영역, 하단 영역 등 공통으로 사용되는 영역을 모듈화 시킨다. 
+		-->
+		<div id="myheader" th:insert="~{fragment/header :: main_header}"></div>
+		
+		<!-- 5. 맨 위의 layout fragment 의 content 내용으로 교체 되어짐 -->
+		<div id="mycontent" th:insert="${content}"></div>
+		
+		<!-- >>> 템플릿 조각 <<< 
+		     공통부분을 템플릿화 하여 필요한 부분에서 해당 템플릿을 불러와 설정하는 기능.
+		     <예> 좌측 카테고리영역, 상단 영역, 하단 영역 등 공통으로 사용되는 영역을 모듈화 시킨다. 
+		-->		
+		<div id="myfooter" th:insert="~{fragment/footer :: footer}"></div>
+	</div>
+</body>
+</html>

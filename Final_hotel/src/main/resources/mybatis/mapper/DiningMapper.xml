@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.app.ih.dining.mapper.DiningMapper">
+
+    <select id="getDiningList" resultType="com.spring.app.ih.dining.model.DiningDTO">
+	    SELECT 
+	        D.NAME            AS name,
+	        D.D_TYPE          AS dType,
+	        T.TABLE_ID        AS tableId,
+	        T.TABLE_NUMBER    AS tableNumber,
+	        T.MAX_CAPACITY    AS maxCapacity,
+	        T.MIN_CAPACITY    AS minCapacity,
+	        T.ZONE_NAME       AS zoneName,
+	        T.IS_SPECIFIABLE  AS isSpecifiable,
+	        T.ACTIVE_YN       AS activeYn
+	    FROM tbl_dining D
+	    INNER JOIN dining_tables T ON D.dining_id = T.FK_HOTEL_ID
+	    ORDER BY D.dining_id, T.TABLE_ID
+	</select>
+</mapper>

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.spring.app.jh.security.domain.MemberDTO;
+import com.spring.app.jh.security.domain.Session_MemberDTO;
 import com.spring.app.jh.security.service.MemberService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -87,64 +88,62 @@ public class MemberController {
     // 회원가입, DB에 insert 하는 것
     @PostMapping("memberRegisterEnd")
     public String memberRegisterEnd(MemberDTO memberdto, Model model) {
-    	
-    	String hashedUserPwd = passwordEncoder.encode( memberdto.getPasswd());
-    	
-    	memberdto.setPasswd(hashedUserPwd);
-    	
-    	try {
-			memberService.insert_member(memberdto);
-			
-			StringBuilder sb = new StringBuilder();
-            sb.append("<span style='font-weight: bold;'>"+ memberdto.getName() + "</span>님의 회원 가입이 정상적으로 처리되었습니다.<br/>");
-            sb.append("메인메뉴에서 로그인 하시기 바랍니다.<br/>");
-            
-            model.addAttribute("message", sb.toString());
-		} catch (Exception e) {
-			model.addAttribute("message", "장애가 발생되어 회원가입이 실패했습니다.");
-			e.printStackTrace();
-		}
-    	
-    	return "security/login/memberRegisterComplete";
-    	// src/main/resources/templates/security/login/memberRegisterComplete.html 파일 생성해줘야 함
+
+        String hashedUserPwd = passwordEncoder.encode(memberdto.getPasswd());
+        memberdto.setPasswd(hashedUserPwd);
+
+        try {
+            int n = memberService.insert_member(memberdto); 
+
+            if (n == 1) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("<span style='font-weight: bold;'>")
+                  .append(memberdto.getName())
+                  .append("</span>님의 회원 가입이 정상적으로 처리되었습니다.<br/>");
+                sb.append("메인메뉴에서 로그인 하시기 바랍니다.<br/>");
+
+                model.addAttribute("message", sb.toString());
+            }
+            else {
+                // insert가 0건이면 보통 뭔가 문제(조건 불일치/트리거/제약/쿼리 문제 등)
+                model.addAttribute("message", "장애가 발생되어 회원가입이 실패했습니다.");
+            }
+        }
+        catch (Exception e) {
+            model.addAttribute("message", "장애가 발생되어 회원가입이 실패했습니다.");
+            e.printStackTrace();
+        }
+
+        return "security/login/memberRegisterComplete";
     }
     
     
     
-    // 로그인 인증 form 페이지 보여주기
+ // 로그인 인증 form 페이지 보여주기
     @GetMapping(value="login")
     public String login(HttpServletRequest request){
-       
-       String referer = request.getHeader("referer"); 
-       
-       // referer가 null이다? -> 직접 url 타이핑 쳐 온것.
-       if(referer == null || 
-          referer.endsWith("/security/login") || 
-          referer.endsWith("/security/login?loginFail=true") ||
-          referer.endsWith("/security/noAuthenticated")) {
-           referer = "http://localhost:9081/final_hotel/index";
-       }
-       
-//       if(referer.endsWith("/board/view")) {
-//           referer = "http://localhost:9081/final_hotel/list";
-//       }
-       
-       HttpSession session = request.getSession();
-       session.setAttribute("prevURLPage", referer);
-       
-        // login 실패여부 체크하기
+
+       /*
+          ★ SavedRequest 방식 사용 ★
+          - 로그인 이전에 보호자원에 접근했다면 Spring Security 가 SavedRequest 로 "원래 가려던 URL" 을 저장한다.
+          - 로그인 성공 시 MemberAuthenticationSuccessHandler(SavedRequestAwareAuthenticationSuccessHandler)가
+            SavedRequest 를 읽어 원래 가려던 페이지로 자동 redirect 한다.
+          - 따라서 여기서 referer 를 세션에 prevURLPage 로 저장하는 방식은 제거한다.
+       */
+
+       // login 실패여부 체크하기
        String loginFail = request.getParameter("loginFail");
-       
+
        String msg = "";
-       
+
        if("true".equals(loginFail)) {
           msg = "로그인 실패!! 아이디 또는 암호를 잘못 입력하셨습니다.";
        }
-       
+
        request.setAttribute("msg", msg);
-       
+
        return "security/login/loginform";
-    // src/main/resources/templates/security/login/loginform.html 파일 생성해줘야 함
+       // src/main/resources/templates/security/login/loginform.html 파일 생성해줘야 함
     }
     
     
@@ -196,7 +195,7 @@ public class MemberController {
     }
     
     // 회원정보보기 URL
-    @PreAuthorize("hasRole('ROLE_USER')") // 해당 권한이 있는 사람이 있는 사람만 허용
+    @PreAuthorize("hasRole('USER')") // 해당 권한이 있는 사람이 있는 사람만 허용
     @GetMapping(value="memberOnly")
     public String memberOnly(){
        
@@ -204,8 +203,40 @@ public class MemberController {
     // src/main/resources/templates/security/member/memberOwnInfo.html 파일 생성해줘야 함
     }
     
+    
+    // 회원정보 수정 폼 페이지
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("member/profileEdit")
+    public String profileEditForm() {
+        return "security/member/profileEditForm";
+    }
+    
+    
+    // 회원정보 수정 저장
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("member/profileEdit")
+    public String profileEditEnd(MemberDTO memberdto,
+                                 HttpSession session,
+                                 Model model) {
+
+        Session_MemberDTO sm = (Session_MemberDTO) session.getAttribute("sessionMemberDTO");
+        memberdto.setMemberNo(sm.getMemberNo());   // ★ 핵심: 어디 회원인지 PK 세팅
+
+        int result = memberService.update_member_profile(memberdto);
+        model.addAttribute("result", result);
+
+        return "security/member/profileEditResult";
+    }
+    
+    
+    
+    
+    
+    
+    
+    
     // 관리자 권한을 가진 사용자만 접근 가능한 URL
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value="admin/adminOnly")
     public String adminOnly(Model model){
        
@@ -248,7 +279,7 @@ public class MemberController {
     
     
     // 특별회원 권한이 있는 URL 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER_SPECIAL')") // config 의 .requestMatchers("/security/special/**").hasAnyRole("ADMIN", "USER_SPECIAL") 와 겹치는 부분이지만 그냥 썼다.
+    @PreAuthorize("hasAnyRole('ADMIN','USER_SPECIAL')") // config 의 .requestMatchers("/security/special/**").hasAnyRole("ADMIN", "USER_SPECIAL") 와 겹치는 부분이지만 그냥 썼다.
     @GetMapping(value="special/special_memberOnly")
     public String special_memberOnly(){
        
