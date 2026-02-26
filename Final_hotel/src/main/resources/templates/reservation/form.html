@@ -43,7 +43,7 @@
 
 </form>
 
-<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
 
 <script>
     var IMP = window.IMP;
@@ -51,12 +51,12 @@
 
     function requestPay() {
 
-        var amount = 100;
+        var amount = 100; // 테스트용
 
-        var merchantUid = "order_" + new Date().getTime();
+        var merchantUid = "hotel_" + new Date().getTime();
 
         IMP.request_pay({
-            pg: "html5_inicis",   // 테스트 PG
+            pg: "html5_inicis",   
             pay_method: "card",
             merchant_uid: merchantUid,
             name: "호텔 예약 결제",
@@ -66,12 +66,32 @@
         }, function (rsp) {
 
             if (rsp.success) {
-                console.log("결제 성공");
-                console.log("imp_uid:", rsp.imp_uid);
-                console.log("merchant_uid:", rsp.merchant_uid);
-                alert("결제 성공!");
+
+                //  서버로 결제 검증 요청
+                fetch("/final_hotel/payment/verify", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        imp_uid: rsp.imp_uid,
+                        merchant_uid: rsp.merchant_uid,
+                        
+                        room_type_id: document.querySelector("input[name='room_type_id']").value,
+                        check_in: document.querySelector("input[name='check_in']").value,
+                        check_out: document.querySelector("input[name='check_out']").value,
+                        guest_count: document.querySelector("input[name='guest_count']").value,
+                        breakfast: document.querySelector("input[name='breakfast']")?.checked ? "Y" : "N"
+                    })
+                })
+                .then(res => res.text())
+                .then(data => {
+                    alert(data);
+                    // 필요하면 예약 완료 페이지로 이동
+                    // location.href = "/final_hotel/reservation/complete";
+                });
+
             } else {
-                console.log("결제 실패:", rsp.error_msg);
                 alert("결제 실패: " + rsp.error_msg);
             }
 

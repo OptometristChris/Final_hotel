@@ -5,27 +5,61 @@
 
 <mapper namespace="reservation">
 
-   <insert id="insertReservation">
-		INSERT INTO RESERVATION (
-		    reservation_id,
-		    member_no,
-		    room_type_id,
-		    checkin_date,
-		    checkout_date,
-		    guest_count,
-		    total_price,
-		    reservation_status
-		)
-		VALUES (
-		    SEQ_RESERVATION.NEXTVAL,
-		    #{member_no},
-		    #{room_type_id},
-		    #{checkin_date},
-		    #{checkout_date},
-		    #{guest_count},
-		    #{total_price},
-		    #{reservation_status}
-		)
+   <!-- 예약하기 성공시 payment 테이블에 insert (imp_uid) -->
+  <insert id="insertPayment" parameterType="map" useGeneratedKeys="false">
+	    <selectKey keyProperty="payment_id" resultType="long" order="BEFORE">
+	        SELECT SEQ_PAYMENT.NEXTVAL FROM DUAL
+	    </selectKey>
+	
+	    INSERT INTO PAYMENT (
+	        payment_id,
+	        member_no,
+	        payment_amount,
+	        payment_method,
+	        payment_status,
+	        imp_uid,
+	        paid_at,
+	        created_at
+	    )
+	    VALUES (
+	        #{payment_id},
+	        #{member_no},
+	        #{total_price},
+	        'CARD',
+	        'PAID',
+	        #{imp_uid},
+	        SYSDATE,
+	        SYSDATE
+	    )
 	</insert>
+	
+	
+	<!-- reservation 테이블에 insert -->
+	<insert id="insertReservation">
+	    INSERT INTO RESERVATION (
+	        reservation_id,
+	        member_no,
+	        room_type_id,
+	        payment_id,
+	        checkin_date,
+	        checkout_date,
+	        guest_count,
+	        total_price,
+	        reservation_status,
+	        created_at
+	    )
+	    VALUES (
+	        SEQ_RESERVATION.NEXTVAL,
+	        #{member_no},
+	        #{room_type_id},
+	        #{payment_id},
+	        TO_DATE(#{check_in}, 'YYYY-MM-DD'),
+	        TO_DATE(#{check_out}, 'YYYY-MM-DD'),
+	        #{guest_count},
+	        #{total_price},
+	        'CONFIRMED',
+	        SYSDATE
+	    )
+    </insert>
 
 </mapper>

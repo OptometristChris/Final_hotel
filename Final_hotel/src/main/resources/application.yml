@@ -135,3 +135,7 @@ server:
       force: true #post 방식으로 전송했을때 한글데이터가 안깨지도록 함. # Spring Framework 에서는 web.xml 파일에서 filter 태그를 등록시켜 주었음.
   tomcat:
     max-part-count: 30  # 폼 태그에 들어올 수 있는 파라미터 개수 및 파일의 총 개수는 최대 30개. -1 로 해주면 무제한임.
+    
+iamport:
+  api-key: 5112162085145453
+  api-secret: Z2DoVZFrrjMwOs8Jbi6sxs30pW4LukrfdyghYaj9P4cDxf08qlVNxDjX8GoKKj15so3nF6ZoiCOfISo2
