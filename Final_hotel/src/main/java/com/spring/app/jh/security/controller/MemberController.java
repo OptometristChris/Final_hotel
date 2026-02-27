@@ -148,6 +148,56 @@ public class MemberController {
     }
     
     
+    // id 찾기
+    @GetMapping("member_id_find")
+    public String memberIdFindForm(HttpServletRequest request) {
+
+        // 필요 시 안내 메시지(선택)
+        // request.setAttribute("msg", "");
+
+        return "security/login/member_id_find";
+        // src/main/resources/templates/security/login/member_id_find.html
+    }
+    
+    
+    // id 찾기 처리
+    @PostMapping("member_id_find")
+    public String memberIdFindEnd(@RequestParam Map<String, String> paraMap,
+                                  Model model) {
+
+        /*
+          paraMap 예시(너가 폼에서 어떤 input name을 쓰는지에 따라):
+          - name
+          - email
+          - mobile
+
+          ※ 컨트롤러에서 암/복호화 하지 말고 "있는 그대로" 서비스로 전달.
+             (DB가 암호화 컬럼이면 서비스/DAO가 통일해서 처리)
+        */
+
+        // TODO: service 구현 필요
+        // 예) String memberid = memberService.findMemberId(paraMap);
+        String memberid = memberService.findMemberId(paraMap);
+
+        if (memberid == null || memberid.trim().isEmpty()) {
+            model.addAttribute("isFound", false);
+            model.addAttribute("message", "일치하는 회원 정보가 없습니다. 입력 정보를 다시 확인하세요.");
+        }
+        else {
+            model.addAttribute("isFound", true);
+
+            // 아이디 전체 노출은 지양 → 마스킹 권장
+            model.addAttribute("memberidMasked", maskId(memberid));
+            // 필요하면 원문도(운영에서는 보통 안 보여줌)
+            // model.addAttribute("memberid", memberid);
+        }
+
+        return "security/login/member_id_find_result";
+        // src/main/resources/templates/security/login/member_id_find_result.html
+    }
+
+    
+    
     
     // 인증 실패시 URL  /* ===== (#스프링시큐리티16) ===== */
     @GetMapping(value="noAuthenticated")
