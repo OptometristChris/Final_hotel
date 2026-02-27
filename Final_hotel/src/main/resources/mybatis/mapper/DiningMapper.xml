@@ -3,19 +3,34 @@
 
 <mapper namespace="com.spring.app.ih.dining.mapper.DiningMapper">
 
-    <select id="getDiningList" resultType="com.spring.app.ih.dining.model.DiningDTO">
+    <select id="getDiningList" resultType="DiningDTO" parameterType="HashMap">
 	    SELECT 
-	        D.NAME            AS name,
-	        D.D_TYPE          AS dType,
-	        T.TABLE_ID        AS tableId,
-	        T.TABLE_NUMBER    AS tableNumber,
-	        T.MAX_CAPACITY    AS maxCapacity,
-	        T.MIN_CAPACITY    AS minCapacity,
-	        T.ZONE_NAME       AS zoneName,
-	        T.IS_SPECIFIABLE  AS isSpecifiable,
-	        T.ACTIVE_YN       AS activeYn
-	    FROM tbl_dining D
-	    INNER JOIN dining_tables T ON D.dining_id = T.FK_HOTEL_ID
-	    ORDER BY D.dining_id, T.TABLE_ID
+	        dining_id, name, d_type, description,
+	        tel, floor, main_img, fk_hotel_id, business_hours
+	    FROM tbl_dining
+	    <where>
+	        <if test="hotel_id != null and hotel_id != ''">
+	            AND fk_hotel_id = #{hotel_id}
+	        </if>
+	        <if test="d_type != null and d_type != ''">
+	            AND UPPER(d_type) = UPPER(#{d_type})
+	        </if>
+	    </where>
+	    ORDER BY dining_id ASC
 	</select>
+	
+    <select id="getDiningDetail" resultType="DiningDTO">
+        SELECT 
+            dining_id, 
+            name, 
+            d_type, 
+            description,
+            introduction,    business_hours,
+            tel, 
+            floor, 
+            main_img,
+            store_imgs,      food_imgs,       menu_pdf,        extra_info,      fk_hotel_id      FROM tbl_dining
+        WHERE dining_id = #{dining_id}
+    </select>
+    
 </mapper>
