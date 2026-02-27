@@ -23,7 +23,7 @@ body {font-family: Arial;}
 
 <!-- 사용자가 선택한 체크인/체크아웃 날짜 표시 영역 -->
 <div id="selectedDateBox" style="margin:20px 0; font-weight:bold;">
-    체크인/체크아웃 선택 안됨
+   
 </div>
 
 <!-- 예약 페이지로 넘길 값 저장용 hidden input -->
@@ -303,32 +303,39 @@ function openCalendar(roomId) {
                 // 드래그
                 select: function(info){
 
-                	const checkIn = info.startStr;  // 체크인
-                    const checkOut = info.endStr;   // 체크아웃 (자동 +1일)
+                	 const nights = calculateNights(info.startStr, info.endStr);
 
-                    applyDateToPage(checkIn, checkOut); // 화면 반영
-                    closeModal();
+                	    // 하루짜리 선택(클릭으로 인식된 select) 무시
+                	    if(nights === 1){
+                	        return;
+                	    }
+
+                	    // 드래그로 2박 이상 선택한 경우만 처리
+                	    applyDateToPage(info.startStr, info.endStr);
+
+                	    selectedCheckIn = null;
+                	    selectedCheckOut = null;
+
+                	    closeModal();
                 },
                 
                 // 클릭 → 클릭 방식
-                dateClick: function(info){             	
-                	
-                	// 추가 : 클릭한 날짜 재고 확인 (예약 막기)
-                	const clickedDay = data.find(d => d.STAY_DATE === info.dateStr);
+                dateClick: function(info){
 
-                	console.log(clickedDay);
-                
-                	if(clickedDay && clickedDay.AVAILABLE_COUNT === 0){
-                	    alert("해당 날짜는 예약 마감입니다.");
-                	    return;
-                	}
-                	
-                	// 시작
+                    const clickedDay = data.find(d => d.STAY_DATE === info.dateStr);
+
+                    if(clickedDay && clickedDay.AVAILABLE_COUNT === 0){
+                        alert("해당 날짜는 예약 마감입니다.");
+                        return;
+                    }
+
+                    // 체크인
                     if(!selectedCheckIn){
                         selectedCheckIn = info.dateStr;
                         return;
                     }
 
+                    // 체크아웃
                     selectedCheckOut = info.dateStr;
 
                     if(new Date(selectedCheckOut) <= new Date(selectedCheckIn)){
@@ -393,8 +400,11 @@ function applyDateToPage(checkIn, checkOut){
 
     // 상단 표시 영역 업데이트
     box.innerHTML = `
-        체크인 ${checkIn} ~ 체크아웃 ${checkOut} / ${nights}박
-    `;
+	    체크인 <span style="color:red; font-weight:bold;">${checkIn}</span> 
+	    ~ 체크아웃 
+	    <span style="color:red; font-weight:bold;">${checkOut}</span> 
+	    / ${nights}박
+	`;
 
     // hidden input에 값 저장 (예약 페이지 전송용)
     document.getElementById("checkInInput").value = checkIn;
