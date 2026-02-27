@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::div.container})}"
+      lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<title>아이디 찾기 결과</title>
+
+<link rel="stylesheet" href="">
+
+<style>
+  :root{
+    --bg: #f6f1ea;
+    --panel: #ffffff;
+    --line: #eadfd3;
+    --line-2: #d8c6b3;
+    --text: #2a2320;
+    --muted: #7a6a61;
+    --brand: #8b6a52;
+    --accent: #cda57a;
+    --danger: #c94b4b;
+    --ok: #2f7d4c;
+    --shadow: 0 18px 45px rgba(54, 38, 25, .10);
+    --radius: 18px;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, "Apple SD Gothic Neo", sans-serif;
+    background: radial-gradient(1200px 600px at 20% 10%, #fff, transparent 55%),
+                radial-gradient(900px 500px at 80% 90%, #fff, transparent 50%),
+                var(--bg);
+    color: var(--text);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px 14px;
+  }
+  .wrap{ width: 420px; max-width: 100%; }
+  .brandbar{ display:flex; justify-content:center; margin-bottom: 14px; letter-spacing:.14em; font-weight: 800; color: var(--brand); }
+  .card{ background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow:hidden; }
+  .header{ padding: 20px 18px 12px; text-align:center; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #fff, #fff7ef); }
+  .header h1{ margin:0; font-size: 20px; letter-spacing:.04em; }
+  .header p{ margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+  .body{ padding: 18px; }
+
+  .ok{
+    color: #fff;
+    background: var(--ok);
+    border-radius: 12px;
+    padding: 10px 10px;
+    font-weight: 900;
+    margin-bottom: 12px;
+  }
+  .fail{
+    color:#fff;
+    background: var(--danger);
+    border-radius: 12px;
+    padding: 10px 10px;
+    font-weight: 900;
+    margin-bottom: 12px;
+  }
+
+  .box{
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+    background: #fffaf5;
+  }
+
+  .id{
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--brand);
+    letter-spacing: .03em;
+    margin-top: 8px;
+    word-break: break-all;
+  }
+
+  .btnrow{ display:flex; gap:10px; margin-top: 14px; }
+  .btn{
+    flex:1;
+    border:0;
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-weight: 900;
+    cursor:pointer;
+    letter-spacing: .04em;
+  }
+  .btn-main{
+    background: linear-gradient(180deg, var(--brand), #6f513f);
+    color:#fff;
+  }
+  .btn-sub{
+    background: #fff;
+    color: var(--brand);
+    border: 1px solid var(--line-2);
+  }
+  .btn:active{ transform: translateY(1px); }
+
+  .links{ margin-top: 12px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap; color: var(--muted); font-size: 12.5px; }
+  .links a{ color: var(--muted); text-decoration:none; border-bottom: 1px dashed transparent; }
+  .links a:hover{ color: var(--brand); border-bottom-color: rgba(139,106,82,.5); }
+</style>
+
+<style type="text/css"></style>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+  // (필요 시) 버튼 클릭 로직을 JS로 빼고 싶으면 여기서 처리 가능.
+/*]]>*/
+</script>
+
+<body>
+<div class="container">
+  <div class="wrap">
+    <div class="brandbar">CIEL</div>
+
+    <section class="card" aria-label="아이디 찾기 결과 카드">
+      <div class="header">
+        <h1>아이디 찾기 결과</h1>
+        <p>입력하신 정보 기준 조회 결과입니다.</p>
+      </div>
+
+      <div class="body">
+
+        <!-- 성공 -->
+        <div th:if="${isFound}">
+          <div class="ok">아이디를 찾았습니다.</div>
+
+          <div class="box">
+            <div>회원님의 아이디는 아래와 같습니다.</div>
+            <div class="id" th:text="${memberid}"></div>
+          </div>
+
+          <div class="btnrow">
+            <button class="btn btn-main" type="button"
+                    th:onclick="|location.href='@{/security/login}'|">로그인 하러가기</button>
+            <button class="btn btn-sub" type="button"
+                    th:onclick="|location.href='@{/security/member_pw_find}'|">비밀번호 찾기</button>
+          </div>
+        </div>
+
+        <!-- 실패 -->
+        <div th:if="${!isFound}">
+          <div class="fail">아이디를 찾지 못했습니다.</div>
+
+          <div class="box">
+            <div th:text="${message}">일치하는 회원 정보가 없습니다. 입력 정보를 다시 확인하세요.</div>
+          </div>
+
+          <div class="btnrow">
+            <button class="btn btn-main" type="button"
+                    th:onclick="|location.href='@{/security/member_id_find}'|">다시 시도</button>
+            <button class="btn btn-sub" type="button"
+                    th:onclick="|location.href='@{/security/memberRegister}'|">회원가입</button>
+          </div>
+        </div>
+
+        <div class="links">
+          <a th:href="@{/index}">메인</a>
+          <span>|</span>
+          <a th:href="@{/security/login}">로그인</a>
+        </div>
+
+      </div>
+    </section>
+  </div>
+</div>
+</body>
+</html>

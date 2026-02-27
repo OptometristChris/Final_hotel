@@ -41,7 +41,21 @@ public interface MemberDAO {
 	List<String> authorityListByMemberNo(@Param("memberNo") Integer memberNo);
 	
 	int update_member_profile(MemberDTO memberdto);
+	
+	String findMemberId(Map<String, String> paraMap);
+
+	int verifyMemberForPwReset(Map<String, String> paraMap);
+
+	int updatePasswordForTemp(Map<String, String> paraMap);
+	
+	String findEmailByMemberid(String memberid);
 	// ===== MemberController 에서 사용하는 메서드 ===== //
+
+
+	
+
+
+
 
 
 	

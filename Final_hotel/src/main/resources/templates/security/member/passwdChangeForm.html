@@ -1,125 +1,159 @@
 <!DOCTYPE html>
-<html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::div.container})}" 
-      lang="ko" 
-      xmlns:th="http://www.thymeleaf.org"> 
-<!-- ::title 은   현재 페이지의 title   태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 첫번째 파라미터로 전달한다. -->
-<!-- ::link  는   현재 페이지의 link    태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 두번째 파라미터로 전달한다. -->
-<!-- ::style 은   현재 페이지의 style   태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 세번째 파라미터로 전달한다. -->
-<!-- ::script 는  현재 페이지의 script  태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 네번째 파라미터로 전달한다. -->
-<!-- ::div.container 은 현재 페이지의 div.container 태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 다섯번째 파라미터로 전달한다. --> 
-<!-- 타임리프는 백엔드 서버에서 HTML을 동적으로 렌더링하는 용도로 사용된다. -->
+<html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::div.container})}"
+      lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
 
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>비밀번호 변경</title>
 
 <link rel="stylesheet" href="">
 
-<style type="text/css"></style>
+<style>
+  :root{
+    --bg: #f6f1ea;
+    --panel: #ffffff;
+    --line: #eadfd3;
+    --line-2: #d8c6b3;
+    --text: #2a2320;
+    --muted: #7a6a61;
+    --brand: #8b6a52;
+    --accent: #cda57a;
+    --danger: #c94b4b;
+    --shadow: 0 18px 45px rgba(54, 38, 25, .10);
+    --radius: 18px;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, "Apple SD Gothic Neo", sans-serif;
+    background: radial-gradient(1200px 600px at 20% 10%, #fff, transparent 55%),
+                radial-gradient(900px 500px at 80% 90%, #fff, transparent 50%),
+                var(--bg);
+    color: var(--text);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px 14px;
+  }
+  .wrap{ width: 420px; max-width: 100%; }
+  .brandbar{ display:flex; justify-content:center; margin-bottom: 14px; letter-spacing:.14em; font-weight: 800; color: var(--brand); }
+  .card{ background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow:hidden; }
+  .header{ padding: 20px 18px 12px; text-align:center; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #fff, #fff7ef); }
+  .header h1{ margin:0; font-size: 20px; letter-spacing:.04em; }
+  .header p{ margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+  .body{ padding: 18px; }
 
-<!--/* 
-      자바스크립트 인라인 
-      th:inline="javascript" 은 스크립트 태그 내에서 Thymeleaf 문법([[...]])을 해석할 수 있게 해주는 설정이다.
-      JavaScript 안에서 Thymeleaf 값을 넣을 때는 th:inline="javascript" 와 /*[[뭐뭐뭐]]*/ 구문을 사용해야 한다. 
-*/-->
+  .field{ margin-bottom: 12px; }
+  .label{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 6px; font-size: 13px; color: var(--muted); font-weight: 700; }
+  .input{ width:100%; padding: 12px 12px; border: 1px solid var(--line-2); border-radius: 12px; outline:none; background: #fff; font-size: 14px; transition: border-color .15s, box-shadow .15s; }
+  .input:focus{ border-color: var(--accent); box-shadow: 0 0 0 4px rgba(205,165,122,.22); }
+
+  .hint{
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.55;
+    background: #fffaf5;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 12px;
+  }
+
+  .btn{ width:100%; border:0; border-radius: 14px; padding: 12px 14px; font-weight: 900; cursor:pointer; background: linear-gradient(180deg, var(--brand), #6f513f); color:#fff; letter-spacing: .04em; }
+  .btn:active{ transform: translateY(1px); }
+
+  .error{ display:none; margin-top: 10px; font-size: 12.5px; color: #fff; background: var(--danger); border-radius: 12px; padding: 10px 10px; line-height: 1.45; }
+  .error.show{ display:block; }
+
+  .links{ margin-top: 12px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap; color: var(--muted); font-size: 12.5px; }
+  .links a{ color: var(--muted); text-decoration:none; border-bottom: 1px dashed transparent; }
+  .links a:hover{ color: var(--brand); border-bottom-color: rgba(139,106,82,.5); }
+</style>
+
 <script th:inline="javascript">
- /*<![CDATA[*/
-  $(document).ready(function(){
-	  
-	  $("button#btnPwdChange").click(function(){
-		  func_PwdChange();
-	  });
-	  
-	  
-	  $("input#passwd2").keydown(function(event){
-		  
-		  if(event.keyCode == 13) { // 엔터를 했을 경우
-			  func_PwdChange();
-		  }
-	  });
-	  
-  });// end of $(document).ready(function(){})------------------------------
-  
-// Function Declaration
-  
-  function func_PwdChange() {
-	  
-	  const passwd = $("input#passwd").val(); 
-	  const passwd2 = $("input#passwd2").val(); 
-	
-   // const regExp = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).*$/g; 
-   // 또는
-	  const regExp = new RegExp(/^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).*$/g); 
-      //  숫자/문자/특수문자 포함 형태의 8~15자리 이내의 암호 정규표현식 객체 생성 
-          
-      const bool = regExp.test(passwd);
-			
-	  if(!bool) {
-		 // 비밀번호가 정규표현식에 위배된 경우  
-		 alert("새비밀번호는 숫자,영문자,특수문자가 혼합된 8~15자리 이내이어야 합니다.");
-		 $("input#passwd").val(""); 
-		 $("input#passwd2").val("");
-		 $("input#passwd").focus();
-		 return; // 종료	
-	  }
-	  
-	  else {
-		 // 비밀번호가 정규표현식에 맞는 경우 
-		 if(passwd != passwd2) {
-		    alert("새비밀번호 입력값이 다릅니다.");
-		    $("input#passwd").val("");
-		    $("input#passwd2").val(""); 
-		    $("input#passwd").focus();
-		    return; // 종료 
-	     }
-		 
-		 else {
-			  const frm = document.passwdChangeFrm;
-			    
-		   // [[@{...}]] 문법이 자동으로 Context Path를 붙여줍니다.
-		   // Thymeleaf가 실행될 때는 주석 내부의 값이 할당되고, 
-		   // 정적 HTML 상태일 때는 뒤의 'url' 문자열이 할당되어 에러가 나지 않습니다.
-			  frm.action = /*[[@{/security/passwdChange}]]*/ 'url';
-			  frm.method = "post";
-			  frm.submit();
-		 }
-		 
-	  }
-	  
-  }// end of function func_Login()------------------------
-  
- /*]]>*/	
+/*<![CDATA[*/
+document.addEventListener('DOMContentLoaded', () => {
+
+  const frm = document.getElementById('passwdChangeFrm');
+  const err = document.getElementById('err');
+  const btn = document.getElementById('btnPwdChange');
+
+  function show(msg){
+    err.textContent = msg;
+    err.classList.add('show');
+  }
+
+  function submitChange(){
+    err.classList.remove('show');
+
+    const passwd = frm.passwd.value.trim();
+    const passwd2 = frm.passwd2.value.trim();
+
+    const regExp = new RegExp(/^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).*$/g);
+
+    if(!regExp.test(passwd)){
+      return show("새비밀번호는 숫자/영문자/특수문자가 혼합된 8~15자리 이내이어야 합니다.");
+    }
+    if(passwd !== passwd2){
+      return show("새비밀번호 입력값이 다릅니다.");
+    }
+
+    frm.action = /*[[@{/security/passwdChange}]]*/ 'url';
+    frm.method = "post";
+    frm.submit();
+  }
+
+  btn.addEventListener('click', submitChange);
+  frm.passwd2.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){ submitChange(); }
+  });
+});
+/*]]>*/
 </script>
 
 <body>
-	<div class="container">
-		<div class="row" style="display: flex; border: solid 0px red;">
-			<div class="col-md-8 col-md-offset-2" style="margin: auto; border: solid 0px blue;">
-				<h2 class="text-muted">Spring Security(스프링 보안) 비밀번호 변경</h2>
-				<hr style="border: solid 1px orange">
-				
-				<form name="passwdChangeFrm" class="mt-5">
-					<div class="form-row">    
-					    <div class="form-group col-md-6">
-							<label class="text-muted font-weight-bold" for="passwd">새비밀번호</label>
-							<input type="password" class="form-control" name="passwd" id="passwd" value=""/>  <!--/* 부트스트랩에서 input 태그에는 항상 class form-control 이 사용되어져야 한다. */--> 
-							<input type="hidden" name="memberid" th:value="${session.sessionMemberDTO.memberid}"/>
-			            </div>
-			
-						<div class="form-group col-md-6">
-							<label class="text-muted font-weight-bold text-muted" for="passwd2">비밀번호확인</label>
-							<input type="password" class="form-control" id="passwd2" value="" /> 
-						</div>
-					</div>
-				</form>
-			</div>
-			
-			<div class="col-md-8 col-md-offset-2" style="margin: auto; display: flex; border: solid 0px blue;">
-				<div style="margin: auto; border: solid 0px blue;">
-					<button style="width: 150px; height: 40px;" class="btn btn-primary" type="button" id="btnPwdChange">확인</button>
-				</div>
-			</div>
-		</div>
-	</div>
+<div class="container">
+  <div class="wrap">
+    <div class="brandbar">CIEL</div>
+
+    <section class="card" aria-label="비밀번호 변경 카드">
+      <div class="header">
+        <h1>비밀번호 변경</h1>
+        <p>새 비밀번호를 입력해주세요.</p>
+      </div>
+
+      <div class="body">
+        <div class="hint">
+          비밀번호 규칙: <b>숫자/영문자/특수문자 포함</b>, <b>8~15자리</b>
+        </div>
+
+        <form id="passwdChangeFrm" name="passwdChangeFrm">
+          <div class="field">
+            <div class="label"><span>새 비밀번호</span></div>
+            <input class="input" type="password" name="passwd" id="passwd" autocomplete="new-password" placeholder="새 비밀번호" />
+            <input type="hidden" name="memberid" th:value="${session.sessionMemberDTO.memberid}" />
+          </div>
+
+          <div class="field">
+            <div class="label"><span>비밀번호 확인</span></div>
+            <input class="input" type="password" name="passwd2" id="passwd2" autocomplete="new-password" placeholder="비밀번호 확인" />
+          </div>
+
+          <button class="btn" type="button" id="btnPwdChange">변경하기</button>
+
+          <div class="error" id="err"></div>
+
+          <div class="links">
+            <a th:href="@{/security/member/mypage}">마이페이지</a>
+            <span>|</span>
+            <a th:href="@{/index}">메인</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>
 </body>
-</html> 
+</html>

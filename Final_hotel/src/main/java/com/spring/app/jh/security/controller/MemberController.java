@@ -37,7 +37,13 @@ public class MemberController {
 	
 	// 회원가입 form 페이지
 	@GetMapping("memberRegister")
-	public String memberRegister() {
+	public String memberRegister(HttpServletRequest request) {
+		
+		// 이미 로그인 했다면 인덱스로
+       HttpSession session = request.getSession(false);
+	   if(session != null && session.getAttribute("sessionMemberDTO") != null) {
+	       return "redirect:/index";
+	   }
 		
 		return "security/login/memberRegisterForm";
 		// src/main/resources/templates/security/login/memberRegisterForm.html 파일 생성해줘야 함
@@ -132,6 +138,13 @@ public class MemberController {
           - 따라서 여기서 referer 를 세션에 prevURLPage 로 저장하는 방식은 제거한다.
        */
     	
+       
+       // 이미 로그인 했다면 인덱스로
+       HttpSession session = request.getSession(false);
+	   if(session != null && session.getAttribute("sessionMemberDTO") != null) {
+	       return "redirect:/index";
+	   }
+    	
        // login 실패여부 체크하기
        String loginFail = request.getParameter("loginFail");
 
@@ -148,7 +161,7 @@ public class MemberController {
     }
     
     
-    // id 찾기
+    // id 찾기 form
     @GetMapping("member_id_find")
     public String memberIdFindForm(HttpServletRequest request) {
 
@@ -185,15 +198,66 @@ public class MemberController {
         }
         else {
             model.addAttribute("isFound", true);
-
-            // 아이디 전체 노출은 지양 → 마스킹 권장
-            model.addAttribute("memberidMasked", maskId(memberid));
-            // 필요하면 원문도(운영에서는 보통 안 보여줌)
-            // model.addAttribute("memberid", memberid);
+            model.addAttribute("memberid", memberid);
         }
 
         return "security/login/member_id_find_result";
         // src/main/resources/templates/security/login/member_id_find_result.html
+    }
+    
+    // 비밀번호 찾기 form
+    @GetMapping("member_pw_find")
+    public String memberPwFindForm(HttpServletRequest request) {
+
+        return "security/login/member_pw_find";
+        // src/main/resources/templates/security/login/member_pw_find.html
+    }
+    
+    // 비밀번호 찾기 처리
+    @PostMapping("member_pw_find")
+    public String memberPwFindEnd(@RequestParam Map<String, String> paraMap,
+                                  Model model) {
+
+        /*
+          paraMap 예시:
+          - memberid
+          - email (또는 mobile)
+          - name (선택)
+
+          구현 방향(둘 중 하나 고르면 됨):
+          A) 임시비밀번호 발급 → DB에 BCrypt 해시로 저장 → 이메일/문자로 전달
+          B) 재설정 토큰 발급 → 재설정 페이지에서 새 비번 입력받아 저장(더 권장)
+
+          지금 단계에서는 우선 A로 가는 경우가 많음.
+        */
+
+        // 비밀번호 리셋을 위해 기입한 정보로 신원 특정
+        boolean isVerified = memberService.verifyMemberForPwReset(paraMap);
+
+        if (!isVerified) {
+            model.addAttribute("isSuccess", false);
+            model.addAttribute("message", "입력하신 정보와 일치하는 회원이 없습니다.");
+            return "security/login/member_pw_find_result";
+        }
+
+        // 이메일 발송 없이 그냥 임시비밀번호 발급 + DB 업데이트
+        // String tmp = memberService.issueTempPasswordAndUpdate(paraMap);
+        
+        // 해당 회원의 비밀번호 초기화 후 임시비밀번호 발급 + DB 업데이트 + 이메일로 발송
+        boolean ok = memberService.issueTempPasswordAndSendEmail(paraMap);
+
+        if (!ok) {
+            model.addAttribute("isSuccess", false);
+            model.addAttribute("message", "입력하신 정보와 일치하는 회원이 없거나 이메일 발송에 실패했습니다.");
+        }
+        else {
+            model.addAttribute("isSuccess", true);
+            model.addAttribute("message", "임시 비밀번호를 이메일로 발송했습니다. 메일 확인 후 로그인하세요.");
+            // model.addAttribute("tempPw", ...)  <-- 제거
+        }
+
+        return "security/login/member_pw_find_result";
+        // src/main/resources/templates/security/login/member_pw_find_result.html
     }
 
     
@@ -244,6 +308,20 @@ public class MemberController {
        return "security/member/passwdChangeResult";
     // src/main/resources/templates/security/member/passwdChangeResult.html 파일 생성해줘야 함
     }
+    
+    
+    // 마이페이지로
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("member/mypage")
+    public String mypage(HttpSession session, Model model) {
+
+        // DB 조회값을 올릴 수 있으면 올리고(예: memberService.getMemberDetail(memberNo))
+        // 아직 없으면 model에 안 담아도 템플릿에서 더미로 처리됨
+
+        return "security/member/mypage";
+        // templates/security/member/mypage.html
+    }
+    
     
     // 회원정보보기 URL
     @PreAuthorize("hasRole('USER')") // 해당 권한이 있는 사람이 있는 사람만 허용
