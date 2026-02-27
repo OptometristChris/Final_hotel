@@ -79,4 +79,24 @@ public class NoticeServiceimple implements NoticeService {
         return noticeDao.selectNoticeListWithSearch(paraMap);
     }
 
+    // 검색 및 페이징이 포함된 목록 조회 구현
+    @Override
+    public List<NoticeDTO> getNoticeList(Map<String, Object> paraMap) {
+        return noticeDao.selectNoticeListWithSearch(paraMap);
+    }
+
+    // 총 게시글 개수 조회 구현
+    @Override
+    public int getTotalCount(Map<String, Object> paraMap) {
+        return noticeDao.getTotalCount(paraMap);
+    }
+    
+    // 고정글(isTop = 'Y')만 별도로 조회 (모든 페이지 상단 노출용)
+    @Override
+    public List<NoticeDTO> getTopNotices(Long hotelId) {
+        // hotelId가 0(전체)이면 null을 넘겨서 전체 고정글 조회
+        Long id = (hotelId == null || hotelId == 0) ? null : hotelId;
+        return noticeDao.selectTopNotices(id);
+    }
+    
 }
