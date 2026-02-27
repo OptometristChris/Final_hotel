@@ -37,7 +37,7 @@ public class RoomController {
         System.out.println(roomList);
 
         mav.addObject("roomList", roomList);
-        mav.setViewName("room/list");
+        mav.setViewName("hk/room/list");
 
         return mav;
     }
@@ -74,7 +74,7 @@ public class RoomController {
         RoomTypeDTO room = roomService.getRoomDetail(roomId);
 
         mav.addObject("room", room);
-        mav.setViewName("room/detail");
+        mav.setViewName("hk/room/detail");
 
         return mav;
     }

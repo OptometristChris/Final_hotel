@@ -28,7 +28,7 @@ public class ReservationController {
         model.addAttribute("check_in", check_in);
         model.addAttribute("check_out", check_out);
 
-        return "reservation/form";
+        return "hk/reservation/form";
     }
 
 }
