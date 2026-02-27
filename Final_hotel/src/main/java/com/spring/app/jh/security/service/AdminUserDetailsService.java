@@ -36,7 +36,7 @@ public class AdminUserDetailsService implements UserDetailsService {
         (회원 인증은 MemberUserDetailsService 에서 별도로 처리)
 	*/
 
-	private final AdminDAO adminDao;
+	private final AdminService adminService;
 
 	// !!!! 관리자 로그인 처리 메서드 임 !!!! //
 	@Override
@@ -45,8 +45,8 @@ public class AdminUserDetailsService implements UserDetailsService {
 		// 우리는 UserDetails 인터페이스를 구현한 com.spring.app.security.domain.CustomAdminDetails 클래스를 만들어 두었다.
 
 		// username = 로그인 폼에서 입력한 아이디(관리자 adminid) 를 의미한다고 보면 된다.
-		AdminDTO adminDto = adminDao.findByUsername(username);
-		// !!! 중요함 adminDao.findByUsername(username); 을 잘 봐야 함 !!!
+		AdminDTO adminDto = adminService.findByAdminid(username);
+		// !!! 중요함 adminService.findByUsername(username); 을 잘 봐야 함 !!!
 		// -> 여기서 DB 조회 시, 비밀번호/enabled 뿐 아니라 권한(ROLE_*)도 함께 채워져 있어야 한다.
 		// -> 또한 admin_type(HQ/BRANCH), BRANCH 인 경우 fk_hotel_id 같은 운영정보도 adminDto에 들어있으면 이후 인가/페이지 제한에 활용 가능.
 

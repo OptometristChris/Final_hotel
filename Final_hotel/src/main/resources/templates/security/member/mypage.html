@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::div.container})}"
+      lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<title>마이페이지</title>
+
+<link rel="stylesheet" href="">
+
+<style>
+/* ===== 업로드한 마이페이지.html 기반 스타일 그대로 이식 ===== */
+:root{
+  --bg:#ffffff;
+  --line:#dcdcdc;
+  --muted:#666;
+  --text:#111;
+  --card:#fff;
+  --shadow:0 8px 24px rgba(0,0,0,.06);
+  --radius:14px;
+  --radius-lg:18px;
+  --pad:18px;
+  --max:1200px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
+  color:var(--text);
+  background:#fafafa;
+}
+
+.layout{
+  max-width:var(--max);
+  margin:0 auto;
+  padding:22px 16px 40px;
+  display:grid;
+  grid-template-columns:260px 1fr;
+  gap:18px;
+  align-items:start;
+}
+
+.sidebar{
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  position:sticky;
+  top:14px;
+}
+.side-title{
+  padding:16px 16px 14px;
+  border-bottom:1px solid var(--line);
+  font-weight:800;
+  text-align:center;
+}
+.side-section{
+  padding:14px 14px 10px;
+  border-bottom:1px solid #eee;
+}
+.side-section:last-child{border-bottom:none;}
+.side-section h3{
+  margin:0 0 10px;
+  font-size:13px;
+  color:#222;
+  letter-spacing:.2px;
+}
+.side-section a{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 10px;
+  border-radius:10px;
+  color:#222;
+  text-decoration:none;
+  font-size:14px;
+}
+.side-section a:hover{ background:#f3f3f3; }
+.side-section a span{ color:var(--muted); font-size:12px; }
+
+.main{ min-width:0; }
+.page-title{
+  font-size:28px;
+  margin:4px 0 14px;
+  font-weight:900;
+  letter-spacing:-.3px;
+}
+
+.section{ margin-bottom:18px; }
+.section-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin:0 0 10px;
+}
+.section-head h2{
+  margin:0;
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:-.3px;
+}
+.section-head p{
+  margin:0;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow);
+  padding:var(--pad);
+}
+
+/* Summary cards */
+.grid3{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:12px;
+}
+.mini{
+  padding:16px;
+  display:flex;
+  gap:14px;
+  align-items:center;
+  cursor:pointer;
+  text-decoration:none;
+  color:inherit;
+}
+.mini:hover{ transform:translateY(-1px); }
+.icon{
+  width:66px;height:66px;
+  border:2px solid #111;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  font-size:22px;
+}
+.mini .info{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:0;
+}
+.mini .info .title{ font-weight:900; font-size:16px; }
+.mini .info .desc{
+  color:var(--muted);
+  font-size:13px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.mini .arrow{ color:#222; font-weight:900; font-size:18px; }
+
+/* 2 cards */
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.kv{
+  display:grid;
+  grid-template-columns:120px 1fr;
+  gap:10px;
+  font-size:14px;
+  padding:14px;
+}
+.kv .k{ color:var(--muted); }
+.kv .v{ font-weight:800; }
+
+/* Favorites */
+.favorites{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:18px;
+}
+.fav-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex:1;
+  justify-content:center;
+}
+.divider{
+  width:1px;
+  align-self:stretch;
+  background:var(--line);
+}
+.fav-icon{
+  width:58px;height:58px;
+  border:2px solid #111;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  font-size:18px;
+}
+.fav-text{ display:flex; flex-direction:column; gap:2px; }
+.fav-text b{ font-size:15px; }
+.fav-text span{ font-size:13px; color:var(--muted); }
+
+/* Promos */
+.promos{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:12px;
+}
+.promo{
+  padding:14px;
+  text-decoration:none;
+  color:inherit;
+}
+.promo .thumb{
+  height:110px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:#f3f3f3;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+  color:#777;
+  margin-bottom:12px;
+}
+.promo h3{
+  margin:0 0 8px;
+  font-size:16px;
+  font-weight:900;
+}
+.promo .meta{
+  margin:0;
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.6;
+}
+.promo:hover{ transform:translateY(-1px); }
+
+/* Sticky reserve */
+.reserve-sticky{
+  position:fixed;
+  right:22px;
+  bottom:22px;
+  width:140px;
+  height:140px;
+  border-radius:999px;
+  border:3px solid #111;
+  background:#fff;
+  box-shadow:var(--shadow);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+  color:#111;
+  font-weight:900;
+  font-size:22px;
+  z-index:50;
+}
+.reserve-sticky:hover{ transform:translateY(-2px); }
+
+@media (max-width: 980px){
+  .layout{ grid-template-columns:1fr; }
+  .sidebar{ position:relative; top:auto; }
+  .grid3{ grid-template-columns:1fr; }
+  .grid2{ grid-template-columns:1fr; }
+  .promos{ grid-template-columns:1fr; }
+  .reserve-sticky{ width:120px;height:120px;font-size:20px; }
+}
+
+/* ===== Top Area(업로드 파일의 상단/등급 카드) ===== */
+.mypage-top{
+  border-radius: 18px;
+  overflow: hidden;
+  border:1px solid #dcdcdc;
+  background:#fff;
+}
+.name-go-edit{
+  width:28px;height:28px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+  color:#fff;
+  font-size:18px;
+  font-weight:900;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.22);
+  line-height:1;
+}
+.name-go-edit:hover{ background:rgba(255,255,255,.28); }
+.mypage-topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:18px 18px;
+  background:#6f6663;
+  color:#fff;
+}
+.topbar-left{display:flex;flex-direction:column;gap:10px;}
+.user-chip{display:flex;align-items:center;gap:10px;font-weight:800;}
+.user-icon{
+  width:30px;height:30px;border-radius:999px;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.18);
+  font-size:16px;
+}
+.user-name{font-size:18px;letter-spacing:.2px;}
+.sns-row{display:flex;align-items:center;gap:10px;font-size:14px;}
+.sns-label{opacity:.9;}
+.sns-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 10px;border-radius:999px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.22);
+  font-weight:700;
+}
+.sns-dot{
+  width:10px;height:10px;border-radius:999px;
+  background:#ffd400;
+  display:inline-block;
+}
+
+.grade-card{ padding:22px 18px 18px; background:#fff; }
+.grade-card-body{
+  display:grid;
+  grid-template-columns: 260px 1fr;
+  gap:18px;
+  align-items:center;
+}
+.grade-logo-area{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:12px;
+  padding-left:6px;
+}
+.grade-logo{
+  width:120px;height:120px;border-radius:999px;
+  border:2px solid #111;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:6px;
+}
+.grade-letter{font-size:46px;font-weight:900;line-height:1;}
+.grade-label{font-size:12px;color:#666;font-weight:700;}
+.grade-now{font-size:14px;color:#333;}
+.grade-now b{font-weight:900;}
+.benefit-area{display:flex;justify-content:flex-end;}
+.benefit-box{
+  width:min(420px, 100%);
+  border:1px solid #dcdcdc;
+  border-radius:14px;
+  padding:14px 16px;
+  background:#fff;
+}
+.benefit-title{ font-weight:900; font-size:16px; margin-bottom:6px; }
+.benefit-sub{ color:#666; font-size:12px; margin-bottom:10px; }
+.benefit-list{ margin:0; padding-left:18px; color:#222; line-height:1.7; font-size:13px; }
+
+@media (max-width: 900px){
+  .grade-card-body{grid-template-columns:1fr;gap:14px;}
+  .benefit-area{justify-content:flex-start;}
+}
+</style>
+
+<style type="text/css"></style>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+  // 필요 시: href="#" 클릭 막는 프로토타입 스크립트는 넣지 않음(실제 라우팅 붙일 예정)
+/*]]>*/
+</script>
+
+<body>
+<div class="container"
+     th:with="
+        m = (${memberDto} != null ? ${memberDto} : ${session.sessionMemberDTO}),
+        userName = (${m} != null and ${m.name} != null ? ${m.name} : '홍길동'),
+        userId   = (${m} != null and ${m.memberid} != null ? ${m.memberid} : 'hong123'),
+        gradeName = (${gradeName} != null ? ${gradeName} : 'Silver'),
+        gradeLetter = (${gradeLetter} != null ? ${gradeLetter} : 'S'),
+        snsName = (${snsName} != null ? ${snsName} : 'Kakao'),
+        roomUpcoming = (${roomUpcoming} != null ? ${roomUpcoming} : 2),
+        roomPending = (${roomPending} != null ? ${roomPending} : 1),
+        diningUpcoming = (${diningUpcoming} != null ? ${diningUpcoming} : 3),
+        shuttleUpcoming = (${shuttleUpcoming} != null ? ${shuttleUpcoming} : 2),
+        payWaiting = (${payWaiting} != null ? ${payWaiting} : 1),
+        payDone = (${payDone} != null ? ${payDone} : 4),
+        refundDoing = (${refundDoing} != null ? ${refundDoing} : 0),
+        qnaOpen = (${qnaOpen} != null ? ${qnaOpen} : 1),
+        qnaDone = (${qnaDone} != null ? ${qnaDone} : 5),
+        favReserve = (${favReserve} != null ? ${favReserve} : 2),
+        favPromo = (${favPromo} != null ? ${favPromo} : 5)
+     ">
+
+  <div class="layout">
+
+    <!-- 사이드바(업로드 파일 구조 유지) :contentReference[oaicite:4]{index=4} -->
+    <aside class="sidebar" aria-label="마이페이지 메뉴">
+      <div class="side-title">마이페이지</div>
+
+      <div class="side-section">
+        <h3>예약</h3>
+        <a th:href="@{/member/reservations/room}">객실예약내역 <span>→</span></a>
+        <a th:href="@{/member/reservations/dining}">다이닝예약내역 <span>→</span></a>
+        <a th:href="@{/member/reservations/shuttle}">셔틀예약내역 <span>→</span></a>
+      </div>
+
+      <div class="side-section">
+        <h3>나의활동</h3>
+        <a th:href="@{/member/favorites}">나의관심목록 <span>→</span></a>
+        <a th:href="@{/member/qna}">내 QnA <span>→</span></a>
+      </div>
+
+      <div class="side-section">
+        <h3>나의정보관리</h3>
+        <a th:href="@{/security/member/profileEdit}">회원정보수정 <span>→</span></a>
+        <a th:href="@{/member/sns-link}">SNS연동 <span>→</span></a>
+        <a th:href="@{/member/withdraw}">회원탈퇴 <span>→</span></a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page-title">마이페이지</div>
+
+      <!-- 상단/등급 카드(업로드 파일 구조 유지) :contentReference[oaicite:5]{index=5} -->
+      <section class="mypage-top">
+        <div class="mypage-topbar">
+          <div class="topbar-left">
+            <div class="user-chip">
+              <span class="user-icon" aria-hidden="true">👤</span>
+              <span class="user-name" th:text="|${userName} 님|">홍길동 님</span>
+              <a class="name-go-edit" th:href="@{/security/member/profileEdit}" aria-label="회원정보 수정으로 이동">›</a>
+            </div>
+
+            <div class="sns-row">
+              <span class="sns-label">SNS 간편가입 정보</span>
+              <span class="sns-pill">
+                <span class="sns-dot" aria-hidden="true"></span>
+                <span th:text="${snsName}">Kakao</span>
+              </span>
+            </div>
+          </div>
+          <div class="topbar-right"></div>
+        </div>
+
+        <div class="grade-card">
+          <div class="grade-card-body">
+            <div class="grade-logo-area">
+              <div class="grade-logo" aria-label="등급 로고">
+                <div class="grade-letter" th:text="${gradeLetter}">S</div>
+                <div class="grade-label">등급</div>
+              </div>
+              <div class="grade-now">현재 등급: <b th:text="${gradeName}">Silver</b></div>
+              <div style="color:#666;font-size:12px;">회원ID: <b th:text="${userId}">hong123</b></div>
+            </div>
+
+            <div class="benefit-area">
+              <div class="benefit-box">
+                <div class="benefit-title">혜택 내용</div>
+                <div class="benefit-sub" th:text="|${gradeName} 전용|">Silver 전용</div>
+                <ul class="benefit-list">
+                  <li th:text="${benefit1 != null ? benefit1 : '레이트 체크아웃'}">레이트 체크아웃</li>
+                  <li th:text="${benefit2 != null ? benefit2 : '웰컴 드링크'}">웰컴 드링크</li>
+                  <li th:text="${benefit3 != null ? benefit3 : '프로모션 선공개'}">프로모션 선공개</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 예약 요약 -->
+      <section class="section">
+        <div class="section-head">
+          <h2>나의 예약</h2>
+          <p>모두 클릭 시 해당 예약확인 페이지로 이동</p>
+        </div>
+
+        <div class="grid3">
+          <a class="card mini" th:href="@{/member/reservations/room}" aria-label="객실 예약 내역">
+            <div class="icon">🏨</div>
+            <div class="info">
+              <div class="title">객실 예약</div>
+              <div class="desc" th:text="|투숙 예정 ${roomUpcoming}건 · 결제대기 ${roomPending}건|">투숙 예정 2건 · 결제대기 1건</div>
+            </div>
+            <div class="arrow">›</div>
+          </a>
+
+          <a class="card mini" th:href="@{/member/reservations/dining}" aria-label="다이닝 예약 내역">
+            <div class="icon">🍴</div>
+            <div class="info">
+              <div class="title">다이닝 예약</div>
+              <div class="desc" th:text="|방문 예정 ${diningUpcoming}건|">방문 예정 3건</div>
+            </div>
+            <div class="arrow">›</div>
+          </a>
+
+          <a class="card mini" th:href="@{/member/reservations/shuttle}" aria-label="셔틀버스 예약 내역">
+            <div class="icon">🚌</div>
+            <div class="info">
+              <div class="title">셔틀버스 예약</div>
+              <div class="desc" th:text="|이용 예정 ${shuttleUpcoming}건 (결제완료 예약만 가능)|">이용 예정 2건</div>
+            </div>
+            <div class="arrow">›</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- 결제/문의 -->
+      <section class="section">
+        <div class="section-head">
+          <h2>결제 · 문의</h2>
+          <p>※ 스토리보드 외 추가</p>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <div style="font-weight:900;font-size:16px;margin-bottom:10px;">결제/환불 상태</div>
+            <div class="kv">
+              <div class="k">결제 대기</div><div class="v" th:text="|${payWaiting}건|">1건</div>
+              <div class="k">결제 완료</div><div class="v" th:text="|${payDone}건|">4건</div>
+              <div class="k">환불 진행</div><div class="v" th:text="|${refundDoing}건|">0건</div>
+            </div>
+            <a th:href="@{/member/payments}" style="display:inline-block;margin-top:8px;font-weight:800;color:#111;text-decoration:none;">결제내역으로 이동 →</a>
+          </div>
+
+          <div class="card">
+            <div style="font-weight:900;font-size:16px;margin-bottom:10px;">내 QnA</div>
+            <div class="kv">
+              <div class="k">미답변</div><div class="v" th:text="|${qnaOpen}건|">1건</div>
+              <div class="k">답변 완료</div><div class="v" th:text="|${qnaDone}건|">5건</div>
+            </div>
+            <a th:href="@{/member/qna}" style="display:inline-block;margin-top:8px;font-weight:800;color:#111;text-decoration:none;">내 문의로 이동 →</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 관심목록 -->
+      <section class="section">
+        <div class="section-head">
+          <h2>나의 관심목록</h2>
+          <p>모두 클릭 시 해당 관심표시 목록 페이지로 이동</p>
+        </div>
+
+        <div class="card favorites">
+          <a th:href="@{/member/favorites/reservations}" class="fav-item" style="text-decoration:none;color:inherit;">
+            <div class="fav-icon">📅</div>
+            <div class="fav-text">
+              <b>관심 예약</b>
+              <span th:text="|${favReserve}건|">2건</span>
+            </div>
+          </a>
+
+          <div class="divider" aria-hidden="true"></div>
+
+          <a th:href="@{/member/favorites/promotions}" class="fav-item" style="text-decoration:none;color:inherit;">
+            <div class="fav-icon">♡</div>
+            <div class="fav-text">
+              <b>관심 프로모션</b>
+              <span th:text="|${favPromo}건|">5건</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- 추천상품(더미/DB 혼용) -->
+      <section class="section">
+        <div class="section-head">
+          <h2><span th:text="${userName}">홍길동</span>님을 위한 추천 상품</h2>
+          <p>모두 클릭 시 해당 프로모션 상세 페이지로 이동</p>
+        </div>
+
+        <div class="promos">
+          <a class="card promo" th:href="@{/promotion/detail/1}" aria-label="프로모션 1">
+            <div class="thumb">프로모션 1</div>
+            <h3 th:text="${promo1Title != null ? promo1Title : '르시엘 라운지바 + 객실 패키지'}">르시엘 라운지바 + 객실 패키지</h3>
+            <p class="meta" th:text="${promo1Meta != null ? promo1Meta : '예약기간: 2026-02-01 ~ 2026-02-28\n투숙기간: 2026-02-05 ~ 2026-03-10'}">
+              예약기간: 2026-02-01 ~ 2026-02-28<br/>투숙기간: 2026-02-05 ~ 2026-03-10
+            </p>
+          </a>
+
+          <a class="card promo" th:href="@{/promotion/detail/2}" aria-label="프로모션 2">
+            <div class="thumb">프로모션 2</div>
+            <h3 th:text="${promo2Title != null ? promo2Title : '시엘 조식 포함 위크데이 특가'}">시엘 조식 포함 위크데이 특가</h3>
+            <p class="meta" th:text="${promo2Meta != null ? promo2Meta : '예약기간: 2026-02-01 ~ 2026-02-20\n투숙기간: 2026-02-03 ~ 2026-02-28'}"></p>
+          </a>
+
+          <a class="card promo" th:href="@{/promotion/detail/3}" aria-label="프로모션 3">
+            <div class="thumb">프로모션 3</div>
+            <h3 th:text="${promo3Title != null ? promo3Title : '롯데월드 입장권 + 객실 패키지'}">롯데월드 입장권 + 객실 패키지</h3>
+            <p class="meta" th:text="${promo3Meta != null ? promo3Meta : '예약기간: 2026-02-01 ~ 2026-03-15\n투숙기간: 2026-02-10 ~ 2026-04-10'}"></p>
+          </a>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <a class="reserve-sticky" th:href="@{/product/list}" aria-label="예약하기">예약하기</a>
+</div>
+</body>
+</html>

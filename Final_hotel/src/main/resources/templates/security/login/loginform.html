@@ -11,12 +11,236 @@
 
 <head>
 <meta charset="UTF-8">
-<!--/* #스프링시큐리티12 */-->
-<title>스프링 시큐리티 로그인</title>
+<title>로그인</title>
 
 <link rel="stylesheet" href="">
 
-<style type="text/css"></style>
+<style>
+  :root{
+    /* 연갈색 테마 (업로드 로그인.html 기반) */
+    --bg: #f6f1ea;
+    --panel: #ffffff;
+    --line: #eadfd3;
+    --line-2: #d8c6b3;
+    --text: #2a2320;
+    --muted: #7a6a61;
+
+    --brand: #8b6a52;
+    --brand-2: #b08a6e;
+    --accent: #cda57a;
+    --danger: #c94b4b;
+
+    --shadow: 0 18px 45px rgba(54, 38, 25, .10);
+    --radius: 18px;
+  }
+
+  /* layout_main이 bootstrap을 깔아두므로,
+     로그인 페이지 전용으로만 '컨테이너 영역'을 카드처럼 보이게 한다. */
+  .login-bg{
+    background: radial-gradient(1200px 600px at 20% 10%, #fff, transparent 55%),
+                radial-gradient(900px 500px at 80% 90%, #fff, transparent 50%),
+                var(--bg);
+    min-height: calc(100vh - 40px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px 14px;
+  }
+
+  .wrap{ width: 380px; max-width: 100%; }
+
+  .brandbar{
+    display:flex;
+    justify-content:center;
+    margin-bottom: 14px;
+    letter-spacing:.14em;
+    font-weight: 800;
+    color: var(--brand);
+  }
+
+  .card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
+
+  .header{
+    padding: 20px 18px 12px;
+    text-align:center;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, #fff, #fff7ef);
+  }
+  .header h1{ margin:0; font-size: 20px; letter-spacing:.04em; }
+  .header p{ margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+
+  .tabs{
+    display:flex;
+    border-bottom: 1px solid var(--line);
+    background: #fffaf5;
+  }
+  .tab{
+    flex:1;
+    border:0;
+    background: transparent;
+    padding: 12px 10px;
+    font-weight: 700;
+    color: var(--muted);
+    cursor:pointer;
+    position:relative;
+  }
+  .tab[aria-selected="true"]{
+    color: var(--brand);
+    background: #fff;
+  }
+  .tab[aria-selected="true"]::after{
+    content:"";
+    position:absolute;
+    left:14px; right:14px; bottom:-1px;
+    height:3px;
+    background: var(--accent);
+    border-radius: 999px;
+  }
+
+  .body{ padding: 18px; }
+
+  .form{ display:none; }
+  .form.active{ display:block; }
+
+  .field{ margin-bottom: 12px; }
+  .label{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .input{
+    width:100%;
+    padding: 12px 12px;
+    border: 1px solid var(--line-2);
+    border-radius: 12px;
+    outline:none;
+    background: #fff;
+    font-size: 14px;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .input:focus{
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(205,165,122,.22);
+  }
+
+  .rowline{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin: 10px 0 14px;
+  }
+  .check{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color: var(--muted);
+    font-size: 13px;
+    user-select:none;
+    margin:0;
+  }
+  .check input{ width:16px; height:16px; accent-color: var(--accent); }
+
+  .secure{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .lock{
+    width:22px; height:22px;
+    border-radius: 999px;
+    display:grid;
+    place-items:center;
+    background: rgba(205,165,122,.18);
+    border: 1px solid rgba(205,165,122,.35);
+    color: var(--brand);
+    font-weight: 900;
+  }
+
+  .btnx{
+    width:100%;
+    border:0;
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-weight: 800;
+    cursor:pointer;
+    background: linear-gradient(180deg, var(--brand), #6f513f);
+    color:#fff;
+    letter-spacing: .04em;
+    transition: transform .06s ease, filter .15s ease;
+  }
+  .btnx:active{ transform: translateY(1px); }
+  .btnx:hover{ filter: brightness(1.02); }
+
+  .links{
+    margin-top: 12px;
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    flex-wrap:wrap;
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+  .links a{
+    color: var(--muted);
+    text-decoration:none;
+    border-bottom: 1px dashed transparent;
+  }
+  .links a:hover{
+    color: var(--brand);
+    border-bottom-color: rgba(139,106,82,.5);
+  }
+
+  /* 서버 msg(로그인Fail) */
+  .server-msg{
+    margin-bottom: 12px;
+    font-size: 12.5px;
+    color:#fff;
+    background: var(--danger);
+    border-radius: 12px;
+    padding: 10px 10px;
+    line-height: 1.45;
+  }
+
+  /* 프론트 유효성 에러 */
+  .error{
+    display:none;
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: #fff;
+    background: var(--danger);
+    border-radius: 12px;
+    padding: 10px 10px;
+    line-height: 1.45;
+  }
+  .error.show{ display:block; }
+
+  /* 관리자 로그인 버튼(링크처럼) */
+  .admin-link{
+    cursor:pointer;
+    font-size: 12px;
+    color: var(--brand);
+    font-weight: 800;
+    text-decoration:none;
+    border-bottom: 1px dashed transparent;
+    white-space: nowrap;
+  }
+  .admin-link:hover{
+    border-bottom-color: rgba(139,106,82,.5);
+  }
+</style>
 
 <!--/* 
       자바스크립트 인라인 
@@ -24,95 +248,187 @@
       JavaScript 안에서 Thymeleaf 값을 넣을 때는 th:inline="javascript" 와 /*[[뭐뭐뭐]]*/ 구문을 사용해야 한다. 
 */-->
 <script th:inline="javascript">
- /*<![CDATA[*/
+/*<![CDATA[*/
 
- $(document).ready(function(){
-	  
-	  $("button#btnLOGIN").click(function(){
-		  func_Login();
-	  });
-	  
-	  
-	  $("input#passwd").keydown(function(event){
-		  
-		  if(event.keyCode == 13) { // 엔터를 했을 경우
-			  func_Login();
-		  }
-	  });
-	  
-  });// end of $(document).ready(function(){})------------------------------
-  
-  
-  // Function Declaration
-  
-  function func_Login() {
-	  
-	  const memberid = $("input#memberid").val(); 
-	  const passwd = $("input#passwd").val(); 
-	
-	  if(memberid.trim()=="") {
-	 	 alert("아이디를 입력하세요!!");
-		 $("input#memberid").val(""); 
-		 $("input#memberid").focus();
-		 return; // 종료 
-	  }
-	
-	  if(passwd.trim()=="") {
-		 alert("비밀번호를 입력하세요!!");
-		 $("input#passwd").val(""); 
-		 $("input#passwd").focus();
-		 return; // 종료 
-	  }
-	  
-	  const frm = document.loginFrm;
-	  
-	  frm.action = /*[[@{/security/loginEnd}]]*/ 'url';
-	  /* 
-	     Spring Security 를 사용한 로그인 처리를 하는 것이므로 
-	     Controller 인 com.spring.app.security.controller.MemberController 파일에는 
-	     URL "member/loginEnd" 을 넣지 않고,
-	     /myspringboot/src/main/java/com/spring/app/security/config/SecurityConfig.java 파일에서 
-	     loginProcessingUrl("/security/loginEnd") 을 처리해주는 것이다.!!!!
-	  */
-	  frm.method = "POST";
-	  frm.submit();
-	  
-  }// end of function func_Login()------------------------	 
-	 
- /*]]>*/	
+$(document).ready(function(){
+
+  // ===== 탭 전환 (회원/비회원) =====
+  function setTab(active){
+    const isMember = (active === "member");
+
+    $("#tab-member").attr("aria-selected", String(isMember));
+    $("#tab-guest").attr("aria-selected", String(!isMember));
+
+    $("#panel-member").toggleClass("active", isMember);
+    $("#panel-guest").toggleClass("active", !isMember);
+
+    $("#err-member").removeClass("show").text("");
+    $("#err-guest").removeClass("show").text("");
+  }
+
+  $("#tab-member").click(function(){ setTab("member"); });
+  $("#tab-guest").click(function(){ setTab("guest"); });
+
+  // ===== 에러 표시 =====
+  function showError($el, msg){
+    $el.text(msg);
+    $el.addClass("show");
+  }
+
+  // ===== 회원 로그인 유효성 + submit =====
+  $("#panel-member").submit(function(e){
+    const $err = $("#err-member");
+    $err.removeClass("show").text("");
+
+    const memberid = $.trim($("#memberid").val());
+    const passwd   = $.trim($("#passwd").val());
+
+    if(memberid === ""){
+      e.preventDefault();
+      showError($err, "아이디(또는 이메일)를 입력하세요.");
+      $("#memberid").focus();
+      return false;
+    }
+
+    if(passwd === ""){
+      e.preventDefault();
+      showError($err, "비밀번호를 입력하세요.");
+      $("#passwd").focus();
+      return false;
+    }
+
+    // 여기서부터 Spring Security가 /security/loginEnd로 인증 처리
+    return true;
+  });
+
+  // Enter로도 submit되지만 UX상 비밀번호에서 Enter 처리도 유지
+  $("#passwd").keydown(function(event){
+    if(event.keyCode == 13){
+      $("#panel-member").submit();
+    }
+  });
+
+  // ===== 관리자 로그인 이동 =====
+  $("#goAdminLogin").click(function(){
+    const ctxPath = /*[[@{/}]]*/ "";
+    location.href = `${ctxPath}admin/login`;
+  });
+
+}); // end of ready
+
+/*]]>*/
 </script>
+
+</head>
 
 <body>
 <div class="container">
-		<div class="row" style="display: flex; border: solid 0px red;">
-			<div class="col-md-8 col-md-offset-2" style="margin: auto; border: solid 0px blue;">
-				<h2 class="text-muted">Spring Security(스프링 보안) 로그인</h2>
-				<hr style="border: solid 1px orange">
-				
-				<div class="col-md-12 text-danger" th:text="${msg}"></div>
-				
-				<form name="loginFrm" class="mt-5">
-					<div class="form-row">
-					    <div class="form-group col-md-6">
-							<label class="text-muted font-weight-bold" for="memberid">아이디</label>
-							<input type="text" class="form-control" name="memberid" id="memberid" value=""/> 
-                            <!--/* 부트스트랩에서 input 태그에는 항상 class form-control 이 사용되어져야 한다. */-->
-			            </div>
-			
-						<div class="form-group col-md-6">
-							<label class="text-muted font-weight-bold text-muted" for="passwd">비밀번호</label>
-							<input type="password" class="form-control" name="passwd" id="passwd" value="" /> 
-						</div>
-					</div>
-				</form>
-			</div>
-			
-			<div class="col-md-8 col-md-offset-2" style="margin: auto; display: flex; border: solid 0px blue;">
-				<div style="margin: auto; border: solid 0px blue;">
-					<button style="width: 150px; height: 40px;" class="btn btn-primary" type="button" id="btnLOGIN">확인</button>
-				</div>
-			</div>
-		</div>
-	</div>	
+  <div class="login-bg">
+    <div class="wrap">
+      <div class="brandbar">CIEL</div>
+
+      <section class="card" aria-label="로그인 카드">
+        <div class="header">
+          <h1>로그인</h1>
+          <p>연갈색 테마 · 회원/비회원 탭</p>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="로그인 방식 선택">
+          <button class="tab" id="tab-member" role="tab" aria-selected="true" aria-controls="panel-member" type="button">회원</button>
+          <button class="tab" id="tab-guest"  role="tab" aria-selected="false" aria-controls="panel-guest"  type="button">비회원</button>
+        </div>
+
+        <div class="body">
+
+          <!-- Controller에서 request.setAttribute("msg", msg); 로 내려주는 메시지 -->
+          <div class="server-msg" th:if="${msg != null and #strings.length(msg) > 0}" th:text="${msg}"></div>
+
+          <!-- =======================
+               회원 로그인 (Spring Security)
+               - memberChain: loginProcessingUrl("/security/loginEnd")
+               - usernameParameter("memberid")
+               - passwordParameter("passwd")
+               ======================= -->
+          <form class="form active"
+                id="panel-member"
+                name="loginFrm"
+                role="tabpanel"
+                aria-labelledby="tab-member"
+                method="post"
+                th:action="@{/security/loginEnd}">
+
+            <div class="field">
+              <div class="label"><span>아이디 또는 이메일</span></div>
+              <input class="input" id="memberid" name="memberid" autocomplete="username" placeholder="아이디 또는 이메일" />
+            </div>
+
+            <div class="field">
+              <div class="label"><span>비밀번호</span></div>
+              <input class="input" id="passwd" name="passwd" type="password" autocomplete="current-password" placeholder="비밀번호" />
+            </div>
+
+            <div class="rowline">
+              <label class="check">
+                <input type="checkbox" name="rememberMe" />
+                로그인 상태 유지
+              </label>
+
+              <div class="secure" title="보안 로그인">
+                <span class="lock">🔒</span>
+                <span>보안</span>
+              </div>
+            </div>
+
+            <div class="rowline" style="margin-top:0;">
+              <span></span>
+              <!-- 회원 로그인 화면에서 관리자 로그인 페이지로 이동 -->
+              <span class="admin-link" id="goAdminLogin">관리자 로그인 →</span>
+            </div>
+
+            <button class="btnx" type="submit">로그인</button>
+
+            <div class="links">
+              <!-- 아래 링크들은 네 프로젝트 URL에 맞게 필요하면 교체 -->
+              <a th:href="@{/security/member_id_find}">아이디 찾기</a>
+              <span>|</span>
+              <a th:href="@{/security/member_pw_find}">비밀번호 찾기</a>
+              <span>|</span>
+              <a th:href="@{/security/memberRegister}">회원가입</a>
+            </div>
+
+            <div class="error" id="err-member"></div>
+          </form>
+
+          <!-- =======================
+               비회원 로그인(현재 컨트롤러/URL이 없다면 임시)
+               - 아직 미구현이면 submit 막고 안내만 띄워도 됨
+               ======================= -->
+          <form class="form"
+                id="panel-guest"
+                role="tabpanel"
+                aria-labelledby="tab-guest"
+                method="post"
+                action="#">
+
+            <div class="field">
+              <div class="label"><span>휴대폰번호</span></div>
+              <input class="input" name="phone" inputmode="tel" autocomplete="tel" placeholder="휴대폰번호 (숫자만)" />
+            </div>
+
+            <div class="field">
+              <div class="label"><span>고객명</span></div>
+              <input class="input" name="guestName" type="text" autocomplete="name" placeholder="비회원 고객명" />
+            </div>
+
+            <button class="btnx" type="button" onclick="alert('비회원 로그인은 아직 미구현입니다.');">비회원으로 계속</button>
+
+            <div class="error" id="err-guest"></div>
+          </form>
+
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
 </body>
-</html> 
+</html>

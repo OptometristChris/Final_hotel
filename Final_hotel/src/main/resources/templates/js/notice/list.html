@@ -11,7 +11,7 @@
             .notice-title { font-size: 2.5rem; font-weight: 700; color: #1a1a1a; margin-bottom: 60px; text-align: center; letter-spacing: 2px; }
             
             /* 탭 메뉴 스타일 */
-            .notice-tabs { display: flex; justify-content: center; margin-bottom: 50px; border-bottom: 1px solid #eee; }
+            .notice-tabs { display: flex; justify: center; margin-bottom: 50px; border-bottom: 1px solid #eee; }
             .tab-item { padding: 15px 40px; cursor: pointer; border-bottom: 2px solid transparent; transition: 0.3s; color: #999; text-decoration: none; font-size: 1rem; }
             .tab-item:hover { color: #d4af37; }
             .tab-item.active { border-bottom: 2px solid #1a1a1a; color: #1a1a1a; font-weight: 600; }
@@ -36,33 +36,27 @@
             .item-date { font-size: 0.95rem; color: #666; font-family: 'Noto Sans KR', sans-serif; min-width: 100px; text-align: right; }
             .row-top { background-color: #fdfaf2; }
 
-            /* [수정] 검색창 스타일 - 드롭다운과 입력창 통합 */
+            /* 검색창 스타일 */
             .search-wrapper { margin-bottom: 25px; display: flex; justify-content: flex-end; }
             .search-form { display: flex; align-items: center; }
-            
-            .search-select { 
-                height: 48px; border: 1px solid #ddd; border-right: none; 
-                padding: 0 15px; font-size: 0.9rem; outline: none; background-color: #fff;
-                color: #333; cursor: pointer;
-            }
-            
+            .search-select { height: 48px; border: 1px solid #ddd; border-right: none; padding: 0 15px; font-size: 0.9rem; outline: none; background-color: #fff; color: #333; cursor: pointer; }
             .search-input-box { position: relative; display: flex; align-items: center; }
-            .search-input-box input { 
-                width: 320px; height: 48px; border: 1px solid #ddd; 
-                padding: 0 50px 0 15px; font-size: 0.9rem; outline: none;
+            .search-input-box input { width: 320px; height: 48px; border: 1px solid #ddd; padding: 0 50px 0 15px; font-size: 0.9rem; outline: none; }
+            .btn-search { position: absolute; right: 0; top: 0; width: 48px; height: 48px; background: none; border: none; font-size: 1.2rem; color: #1a1a1a; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+            /* 페이징 스타일 */
+            .pagination-container { display: flex; justify-content: center; align-items: center; margin-top: 50px; gap: 4px; }
+            .page-box { 
+                width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; 
+                border: 1px solid #eee; color: #666; text-decoration: none; font-size: 0.9rem; transition: 0.3s;
             }
-            .search-input-box input:focus { border-color: #1a1a1a; z-index: 1; }
-            
-            .btn-search { 
-                position: absolute; right: 0; top: 0; width: 48px; height: 48px; 
-                background: none; border: none; font-size: 1.2rem; color: #1a1a1a; cursor: pointer;
-                display: flex; align-items: center; justify-content: center;
-            }
-            .btn-search:hover { color: #d4af37; }
+            .page-box:hover { border-color: #1a1a1a; color: #d4af37; }
+            .page-box.active { background-color: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+            .page-box.disabled { color: #ccc; cursor: default; background-color: #f9f9f9; pointer-events: none; }
 
             /* 글쓰기 버튼 */
-            .btn-write { background-color: #1a1a1a; color: #fff; border: none; padding: 12px 30px; transition: 0.3s; font-size: 0.9rem; letter-spacing: 1px; text-decoration: none; }
-            .btn-write:hover { background-color: #d4af37; color: #fff; }
+            .btn-write { background-color: #1a1a1a; color: #fff !important; border: none; padding: 12px 30px; transition: 0.3s; font-size: 0.9rem; letter-spacing: 1px; text-decoration: none; }
+            .btn-write:hover { background-color: #d4af37; }
         </style>
     </th:block>
 </head>
@@ -81,13 +75,11 @@
         <div class="search-wrapper">
             <form th:action="@{/notice/list}" method="get" class="search-form">
                 <input type="hidden" name="hotelId" th:value="${hotelId}">
-                
                 <select name="searchType" class="search-select">
                     <option value="title" th:selected="${searchType == 'title'}">제목</option>
                     <option value="content" th:selected="${searchType == 'content'}">내용</option>
                     <option value="all" th:selected="${searchType == 'all'}">제목+내용</option>
                 </select>
-                
                 <div class="search-input-box">
                     <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어를 입력하세요">
                     <button type="submit" class="btn-search">
@@ -98,7 +90,7 @@
         </div>
         
         <div class="notice-list-wrap">
-            <a th:each="notice : ${notices}" th:if="${notice.isTop == 'Y'}" 
+            <a th:each="notice : ${topNotices}" 
                th:href="@{'/notice/detail/' + ${notice.noticeId}(hotelId=${hotelId})}" 
                class="notice-item row-top">
                 <div class="item-left">
@@ -115,7 +107,7 @@
                 <div class="item-date" th:text="${#dates.format(notice.createdAt, 'yyyy.MM.dd')}">날짜</div>
             </a>
 
-            <a th:each="notice : ${notices}" th:if="${notice.isTop == 'N'}" 
+            <a th:each="notice : ${notices}" 
                th:href="@{'/notice/detail/' + ${notice.noticeId}(hotelId=${hotelId})}" 
                class="notice-item">
                 <div class="item-left">
@@ -132,9 +124,42 @@
                 <div class="item-date" th:text="${#dates.format(notice.createdAt, 'yyyy.MM.dd')}">날짜</div>
             </a>
 
-            <div th:if="${#lists.isEmpty(notices)}" class="text-center py-5 text-muted">
+            <div th:if="${#lists.isEmpty(topNotices) and #lists.isEmpty(notices)}" class="text-center py-5 text-muted">
                 등록된 공지사항이 없습니다.
             </div>
+        </div>
+
+        <div class="pagination-container" th:if="${totalPage > 0}"
+             th:with="blockSize=5, 
+                      startPage=${((curPage - 1) / blockSize) * blockSize + 1}, 
+                      tempEndPage=${startPage + blockSize - 1},
+                      endPage=${tempEndPage > totalPage ? totalPage : tempEndPage}">
+            
+            <a class="page-box" th:classappend="${curPage == 1} ? 'disabled'"
+               th:href="@{/notice/list(hotelId=${hotelId}, curPage=1, searchType=${searchType}, keyword=${keyword})}">
+                <i class="bi bi-chevron-double-left"></i>
+            </a>
+
+            <a class="page-box" th:classappend="${startPage == 1} ? 'disabled'"
+               th:href="@{/notice/list(hotelId=${hotelId}, curPage=${startPage - 1}, searchType=${searchType}, keyword=${keyword})}">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+
+            <a class="page-box" th:each="pageNum : ${#numbers.sequence(startPage, endPage)}" 
+               th:classappend="${pageNum == curPage} ? 'active'"
+               th:text="${pageNum}"
+               th:href="@{/notice/list(hotelId=${hotelId}, curPage=${pageNum}, searchType=${searchType}, keyword=${keyword})}">
+            </a>
+
+            <a class="page-box" th:classappend="${endPage == totalPage} ? 'disabled'"
+               th:href="@{/notice/list(hotelId=${hotelId}, curPage=${endPage + 1}, searchType=${searchType}, keyword=${keyword})}">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+
+            <a class="page-box" th:classappend="${curPage == totalPage} ? 'disabled'"
+               th:href="@{/notice/list(hotelId=${hotelId}, curPage=${totalPage}, searchType=${searchType}, keyword=${keyword})}">
+                <i class="bi bi-chevron-double-right"></i>
+            </a>
         </div>
         
         <div class="text-right mt-5" style="text-align: right;">
@@ -145,6 +170,18 @@
 
 <th:block th:fragment="script">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        window.onload = function() {
+            // 수정/삭제 완료 후 전달된 플래시 메시지 확인
+            const message = /*[[${message}]]*/ '';
+            if (message && message.trim() !== '') {
+                alert(message);
+            }
+        };
+        /*]]>*/
+    </script>
 </th:block>
 
 </body>

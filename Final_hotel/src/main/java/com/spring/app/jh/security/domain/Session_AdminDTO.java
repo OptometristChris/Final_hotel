@@ -5,8 +5,9 @@ import lombok.Data;
 @Data
 public class Session_AdminDTO {
 
+	private Integer admin_no;
     private String adminid;
     private String name;
     private String admin_type; // HQ / BRANCH
-    private Long fk_hotel_id;  // BRANCH면 NOT NULL, HQ면 null
+    private Integer fk_hotel_id;  // BRANCH면 NOT NULL, HQ면 null
 }

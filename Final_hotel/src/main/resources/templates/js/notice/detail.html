@@ -18,7 +18,7 @@
         
         /* 본문 영역: 너비를 제한하여 안쪽으로 들여쓰기 효과 (이미지 느낌 반영) */
         .content-wrapper { max-width: 900px; margin: 0 auto; padding: 0 20px; }
-        .detail-content { line-height: 2; min-height: 400px; font-size: 1.1rem; color: #333; margin-bottom: 80px; }
+        .detail-content { line-height: 2; min-height: 400px; font-size: 1.1rem; color: #333; margin-bottom: 80px; word-break: break-all; }
         .detail-content img { max-width: 100%; height: auto; display: block; margin: 30px auto; } 
 
         /* 하단 버튼 및 관리 영역 */
@@ -28,6 +28,32 @@
         
         .admin-btns .btn { padding: 8px 20px; font-size: 0.85rem; margin-left: 5px; border-radius: 0; }
     </style>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        	
+        window.onload = function() {
+	        // 수정 완료 후 리다이렉트 되었을 때 컨트롤러가 보낸 메시지를 확인
+	        const msg = /*[[${message}]]*/ '';
+	        
+	        if(msg && msg !== '') {
+	            alert(msg);
+	        }
+    	};
+        	
+        	
+        function deleteNotice() {
+            if(confirm("정말로 이 게시물을 삭제하시겠습니까?")) {
+                const form = document.getElementById('deleteFrm');
+                if(form) {
+                    form.submit();
+                } else {
+                    alert("삭제 폼을 찾을 수 없습니다.");
+                }
+            }
+        }
+        /*]]>*/
+    </script>
 </head>
 <body>
 
@@ -42,7 +68,6 @@
                     <span>공지사항</span>
                 </div>
                 <h2 class="detail-title">
-                    
                     <span th:text="${notice.title}">공지사항 제목이 들어갑니다.</span>
                 </h2>
                 <div class="detail-date" th:text="${#dates.format(notice.createdAt, 'yyyy. MM. dd')}">2026. 02. 26</div>
@@ -50,18 +75,18 @@
         </div>
 
         <div class="content-wrapper">
-            <div class="detail-content" th:utext="${notice.content}">
-                </div>
+            <div class="detail-content" th:utext="${notice.content}"></div>
         </div>
 
         <div class="footer-group">
-            <a th:href="@{/notice/list(hotelId=${hotelId != null ? hotelId : 0})}" class="btn-list">목록</a>
+            <a th:href="@{/notice/list(hotelId=${notice.fkHotelId})}" class="btn-list">목록</a>
             
             <div class="admin-btns">
                 <button type="button" class="btn btn-light border" 
-                        th:onclick="|location.href='@{/notice/edit/{id}(id=${notice.noticeId})}'|">수정</button>
+                        th:onclick="|location.href='@{/notice/edit/{id}(id=${notice.noticeId}, hotelId=${notice.fkHotelId})}'|">수정</button>
+                
                 <button type="button" class="btn btn-light border text-danger" 
-                        th:onclick="deleteNotice([[${notice.noticeId}]])">삭제</button>
+                        onclick="deleteNotice()">삭제</button>
             </div>
             
             <form id="deleteFrm" th:action="@{/notice/delete}" method="post" style="display:none;">
@@ -73,27 +98,7 @@
     </div>
 </th:block>
 
-<th:block th:fragment="script">
-    <script th:inline="javascript">
-        function deleteNotice(noticeId) {
-            if(confirm("이 게시물을 삭제하시겠습니까?")) {
-            	document.getElementById('deleteFrm').submit();
-                alert("삭제 처리가 요청되었습니다.");
-            }
-        }
-        
-        function deleteNotice(noticeId) {
-            if(confirm("이 게시물을 삭제하시겠습니까?")) {
-                const form = document.getElementById('deleteFrm');
-                if(form) {
-                    form.submit();
-                } else {
-                    console.error("삭제 폼(deleteFrm)을 찾을 수 없습니다.");
-                }
-            }
-        }
-    </script>
-</th:block>
+<th:block th:fragment="script"></th:block>
 
 </body>
 </html>

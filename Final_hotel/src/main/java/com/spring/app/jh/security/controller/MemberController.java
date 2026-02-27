@@ -1,11 +1,14 @@
 package com.spring.app.jh.security.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
+// import org.springframework.security.crypto.password.PasswordEncoder;  // ★ 제거
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.spring.app.common.AES256;
 import com.spring.app.jh.security.domain.MemberDTO;
 import com.spring.app.jh.security.domain.Session_MemberDTO;
 import com.spring.app.jh.security.service.MemberService;
@@ -29,11 +33,17 @@ import lombok.RequiredArgsConstructor;
 public class MemberController {
 	
 	private final MemberService memberService;	
-	private final PasswordEncoder passwordEncoder; 	
+	// private final PasswordEncoder passwordEncoder; 	// ★ 제거
 	
 	// 회원가입 form 페이지
 	@GetMapping("memberRegister")
-	public String memberRegister() {
+	public String memberRegister(HttpServletRequest request) {
+		
+		// 이미 로그인 했다면 인덱스로
+       HttpSession session = request.getSession(false);
+	   if(session != null && session.getAttribute("sessionMemberDTO") != null) {
+	       return "redirect:/index";
+	   }
 		
 		return "security/login/memberRegisterForm";
 		// src/main/resources/templates/security/login/memberRegisterForm.html 파일 생성해줘야 함
@@ -89,8 +99,6 @@ public class MemberController {
     @PostMapping("memberRegisterEnd")
     public String memberRegisterEnd(MemberDTO memberdto, Model model) {
 
-        String hashedUserPwd = passwordEncoder.encode(memberdto.getPasswd());
-        memberdto.setPasswd(hashedUserPwd);
 
         try {
             int n = memberService.insert_member(memberdto); 
@@ -118,8 +126,7 @@ public class MemberController {
     }
     
     
-    
- // 로그인 인증 form 페이지 보여주기
+    // 로그인 인증 form 페이지 보여주기
     @GetMapping(value="login")
     public String login(HttpServletRequest request){
 
@@ -130,7 +137,14 @@ public class MemberController {
             SavedRequest 를 읽어 원래 가려던 페이지로 자동 redirect 한다.
           - 따라서 여기서 referer 를 세션에 prevURLPage 로 저장하는 방식은 제거한다.
        */
-
+    	
+       
+       // 이미 로그인 했다면 인덱스로
+       HttpSession session = request.getSession(false);
+	   if(session != null && session.getAttribute("sessionMemberDTO") != null) {
+	       return "redirect:/index";
+	   }
+    	
        // login 실패여부 체크하기
        String loginFail = request.getParameter("loginFail");
 
@@ -145,6 +159,107 @@ public class MemberController {
        return "security/login/loginform";
        // src/main/resources/templates/security/login/loginform.html 파일 생성해줘야 함
     }
+    
+    
+    // id 찾기 form
+    @GetMapping("member_id_find")
+    public String memberIdFindForm(HttpServletRequest request) {
+
+        // 필요 시 안내 메시지(선택)
+        // request.setAttribute("msg", "");
+
+        return "security/login/member_id_find";
+        // src/main/resources/templates/security/login/member_id_find.html
+    }
+    
+    
+    // id 찾기 처리
+    @PostMapping("member_id_find")
+    public String memberIdFindEnd(@RequestParam Map<String, String> paraMap,
+                                  Model model) {
+
+        /*
+          paraMap 예시(너가 폼에서 어떤 input name을 쓰는지에 따라):
+          - name
+          - email
+          - mobile
+
+          ※ 컨트롤러에서 암/복호화 하지 말고 "있는 그대로" 서비스로 전달.
+             (DB가 암호화 컬럼이면 서비스/DAO가 통일해서 처리)
+        */
+
+        // TODO: service 구현 필요
+        // 예) String memberid = memberService.findMemberId(paraMap);
+        String memberid = memberService.findMemberId(paraMap);
+
+        if (memberid == null || memberid.trim().isEmpty()) {
+            model.addAttribute("isFound", false);
+            model.addAttribute("message", "일치하는 회원 정보가 없습니다. 입력 정보를 다시 확인하세요.");
+        }
+        else {
+            model.addAttribute("isFound", true);
+            model.addAttribute("memberid", memberid);
+        }
+
+        return "security/login/member_id_find_result";
+        // src/main/resources/templates/security/login/member_id_find_result.html
+    }
+    
+    // 비밀번호 찾기 form
+    @GetMapping("member_pw_find")
+    public String memberPwFindForm(HttpServletRequest request) {
+
+        return "security/login/member_pw_find";
+        // src/main/resources/templates/security/login/member_pw_find.html
+    }
+    
+    // 비밀번호 찾기 처리
+    @PostMapping("member_pw_find")
+    public String memberPwFindEnd(@RequestParam Map<String, String> paraMap,
+                                  Model model) {
+
+        /*
+          paraMap 예시:
+          - memberid
+          - email (또는 mobile)
+          - name (선택)
+
+          구현 방향(둘 중 하나 고르면 됨):
+          A) 임시비밀번호 발급 → DB에 BCrypt 해시로 저장 → 이메일/문자로 전달
+          B) 재설정 토큰 발급 → 재설정 페이지에서 새 비번 입력받아 저장(더 권장)
+
+          지금 단계에서는 우선 A로 가는 경우가 많음.
+        */
+
+        // 비밀번호 리셋을 위해 기입한 정보로 신원 특정
+        boolean isVerified = memberService.verifyMemberForPwReset(paraMap);
+
+        if (!isVerified) {
+            model.addAttribute("isSuccess", false);
+            model.addAttribute("message", "입력하신 정보와 일치하는 회원이 없습니다.");
+            return "security/login/member_pw_find_result";
+        }
+
+        // 이메일 발송 없이 그냥 임시비밀번호 발급 + DB 업데이트
+        // String tmp = memberService.issueTempPasswordAndUpdate(paraMap);
+        
+        // 해당 회원의 비밀번호 초기화 후 임시비밀번호 발급 + DB 업데이트 + 이메일로 발송
+        boolean ok = memberService.issueTempPasswordAndSendEmail(paraMap);
+
+        if (!ok) {
+            model.addAttribute("isSuccess", false);
+            model.addAttribute("message", "입력하신 정보와 일치하는 회원이 없거나 이메일 발송에 실패했습니다.");
+        }
+        else {
+            model.addAttribute("isSuccess", true);
+            model.addAttribute("message", "임시 비밀번호를 이메일로 발송했습니다. 메일 확인 후 로그인하세요.");
+            // model.addAttribute("tempPw", ...)  <-- 제거
+        }
+
+        return "security/login/member_pw_find_result";
+        // src/main/resources/templates/security/login/member_pw_find_result.html
+    }
+
     
     
     
@@ -184,8 +299,8 @@ public class MemberController {
     @PostMapping(value="passwdChange")
     public String passwdChange(@RequestParam Map<String, String> paraMap, Model model){
        
-       String hashedUserPwd = passwordEncoder.encode(paraMap.get("passwd"));
-       paraMap.put("passwd", hashedUserPwd);
+       // String hashedUserPwd = passwordEncoder.encode(paraMap.get("passwd"));  // ★ 제거
+       // paraMap.put("passwd", hashedUserPwd);                                  // ★ 제거
        
        int result = memberService.passwdChange(paraMap);
        model.addAttribute("result", result);
@@ -193,6 +308,20 @@ public class MemberController {
        return "security/member/passwdChangeResult";
     // src/main/resources/templates/security/member/passwdChangeResult.html 파일 생성해줘야 함
     }
+    
+    
+    // 마이페이지로
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("member/mypage")
+    public String mypage(HttpSession session, Model model) {
+
+        // DB 조회값을 올릴 수 있으면 올리고(예: memberService.getMemberDetail(memberNo))
+        // 아직 없으면 model에 안 담아도 템플릿에서 더미로 처리됨
+
+        return "security/member/mypage";
+        // templates/security/member/mypage.html
+    }
+    
     
     // 회원정보보기 URL
     @PreAuthorize("hasRole('USER')") // 해당 권한이 있는 사람이 있는 사람만 허용
@@ -227,6 +356,8 @@ public class MemberController {
 
         return "security/member/profileEditResult";
     }
+    
+    
     
     
     
@@ -286,8 +417,6 @@ public class MemberController {
        return "security/special_memberOnly";
     // src/main/resources/templates/security/special_memberOnly.html 파일 생성해줘야 함
     }
-    
-    
     
     
     
