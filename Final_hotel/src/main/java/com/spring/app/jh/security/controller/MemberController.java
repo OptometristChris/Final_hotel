@@ -336,7 +336,15 @@ public class MemberController {
     // 회원정보 수정 폼 페이지
     @PreAuthorize("hasRole('USER')")
     @GetMapping("member/profileEdit")
-    public String profileEditForm() {
+    public String profileEditForm(HttpSession session, Model model) {
+
+        Session_MemberDTO sm = (Session_MemberDTO) session.getAttribute("sessionMemberDTO");
+        if(sm == null) return "redirect:/security/login";
+
+        // memberNo 있으면 memberNo로, 없으면 memberid로 조회
+        MemberDTO memberDto = memberService.findByMemberid(sm.getMemberid());
+        model.addAttribute("memberDto", memberDto);
+
         return "security/member/profileEditForm";
     }
     
