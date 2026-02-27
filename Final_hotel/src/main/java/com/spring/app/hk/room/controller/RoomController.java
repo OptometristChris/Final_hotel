@@ -43,26 +43,39 @@ public class RoomController {
     }
 
     /* ==============================
-       2. 객실 필터 조회 (AJAX)
-       ============================== */
-    @GetMapping("/room/filter")
-    @ResponseBody
-    public List<RoomTypeDTO> filterRoom(
-    		@RequestParam(name="hotel", defaultValue="") String hotel,
-            @RequestParam(name="room_grade", defaultValue="") String roomGrade,
-            @RequestParam(name="bed_type", defaultValue="") String bedType,
-            @RequestParam(name="view_type", defaultValue="") String viewType,
-            @RequestParam(name="sort", defaultValue="") String sort) {
-
-        Map<String, String> paraMap = new HashMap<>();
-        paraMap.put("hotel", hotel);
-        paraMap.put("room_grade", roomGrade);
-        paraMap.put("bed_type", bedType);
-        paraMap.put("view_type", viewType);
-        paraMap.put("sort", sort); 
-
-        return roomService.getRoomListByFilter(paraMap);
-    }
+    2. 객실 필터 조회 (AJAX)
+    - 날짜 범위(check_in ~ check_out)를 받아
+      해당 기간의 최소 재고를 계산하여 반환
+    ============================== */
+	 @GetMapping("/room/filter")
+	 @ResponseBody
+	 public List<RoomTypeDTO> filterRoom(
+	
+	     // room type 
+	     @RequestParam(name="hotel", defaultValue="") String hotel,
+	     @RequestParam(name="room_grade", defaultValue="") String roomGrade,
+	     @RequestParam(name="bed_type", defaultValue="") String bedType,
+	     @RequestParam(name="view_type", defaultValue="") String viewType,
+	     @RequestParam(name="sort", defaultValue="") String sort,
+	
+	     // 체크인 날짜/ 체크아웃 날짜
+	     @RequestParam(name="check_in", defaultValue="") String checkIn,
+	     @RequestParam(name="check_out", defaultValue="") String checkOut
+	 ) {	
+	     Map<String, String> paraMap = new HashMap<>();
+	
+	     paraMap.put("hotel", hotel);
+	     paraMap.put("room_grade", roomGrade);
+	     paraMap.put("bed_type", bedType);
+	     paraMap.put("view_type", viewType);
+	     paraMap.put("sort", sort);
+	
+	     // 날짜 추가 _ 재고와 연결
+	     paraMap.put("check_in", checkIn);
+	     paraMap.put("check_out", checkOut);
+	
+	     return roomService.getRoomListByFilter(paraMap);
+	 }
 
     /* ==============================
        3. 객실 상세 조회

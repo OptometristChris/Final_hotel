@@ -1,22 +1,26 @@
 package com.spring.app.hk.reservation.service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.app.hk.reservation.model.ReservationDAO;
+import com.spring.app.hk.room.service.RoomStockService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ReservationService_imple implements ReservationService {
 
-    @Autowired
-    private ReservationDAO reservationDAO;
+    private final ReservationDAO reservationDAO;
+    private final RoomStockService roomStockService;
 
-    // 예약 db 저장하기
+    // 결제 성공 후 db 저장하기
     @Override
     public void saveReservation(Map<String, String> map) {
 
@@ -25,6 +29,14 @@ public class ReservationService_imple implements ReservationService {
         // 테스트용
         paraMap.put("member_no", 4);   // ← 여기
         paraMap.put("total_price", 100);
+        
+        // ■ 날짜 파싱
+        int roomId = Integer.parseInt(map.get("room_type_id"));
+        LocalDate checkIn = LocalDate.parse(map.get("check_in"));
+        LocalDate checkOut = LocalDate.parse(map.get("check_out"));
+
+        // ■ 재고 차감
+        roomStockService.decreaseStockByDateRange(roomId, checkIn, checkOut);
         
         // 1️) PAYMENT insert
         reservationDAO.insertPayment(paraMap);

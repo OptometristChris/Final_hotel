@@ -27,42 +27,109 @@
     </select>
 
 
-    <!-- ===============================
-         2. 필터 검색
-         =============================== -->
-    <select id="selectRoomTypeByFilter" parameterType="map" resultType="RoomTypeDTO">
-
-        SELECT
-            rt.room_type_id,
-            rt.room_name,
-            rt.room_grade,
-            rt.bed_type,
-            rt.view_type,
-            rt.base_price,
-            ri.image_url
-        FROM room_type rt
-        LEFT JOIN room_image ri
-            ON rt.room_type_id = ri.room_type_id
-            AND ri.is_main = 'Y'
-        WHERE 1=1
-		 <if test="hotel != null and hotel != ''">
+   <!-- ===============================
+     2. 필터 검색 + 날짜 범위 재고 조회
+     - 날짜 범위 내 최소 재고(MIN)를 구해서
+       availableCount 로 내려줌
+     =============================== -->
+	<select id="selectRoomTypeByFilter" parameterType="map" resultType="RoomTypeDTO">
+	
+	    SELECT
+	        <!-- room type -->
+	        rt.room_type_id,     
+	        rt.room_name,        
+	        rt.room_grade,       
+	        rt.bed_type,         
+	        rt.view_type,        
+	        rt.base_price,       
+	  
+	        <!-- room image -->
+	        ri.image_url,      
+	        
+	        <!-- 날짜 범위 중 최소 가격 -->
+	        MIN(
+	            ROUND(
+	                rt.base_price
+	                * NVL((
+	                    SELECT se.price_rate
+	                    FROM SEASON se
+	                    WHERE rs.stay_date BETWEEN se.start_date AND se.end_date
+	                    ORDER BY se.priority DESC
+	                    FETCH FIRST 1 ROWS ONLY
+	                ), 1)
+	                * NVL(wr.rate_multiplier, 1)
+	            )
+	        ) AS min_price,
+	               
+	        <!-- 날짜 범위 중 최소 재고 -->          
+	        NVL(MIN(rs.available_count), 0) AS availableCount 
+	
+	    FROM room_type rt
+	
+	    <!-- 대표 이미지 조인 -->
+	    LEFT JOIN room_image ri
+	        ON rt.room_type_id = ri.room_type_id
+	        AND ri.is_main = 'Y'
+	
+	    <!-- 재고 테이블 반드시 조인 -->
+	    LEFT JOIN room_stock rs
+	        ON rt.room_type_id = rs.room_type_id
+	    
+	    <!-- 요일별 가중치 조인 -->
+	    LEFT JOIN weekday_rate wr
+	       ON wr.fk_hotel_id = rt.fk_hotel_id
+	       AND wr.day_of_week = TO_NUMBER(TO_CHAR(rs.stay_date, 'D'))
+	
+	    WHERE 1=1
+	
+	    <!-- ===============================
+	         날짜 조건
+	         체크인 이상 ~ 체크아웃 미만
+	         =============================== -->
+	    <if test="check_in != null and check_in != '' 
+	              and check_out != null and check_out != ''">
+	        
+	         <![CDATA[
+		        AND rs.stay_date >= TO_DATE(#{check_in}, 'YYYY-MM-DD')
+		        AND rs.stay_date < TO_DATE(#{check_out}, 'YYYY-MM-DD')
+	    	]]>
+	
+	    </if>
+	
+	    <!-- 호텔 필터 -->
+	    <if test="hotel != null and hotel != ''">
 	        AND rt.fk_hotel_id = #{hotel}
 	    </if>
-
-        <if test="room_grade != null and room_grade != ''">
-            AND rt.room_grade = #{room_grade}
-        </if>
-
-        <if test="bed_type != null and bed_type != ''">
-            AND rt.bed_type = #{bed_type}
-        </if>
-
-        <if test="view_type != null and view_type != ''">
-            AND rt.view_type = #{view_type}
-        </if>
-
-		<!-- 우측 정렬 필터 추가 -->
-        <choose>
+	
+	    <!-- 객실 등급 -->
+	    <if test="room_grade != null and room_grade != ''">
+	        AND rt.room_grade = #{room_grade}
+	    </if>
+	
+	    <!-- 침대 타입 -->
+	    <if test="bed_type != null and bed_type != ''">
+	        AND rt.bed_type = #{bed_type}
+	    </if>
+	
+	    <!-- 전망 타입 -->
+	    <if test="view_type != null and view_type != ''">
+	        AND rt.view_type = #{view_type}
+	    </if>
+	
+	    <!-- MIN 사용했으므로 GROUP BY 필수 -->
+	    GROUP BY
+	        rt.room_type_id,
+	        rt.room_name,
+	        rt.room_grade,
+	        rt.bed_type,
+	        rt.view_type,
+	        rt.base_price,
+	        ri.image_url
+	
+	    <!-- ===============================
+	         정렬 조건(우측 정렬)
+	         =============================== -->
+	    <choose>
 	        <when test="sort == 'priceAsc'">
 	            ORDER BY rt.base_price ASC
 	        </when>
@@ -73,8 +140,8 @@
 	            ORDER BY rt.room_type_id DESC
 	        </otherwise>
 	    </choose>
-
-    </select>
+	
+	</select>
 
 
     <!-- ===============================
@@ -99,7 +166,7 @@
     </select>
 
     <!-- ===============================
-         4. 날짜별 가격 조회 
+         4. 날짜별 가격 조회 (모달)
          =============================== -->
     <select id="selectCalendarPrice" parameterType="int" resultType="map">
 
@@ -136,6 +203,7 @@
 	
 	</select>
 	
+	
 	<!-- 비교 모달용 (비교함에 담긴 객실 id리스트를 기준으로 객실 정보 조회하기)  푸터 -->
 	<select id="selectRoomsByIds" parameterType="list" resultType="RoomTypeDTO">
 	    SELECT *
@@ -145,6 +213,7 @@
 	        #{id}
 	    </foreach>
 	</select>
+	
 	
 	
 	
