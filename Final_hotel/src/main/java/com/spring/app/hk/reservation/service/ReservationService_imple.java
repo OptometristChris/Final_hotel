@@ -35,15 +35,15 @@ public class ReservationService_imple implements ReservationService {
         LocalDate checkIn = LocalDate.parse(map.get("check_in"));
         LocalDate checkOut = LocalDate.parse(map.get("check_out"));
 
-        // ■ 재고 차감
+        // ■ 1) 재고 차감
         roomStockService.decreaseStockByDateRange(roomId, checkIn, checkOut);
         
-        // 1️) PAYMENT insert
+        // 2) PAYMENT insert
         reservationDAO.insertPayment(paraMap);
 
         System.out.println("생성된 payment_id = " + paraMap.get("payment_id"));
 
-        // 2️) RESERVATION insert
+        // 3) RESERVATION insert
         reservationDAO.insertReservation(paraMap);
 
         System.out.println("예약 + 결제 저장 완료");
