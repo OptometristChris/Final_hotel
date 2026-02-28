@@ -170,6 +170,22 @@ h1 {
     padding: 8px 12px;
     border: 1px solid #ddd;
 }
+
+.title-row {
+    max-width: 1100px;
+    margin: 0 auto 40px auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title-row h1 {
+    margin: 0;
+}
+
+#currencySelect {
+    padding: 6px 10px;
+}
 </style>
 
 <!-- FullCalendar CSS -->
@@ -179,7 +195,15 @@ h1 {
 <body>
 <div th:fragment="content" style="margin-top:140px;">
 
-<h1>객실</h1>
+<div class="title-row">
+	<h1>객실</h1>
+	<select id="currencySelect" style="margin-bottom:20px;">
+	    <option value="KRW">KRW</option>
+	    <option value="USD">USD</option>
+	    <option value="JPY">JPY</option>
+	    <option value="EUR">EUR</option>
+	</select>
+</div>
 
 <!-- 사용자가 선택한 체크인/체크아웃 날짜 표시 영역 -->
 <div id="selectedDateBox" style="margin:20px 0; font-weight:bold;">
@@ -276,8 +300,11 @@ h1 {
             <div>전망: <span th:text="${room.view_type}"></span></div>
 
             <div class="price">
-                <!-- ₩ <span th:text="${room.base_price}"></span> -->
-            </div>
+			    <span class="price-value"
+			          data-base-price="${room.base_price}">
+			        ₩ ${room.base_price}
+			    </span>
+			</div>
             
             <div style="margin-top:20px;">
 			    <button id="reserveBtn" th:onclick="'handleReserveClick(' + ${room.room_type_id} + ')'">
@@ -366,6 +393,9 @@ h1 {
 
 <script>
 
+// 환율
+let exchangeRates = { KRW: 1 };
+let currentCurrency = "KRW";
 
 // ===============================
 // 달력 모달
@@ -388,7 +418,7 @@ function openCalendar(roomId) {
             const events = data.map(day => ({
 			    title: day.AVAILABLE_COUNT === 0 
 			           ? "예약마감" 
-			           : "₩ " + day.FINAL_PRICE,
+			           : convertPrice(day.FINAL_PRICE),
 			    start: day.STAY_DATE,
 			    allDay: true,
 			    color: day.AVAILABLE_COUNT === 0 ? "#999999" : ""  // 재고 0 이면 회색처리
@@ -634,7 +664,12 @@ function loadRooms() {
                             <div>등급: ${room.room_grade}</div>
                             <div>침대: ${room.bed_type}</div>
                             <div>전망: ${room.view_type}</div>
-                            <div class="price">₩ ${room.base_price}</div>
+                            <div class="price">
+	                            <span class="price-value"
+	                                  data-base-price="${room.base_price}">
+	                                ₩ ${room.base_price}
+	                            </span>
+	                        </div>
                             ${stockHtml}
                             
                             <div style="margin-top:20px;">
@@ -649,7 +684,10 @@ function loadRooms() {
                 
             });
 
+            updatePricesByCurrency(currentCurrency);
+            
         });
+    
 }
 
 
@@ -725,7 +763,8 @@ function updateCompareFooter(){
 // 페이지 로드시도 실행
 document.addEventListener("DOMContentLoaded", function(){
     updateCompareFooter();
-    loadRooms(); 
+    loadRooms();
+    loadExchangeRates();
 });
 
 
@@ -785,7 +824,12 @@ function renderCompareModal(data){
 
             <tr>
                 <td>가격</td>
-                ${data.map(r => `<td>₩ ${r.base_price}</td>`).join("")}
+                ${data.map(r => `
+	                <td class="compare-price"
+	                    data-base-price="${r.base_price}">
+	                    ${convertPrice(r.base_price)}
+	                </td>
+	            `).join("")}
             </tr>
 
             <tr>
@@ -816,6 +860,91 @@ function closeCompareModal(){
     document.getElementById("compareModal").style.display = "none";
 }
 
+
+// 환율 api 호출
+function loadExchangeRates() {
+    fetch("https://open.er-api.com/v6/latest/KRW")
+        .then(response => response.json())
+        .then(data => {
+            exchangeRates = data.rates;
+            exchangeRates["KRW"] = 1; // 기준통화
+
+            console.log("환율 저장 완료");
+        })
+        .catch(error => {
+            console.error("환율 API 오류:", error);
+        });
+}
+
+
+// 통화 변경시 가격 재계산 함수
+function updatePricesByCurrency(currency){
+
+    currentCurrency = currency;
+
+    const rate = exchangeRates[currency];
+
+    document.querySelectorAll(".price-value")
+        .forEach(el => {
+
+            const basePrice = Number(el.dataset.basePrice);
+
+            let converted = basePrice;
+
+            if(currency !== "KRW"){
+                converted = basePrice * rate;
+            }
+
+            el.innerText = formatCurrency(converted, currency);
+        });
+}
+
+function formatCurrency(amount, currency){
+    return new Intl.NumberFormat('ko-KR', {
+        style: 'currency',
+        currency: currency
+    }).format(amount);
+}
+
+// 셀렉트 이벤트 연결
+document.getElementById("currencySelect")
+    .addEventListener("change", function(){
+        updatePricesByCurrency(this.value);
+        
+        // 비교 모달 가격 갱신
+        document.querySelectorAll(".compare-price")
+            .forEach(el => {
+                const base = Number(el.dataset.basePrice);
+                el.innerText = convertPrice(base);
+            });
+        
+        // 달력이 열려있으면 다시 열어서 갱신
+        if(calendarInstance !== null){
+            const currentRoomId = window.currentRoomId;
+            if(currentRoomId){
+                openCalendar(currentRoomId);
+            }
+        }
+        
+    });
+    
+    
+// 달력 모달에 통화 변환시 적용 위해 함수 추가
+function convertPrice(price){
+
+    const rate = exchangeRates[currentCurrency] || 1;
+
+    let converted = price;
+
+    if(currentCurrency !== "KRW"){
+        converted = price * rate;
+    }
+
+    return new Intl.NumberFormat('ko-KR', {
+        style: 'currency',
+        currency: currentCurrency
+    }).format(converted);
+}
 
 </script>
 
