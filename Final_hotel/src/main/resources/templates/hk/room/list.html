@@ -113,6 +113,7 @@ h1 {
 
 .filter-wrapper {
     max-width: 1100px;
+    width: 100%;      /* 추가 */
     margin: 0 auto 40px auto;
     padding: 25px 30px;
     background: #fafafa;
@@ -122,9 +123,12 @@ h1 {
 
 .filter-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     gap: 20px;
+}
+
+.sort-group {
+    margin-left: auto;
 }
 
 .filter-group {
@@ -187,6 +191,21 @@ h1 {
 #currencySelect {
     padding: 6px 10px;
 }
+
+.filter-date {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 4px;
+}
+
+.filter-date input {
+    border: none;
+    outline: none;
+}
 </style>
 
 <!-- FullCalendar CSS -->
@@ -226,13 +245,13 @@ h1 {
 <!-- ===============================
       필터 (AJAX)
      =============================== -->
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+<div style="display:flex; justify-content:center; margin-bottom:20px;">
 
 	<!-- 좌측 필터 -->
 	<div class="filter-wrapper">
-
+    
+    <!-- 1줄 -->
     <div class="filter-row">
-
         <form id="filterForm" class="filter-group">
 
             <select name="hotel">
@@ -260,11 +279,7 @@ h1 {
                 <option value="">전망 전체</option>
                 <option value="CITY">CITY</option>
                 <option value="RIVER">RIVER</option>
-            </select>
-
-            <button type="submit" class="filter-search-btn">
-                검색
-            </button>
+            </select>           
 
         </form>
 
@@ -278,9 +293,21 @@ h1 {
         </div>
 
     </div>
+    
+ 		<!-- 2줄 (날짜 + 검색) -->
+		<div class="filter-row" style="margin-top:15px;">
+            <div class="filter-date">
+	           	<input type="date" id="filterCheckIn" name="filter_check_in">
+				<span>~</span>
+				<input type="date" id="filterCheckOut" name="filter_check_out">
+			</div>
+			
+			<button type="submit" form="filterForm" class="filter-search-btn">
+                검색
+            </button>
 
-</div>
-
+		</div>
+	</div>
 </div>
 
 <hr>
@@ -588,8 +615,8 @@ function loadRooms() {
     const sort = document.getElementById("sortSelect").value;
     
     // 날짜 값
-    const checkIn = document.getElementById("checkInInput").value;
-    const checkOut = document.getElementById("checkOutInput").value;
+    const checkIn = document.getElementById("filterCheckIn").value;
+    const checkOut = document.getElementById("filterCheckOut").value;
 
     // 날짜 없으면 재고 조건 없이 조회
     let url = `/final_hotel/room/filter?hotel=${hotel}&room_grade=${roomGrade}&bed_type=${bedType}&view_type=${viewType}&sort=${sort}`;
