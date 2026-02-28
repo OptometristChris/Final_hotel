@@ -80,17 +80,19 @@ public class RoomController {
     /* ==============================
        3. 객실 상세 조회
        ============================== */
-    @GetMapping("/room/detail")
-    public ModelAndView roomDetail(ModelAndView mav,
-                                   @RequestParam("room_id") Long roomId) {
+	 @GetMapping("/room/detail")
+	 public ModelAndView roomDetail(ModelAndView mav,
+	                                @RequestParam("room_id") Long roomId) {
 
-        RoomTypeDTO room = roomService.getRoomDetail(roomId);
+	     RoomTypeDTO room = roomService.getRoomDetail(roomId);
+	     List<String> imageList = roomService.getRoomImages(roomId);
 
-        mav.addObject("room", room);
-        mav.setViewName("hk/room/detail");
+	     mav.addObject("room", room);
+	     mav.addObject("imageList", imageList);
 
-        return mav;
-    }
+	     mav.setViewName("hk/room/detail");
+	     return mav;
+	 }
     
     /* ==============================
        4. 달력 모달 띄우기

@@ -164,6 +164,20 @@
         WHERE rt.room_type_id = #{roomId}
 
     </select>
+    
+    
+    <!-- 객실 상세조회 - 캐러셀 -->
+      <select id="selectRoomImages"
+        parameterType="long"
+        resultType="string">
+
+	    SELECT image_url
+	    FROM room_image
+	    WHERE room_type_id = #{value}
+	    ORDER BY sort_order
+	
+	</select>
+    
 
     <!-- ===============================
          4. 날짜별 가격 조회 (모달)
@@ -213,7 +227,6 @@
 	        #{id}
 	    </foreach>
 	</select>
-	
 	
 	
 	

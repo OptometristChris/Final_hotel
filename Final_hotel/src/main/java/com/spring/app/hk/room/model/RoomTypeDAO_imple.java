@@ -45,4 +45,9 @@ public class RoomTypeDAO_imple implements RoomTypeDAO {
 		return sqlsession.selectList("room.selectRoomsByIds", roomIds);
 	}
 
+	@Override
+	public List<String> getRoomImages(Long roomId) {
+	    return sqlsession.selectList("room.selectRoomImages", roomId);
+	}
+	
 }

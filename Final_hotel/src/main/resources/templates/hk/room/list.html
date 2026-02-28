@@ -1,16 +1,175 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" 
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{js/layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::content})}">
 <head>
 <meta charset="UTF-8">
 <title>객실 목록</title>
 
 <style>
-body {font-family: Arial;}
-.room-card {border-bottom: 1px solid #ddd; padding: 30px 0; display: flex; gap: 30px;}
-.room-image {width: 300px; height: 200px; background-color: #eee;}
-.room-info {flex: 1;}
-.room-name {font-size: 22px; font-weight: bold;}
-.price {font-size: 20px; font-weight: bold; margin-top: 15px;}
+body {
+    font-family: 'Pretendard', sans-serif;
+    background: #fff;
+    color: #111;
+}
+
+#roomListArea {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    font-size: 36px;
+    font-weight: 600;
+    margin-bottom: 50px;
+}
+
+/* 카드 크기 줄임 */
+.room-card {
+    display: flex;
+    gap: 40px;
+    padding: 50px 0;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+/* 이미지 줄임 */
+.room-image {
+    width: 420px;
+    height: 260px;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.room-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 정보 */
+.room-info {
+    flex: 1;
+}
+
+.room-name a {
+    font-size: 24px;
+    font-weight: 600;
+    color: #111;
+    text-decoration: none;
+}
+
+.room-name a:hover {
+    text-decoration: underline;
+}
+
+.room-meta {
+    margin-top: 18px;
+    font-size: 14px;
+    color: #666;
+    line-height: 1.9;
+}
+
+.price {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 22px;
+}
+
+/* 버튼 */
+.button-group {
+    margin-top: 25px;
+    display: flex;
+    gap: 12px;
+}
+
+.btn-reserve {
+    background: #111;
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-reserve:hover {
+    background: #c9a76b;
+    color: #111;
+}
+
+.btn-compare {
+    background: transparent;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-compare:hover {
+    border-color: #111;
+}
+
+.filter-wrapper {
+    max-width: 1100px;
+    margin: 0 auto 40px auto;
+    padding: 25px 30px;
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 6px;
+}
+
+.filter-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.filter-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-group select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    min-width: 130px;
+    background: white;
+}
+
+.filter-group select:focus {
+    outline: none;
+    border-color: #111;
+}
+
+.filter-search-btn {
+    background: #111;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.filter-search-btn:hover {
+    background: #c9a76b;
+    color: #111;
+}
+
+.sort-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sort-group select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+}
 </style>
 
 <!-- FullCalendar CSS -->
@@ -18,6 +177,7 @@ body {font-family: Arial;}
 
 </head>
 <body>
+<div th:fragment="content" style="margin-top:140px;">
 
 <h1>객실</h1>
 
@@ -36,50 +196,58 @@ body {font-family: Arial;}
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
 
 	<!-- 좌측 필터 -->
-	<form id="filterForm">
-		호텔:
-		<select name="hotel">
-		   <option value="">전체</option>
-		   <option value="1">호텔 시엘</option>
-		   <option value="2">르시엘</option>
-		</select>
-		
-	    객실등급:
-	    <select name="room_grade">
-	        <option value="">전체</option>
-	        <option value="DELUXE">DELUXE</option>
-	        <option value="PREMIER">PREMIER</option>
-	        <option value="SUITE">SUITE</option>
-	        <option value="STANDARD">STANDARD</option>
-	    </select>
-	
-	    침대타입:
-	    <select name="bed_type">
-	        <option value="">전체</option>
-	        <option value="DOUBLE">DOUBLE</option>
-	        <option value="TWIN">TWIN</option>
-	        <option value="KING">KING</option>
-	    </select>
-	
-	    전망:
-	    <select name="view_type">
-	        <option value="">전체</option>
-	        <option value="CITY">CITY</option>
-	        <option value="RIVER">RIVER</option>
-	    </select>
-	
-	    <button type="submit">검색</button>
-	</form>
-	
-	<!-- 우측 정렬 -->
-    <div>
-        정렬:
-        <select id="sortSelect">
-            <option value="">기본순</option>
-            <option value="priceAsc">가격 낮은순</option>
-            <option value="priceDesc">가격 높은순</option>
-        </select>
+	<div class="filter-wrapper">
+
+    <div class="filter-row">
+
+        <form id="filterForm" class="filter-group">
+
+            <select name="hotel">
+                <option value="">호텔 전체</option>
+                <option value="1">호텔 시엘</option>
+                <option value="2">르시엘</option>
+            </select>
+
+            <select name="room_grade">
+                <option value="">객실등급 전체</option>
+                <option value="DELUXE">DELUXE</option>
+                <option value="PREMIER">PREMIER</option>
+                <option value="SUITE">SUITE</option>
+                <option value="STANDARD">STANDARD</option>
+            </select>
+
+            <select name="bed_type">
+                <option value="">침대타입 전체</option>
+                <option value="DOUBLE">DOUBLE</option>
+                <option value="TWIN">TWIN</option>
+                <option value="KING">KING</option>
+            </select>
+
+            <select name="view_type">
+                <option value="">전망 전체</option>
+                <option value="CITY">CITY</option>
+                <option value="RIVER">RIVER</option>
+            </select>
+
+            <button type="submit" class="filter-search-btn">
+                검색
+            </button>
+
+        </form>
+
+        <div class="sort-group">
+            <span>정렬</span>
+            <select id="sortSelect">
+                <option value="">기본순</option>
+                <option value="priceAsc">가격 낮은순</option>
+                <option value="priceDesc">가격 높은순</option>
+            </select>
+        </div>
+
     </div>
+
+</div>
+
 </div>
 
 <hr>
@@ -336,23 +504,10 @@ function closeModal(){
 // 선택된 날짜 페이지 반영
 function applyDateToPage(checkIn, checkOut){
 
-    const box = document.getElementById("selectedDateBox");
+    const roomId = currentRoomId;  // 선택한 객실
 
-    const nights = calculateNights(checkIn, checkOut);  // 박수 계산
-
-    // 상단 표시 영역 업데이트
-    box.innerHTML = `
-	    체크인 <span style="color:red; font-weight:bold;">${checkIn}</span> 
-	    ~ 체크아웃 
-	    <span style="color:red; font-weight:bold;">${checkOut}</span> 
-	    / ${nights}박
-	`;
-
-    // hidden input에 값 저장 (예약 페이지 전송용)
-    document.getElementById("checkInInput").value = checkIn;
-    document.getElementById("checkOutInput").value = checkOut;
-    
-    loadRooms();
+    // 바로 예약 페이지로 이동
+    location.href = `/final_hotel/reservation/form?room_type_id=${roomId}&check_in=${checkIn}&check_out=${checkOut}`;
 }
 
 
@@ -368,21 +523,12 @@ function calculateNights(start, end){
 
 
 //예약 버튼 클릭 처리 함수
-//1) 날짜가 선택되지 않은 경우 → 달력 모달 열기
-//2) 날짜가 이미 선택된 경우 → 예약 정보 입력 페이지로 이동
 function handleReserveClick(roomId) {
 
-    const checkIn = document.getElementById("checkInInput").value;
-    const checkOut = document.getElementById("checkOutInput").value;
+    currentRoomId = roomId;
 
-    // 날짜 선택 안 된 상태 → 달력 열기
-    if(!checkIn || !checkOut) {
-        openCalendar(roomId);
-        return;
-    }
-
-    // 날짜 선택됨 → 예약 페이지로 이동
-    location.href = `/final_hotel/reservation/form?room_type_id=${roomId}&check_in=${checkIn}&check_out=${checkOut}`;
+    // 무조건 달력 열기
+    openCalendar(roomId);
 }
 
 
@@ -673,5 +819,6 @@ function closeCompareModal(){
 
 </script>
 
+</div>
 </body>
 </html>

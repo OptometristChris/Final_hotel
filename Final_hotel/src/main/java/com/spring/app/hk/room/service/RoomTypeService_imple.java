@@ -45,4 +45,10 @@ public class RoomTypeService_imple implements RoomTypeService {
 	public List<RoomTypeDTO> getRoomsByIds(List<Long> roomIds) {
 		return roomdao.selectRoomsByIds(roomIds);
     }
+	
+	@Override
+	public List<String> getRoomImages(Long roomId) {
+	    return roomdao.getRoomImages(roomId);
+	}
+	
 }
