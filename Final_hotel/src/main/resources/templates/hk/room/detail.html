@@ -104,9 +104,12 @@
         전망: <span th:text="${room.view_type}"></span>
     </div>
 
-    <div class="price">
-        ₩ <span th:text="${room.base_price}"></span>
-    </div>
+   <div class="price">
+	    <span class="detail-price"
+	          th:attr="data-base-price=${room.base_price}">
+	        ₩ <span th:text="${room.base_price}"></span>
+	    </span>
+	</div>
 
     <div style="margin-top:30px;">
         <a href="javascript:history.back()">← 목록으로</a>
@@ -116,6 +119,51 @@
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+/* 통화 변경시 환율 적용 */
+document.addEventListener("DOMContentLoaded", function(){
+
+    console.log("상세페이지 로드됨");
+
+    let exchangeRates = { KRW: 1 };
+    let currentCurrency = localStorage.getItem("currency") || "KRW";
+
+    function convertPrice(price){
+        const rate = exchangeRates[currentCurrency] || 1;
+
+        let converted = price;
+
+        if(currentCurrency !== "KRW"){
+            converted = price * rate;
+        }
+
+        return new Intl.NumberFormat('ko-KR', {
+            style: 'currency',
+            currency: currentCurrency
+        }).format(converted);
+    }
+
+    function applyCurrency(){
+        const el = document.querySelector(".detail-price");
+        if(!el) return;
+
+        const base = Number(el.dataset.basePrice);
+        el.innerText = convertPrice(base);
+    }
+
+    fetch("https://open.er-api.com/v6/latest/KRW")
+        .then(res => res.json())
+        .then(data => {
+            exchangeRates = data.rates;
+            exchangeRates["KRW"] = 1;
+
+            applyCurrency();
+        });
+
+});
+</script>
 
 </div>
 </body>

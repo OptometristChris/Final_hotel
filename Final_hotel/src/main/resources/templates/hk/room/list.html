@@ -6,6 +6,7 @@
 <meta charset="UTF-8">
 <title>객실 목록</title>
 
+
 <style>
 body {
     font-family: 'Pretendard', sans-serif;
@@ -205,6 +206,14 @@ h1 {
 	</select>
 </div>
 
+<!-- 체크박스 -->
+<div style="max-width:1100px; margin:0 auto 20px auto; text-align:right;">
+    <label>
+        <input type="checkbox" id="extraFeeCheck">
+        세금 · 봉사료 포함 (10%)
+    </label>
+</div>
+
 <!-- 사용자가 선택한 체크인/체크아웃 날짜 표시 영역 -->
 <div id="selectedDateBox" style="margin:20px 0; font-weight:bold;">
    
@@ -397,6 +406,9 @@ h1 {
 let exchangeRates = { KRW: 1 };
 let currentCurrency = "KRW";
 
+// 체크박스 (세금봉사료)
+let includeExtraFee = false;
+
 // ===============================
 // 달력 모달
 // ===============================
@@ -418,7 +430,7 @@ function openCalendar(roomId) {
             const events = data.map(day => ({
 			    title: day.AVAILABLE_COUNT === 0 
 			           ? "예약마감" 
-			           : convertPrice(day.FINAL_PRICE),
+			           : calculateFinalPrice(day.FINAL_PRICE),
 			    start: day.STAY_DATE,
 			    allDay: true,
 			    color: day.AVAILABLE_COUNT === 0 ? "#999999" : ""  // 재고 0 이면 회색처리
@@ -762,6 +774,14 @@ function updateCompareFooter(){
 
 // 페이지 로드시도 실행
 document.addEventListener("DOMContentLoaded", function(){
+	
+   const savedCurrency = localStorage.getItem("currency");
+
+    if(savedCurrency){
+        currentCurrency = savedCurrency;
+        document.getElementById("currencySelect").value = savedCurrency;
+    }
+	    
     updateCompareFooter();
     loadRooms();
     loadExchangeRates();
@@ -827,7 +847,7 @@ function renderCompareModal(data){
                 ${data.map(r => `
 	                <td class="compare-price"
 	                    data-base-price="${r.base_price}">
-	                    ${convertPrice(r.base_price)}
+	                    ${calculateFinalPrice(r.base_price)}
 	                </td>
 	            `).join("")}
             </tr>
@@ -889,13 +909,7 @@ function updatePricesByCurrency(currency){
 
             const basePrice = Number(el.dataset.basePrice);
 
-            let converted = basePrice;
-
-            if(currency !== "KRW"){
-                converted = basePrice * rate;
-            }
-
-            el.innerText = formatCurrency(converted, currency);
+            el.innerText = calculateFinalPrice(basePrice);
         });
 }
 
@@ -909,13 +923,18 @@ function formatCurrency(amount, currency){
 // 셀렉트 이벤트 연결
 document.getElementById("currencySelect")
     .addEventListener("change", function(){
+    	
+    	currentCurrency = this.value;
+
+        localStorage.setItem("currency", currentCurrency); // 통화 선택시 저장
+    	
         updatePricesByCurrency(this.value);
         
         // 비교 모달 가격 갱신
         document.querySelectorAll(".compare-price")
             .forEach(el => {
                 const base = Number(el.dataset.basePrice);
-                el.innerText = convertPrice(base);
+                el.innerText = calculateFinalPrice(base);
             });
         
         // 달력이 열려있으면 다시 열어서 갱신
@@ -929,22 +948,53 @@ document.getElementById("currencySelect")
     });
     
     
-// 달력 모달에 통화 변환시 적용 위해 함수 추가
-function convertPrice(price){
+// 달력 모달에 통화 변환시 적용 위해 함수 추가 + 세금. 봉사료 체크박스 반영 추가
+function calculateFinalPrice(basePrice){
 
+    let price = basePrice;
+
+    // 세금·봉사료 10%
+    if(includeExtraFee){
+        price *= 1.1;
+    }
+
+    // 환율 적용
     const rate = exchangeRates[currentCurrency] || 1;
 
-    let converted = price;
-
     if(currentCurrency !== "KRW"){
-        converted = price * rate;
+        price *= rate;
     }
 
     return new Intl.NumberFormat('ko-KR', {
         style: 'currency',
         currency: currentCurrency
-    }).format(converted);
+    }).format(price);
 }
+
+
+// 체크박스 이벤트 연결
+document.getElementById("extraFeeCheck")
+.addEventListener("change", function(){
+
+    includeExtraFee = this.checked;
+
+    updatePricesByCurrency(currentCurrency);
+
+    // 비교 모달 갱신
+    document.querySelectorAll(".compare-price")
+        .forEach(el => {
+            const base = Number(el.dataset.basePrice);
+            el.innerText = calculateFinalPrice(base);
+        });
+
+    // 달력 열려있으면 다시 렌더
+    if(calendarInstance !== null){
+        if(window.currentRoomId){
+            openCalendar(window.currentRoomId);
+        }
+    }
+});
+
 
 </script>
 
