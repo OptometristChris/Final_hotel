@@ -46,9 +46,23 @@ public class RoomTypeService_imple implements RoomTypeService {
 		return roomdao.selectRoomsByIds(roomIds);
     }
 	
+	// 상세 페이지 이미지 캐러셀용
 	@Override
 	public List<String> getRoomImages(Long roomId) {
 	    return roomdao.getRoomImages(roomId);
+	}
+
+	// 상세 페이지 로그인 기반 조회기록 저장
+	@Override
+	public void insertViewHistory(Integer memberNo, Long roomId) {
+		 roomdao.insertViewHistory(memberNo, roomId);
+		
+	}
+
+	// 상세 페이지 로그인 기반 추천 객실 조회
+	@Override
+	public List<RoomTypeDTO> getRecommendedRooms(Integer memberNo, Long roomId) {
+		return roomdao.selectRecommendedRooms(memberNo, roomId);
 	}
 	
 }

@@ -1,5 +1,6 @@
 package com.spring.app.hk.room.model;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,9 +46,31 @@ public class RoomTypeDAO_imple implements RoomTypeDAO {
 		return sqlsession.selectList("room.selectRoomsByIds", roomIds);
 	}
 
+	// 상세 페이지 이미지 캐러셀용
 	@Override
 	public List<String> getRoomImages(Long roomId) {
 	    return sqlsession.selectList("room.selectRoomImages", roomId);
+	}
+
+	// 상세 페이지 로그인 기반 조회기록 저장
+	@Override
+	public void insertViewHistory(Integer memberNo, Long roomId) {
+		Map<String, Object> paramMap = new HashMap<>();
+	    paramMap.put("memberNo", memberNo);
+	    paramMap.put("roomId", roomId);
+
+	    sqlsession.insert("room.insertViewHistory", paramMap);
+		
+	}
+
+	// 상세 페이지 로그인 기반 추천 객실 조회
+	@Override
+	public List<RoomTypeDTO> selectRecommendedRooms(Integer memberNo, Long roomId) {
+		Map<String, Object> paramMap = new HashMap<>();
+	    paramMap.put("memberNo", memberNo);
+	    paramMap.put("currentRoomId", roomId);
+
+	    return sqlsession.selectList("room.selectRecommendedRooms", paramMap);
 	}
 	
 }

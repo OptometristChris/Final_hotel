@@ -147,23 +147,28 @@
     <!-- ===============================
          3. 객실 상세 조회
          =============================== -->
-    <select id="selectRoomDetail" parameterType="long" resultType="RoomTypeDTO">
+    <select id="selectRoomDetail"
+        parameterType="long"
+        resultType="RoomTypeDTO">
 
-        SELECT
-            rt.room_type_id,
-            rt.room_name,
-            rt.room_grade,
-            rt.bed_type,
-            rt.view_type,
-            rt.base_price,
-            ri.image_url
-        FROM room_type rt
-        LEFT JOIN room_image ri
-            ON rt.room_type_id = ri.room_type_id
-            AND ri.is_main = 'Y'
-        WHERE rt.room_type_id = #{roomId}
-
-    </select>
+	    SELECT
+	        rt.room_type_id,
+	        rt.fk_hotel_id      AS brand_id,
+	        rt.room_name,
+	        rt.room_grade,
+	        rt.bed_type,
+	        rt.view_type,
+	        rt.base_price,
+	        rt.room_size,
+	        rt.max_capacity,
+	        ri.image_url
+	    FROM room_type rt
+	    LEFT JOIN room_image ri
+	        ON rt.room_type_id = ri.room_type_id
+	        AND ri.is_main = 'Y'
+	    WHERE rt.room_type_id = #{roomId}
+	
+	</select>
     
     
     <!-- 객실 상세조회 - 캐러셀 -->
@@ -218,7 +223,7 @@
 	</select>
 	
 	
-	<!-- 비교 모달용 (비교함에 담긴 객실 id리스트를 기준으로 객실 정보 조회하기)  푸터 -->
+	<!-- 5. 비교 모달용 (비교함에 담긴 객실 id리스트를 기준으로 객실 정보 조회하기)  푸터 -->
 	<select id="selectRoomsByIds" parameterType="list" resultType="RoomTypeDTO">
 	    SELECT *
 	    FROM room_type
@@ -229,5 +234,45 @@
 	</select>
 	
 	
+	<!-- ===============================
+     6. 상세 페이지 로그인 기반 조회기록 저장
+     =============================== -->
+	<insert id="insertViewHistory" parameterType="map">
+	
+	    INSERT INTO room_view_history
+	    VALUES (
+	        seq_room_view_history.NEXTVAL,
+	        #{memberNo},
+	        #{roomId},
+	        SYSDATE
+	    )
+	
+	</insert>
+	
+	
+	<!-- ===============================
+     7. 상세 페이지 로그인 기반 추천 객실 조회
+     =============================== -->
+	<select id="selectRecommendedRooms"
+	        parameterType="map"
+	        resultType="RoomTypeDTO">
+	
+	    SELECT *
+	    FROM (
+	        SELECT rt.*
+	        FROM room_type rt
+	        WHERE rt.room_type_id != #{currentRoomId}
+	          AND rt.room_grade IN (
+	                SELECT DISTINCT r.room_grade
+	                FROM room_view_history vh
+	                JOIN room_type r
+	                  ON vh.room_type_id = r.room_type_id
+	                WHERE vh.member_no = #{memberNo}
+	          )
+	        ORDER BY rt.base_price DESC
+	    )
+	    WHERE ROWNUM &lt;= 3
+	
+	</select>
 	
 </mapper>

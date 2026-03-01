@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.spring.app.jh.security.domain.Session_MemberDTO;
 import com.spring.app.hk.room.domain.RoomTypeDTO;
 import com.spring.app.hk.room.service.RoomTypeService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -82,17 +84,37 @@ public class RoomController {
        ============================== */
 	 @GetMapping("/room/detail")
 	 public ModelAndView roomDetail(ModelAndView mav,
-	                                @RequestParam("room_id") Long roomId) {
+	                                @RequestParam("room_id") Long roomId,
+	                                HttpSession session) {
 
+	     // 1️. 상세 정보 조회
 	     RoomTypeDTO room = roomService.getRoomDetail(roomId);
 	     List<String> imageList = roomService.getRoomImages(roomId);
 
 	     mav.addObject("room", room);
 	     mav.addObject("imageList", imageList);
 
+	     // 2️. 로그인 사용자 확인
+	     Session_MemberDTO loginUser = (Session_MemberDTO) session.getAttribute("sessionMemberDTO");
+
+	     if(loginUser != null) {
+
+	    	 Integer memberNo = loginUser.getMemberNo();
+
+	         // 3️. 조회 기록 저장
+	         roomService.insertViewHistory(memberNo, roomId);
+
+	         // 4️. 추천 객실 조회
+	         List<RoomTypeDTO> recommendList =
+	                 roomService.getRecommendedRooms(memberNo, roomId);
+
+	         mav.addObject("recommendList", recommendList);
+	     }
+
 	     mav.setViewName("hk/room/detail");
 	     return mav;
 	 }
+	 
     
     /* ==============================
        4. 달력 모달 띄우기

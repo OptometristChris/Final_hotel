@@ -15,6 +15,9 @@ public class RoomTypeDTO {
     private int base_price;
     private String image_url;
     
+    private int room_size;      // 추가
+    private int max_capacity;   // 추가
+    
     // room stock
     private Integer availableCount; // 날짜 범위 내 최소 재고
     
