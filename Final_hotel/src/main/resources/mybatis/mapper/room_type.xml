@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="room">
+
+    <!-- ===============================
+         1. 전체 객실 목록 조회
+         =============================== -->
+    <select id="selectRoomTypeList" resultType="RoomTypeDTO">
+
+        SELECT
+            rt.room_type_id,
+            rt.room_name,
+            rt.room_grade,
+            rt.bed_type,
+            rt.view_type,
+            rt.base_price,
+            ri.image_url
+        FROM room_type rt
+        LEFT JOIN room_image ri
+            ON rt.room_type_id = ri.room_type_id
+            AND ri.is_main = 'Y'
+        ORDER BY rt.room_type_id DESC
+
+    </select>
+
+
+    <!-- ===============================
+         2. 필터 검색
+         =============================== -->
+    <select id="selectRoomTypeByFilter" parameterType="map" resultType="RoomTypeDTO">
+
+        SELECT
+            rt.room_type_id,
+            rt.room_name,
+            rt.room_grade,
+            rt.bed_type,
+            rt.view_type,
+            rt.base_price,
+            ri.image_url
+        FROM room_type rt
+        LEFT JOIN room_image ri
+            ON rt.room_type_id = ri.room_type_id
+            AND ri.is_main = 'Y'
+        WHERE 1=1
+		 <if test="hotel != null and hotel != ''">
+	        AND rt.fk_hotel_id = #{hotel}
+	    </if>
+
+        <if test="room_grade != null and room_grade != ''">
+            AND rt.room_grade = #{room_grade}
+        </if>
+
+        <if test="bed_type != null and bed_type != ''">
+            AND rt.bed_type = #{bed_type}
+        </if>
+
+        <if test="view_type != null and view_type != ''">
+            AND rt.view_type = #{view_type}
+        </if>
+
+		<!-- 우측 정렬 필터 추가 -->
+        <choose>
+	        <when test="sort == 'priceAsc'">
+	            ORDER BY rt.base_price ASC
+	        </when>
+	        <when test="sort == 'priceDesc'">
+	            ORDER BY rt.base_price DESC
+	        </when>
+	        <otherwise>
+	            ORDER BY rt.room_type_id DESC
+	        </otherwise>
+	    </choose>
+
+    </select>
+
+
+    <!-- ===============================
+         3. 객실 상세 조회
+         =============================== -->
+    <select id="selectRoomDetail" parameterType="long" resultType="RoomTypeDTO">
+
+        SELECT
+            rt.room_type_id,
+            rt.room_name,
+            rt.room_grade,
+            rt.bed_type,
+            rt.view_type,
+            rt.base_price,
+            ri.image_url
+        FROM room_type rt
+        LEFT JOIN room_image ri
+            ON rt.room_type_id = ri.room_type_id
+            AND ri.is_main = 'Y'
+        WHERE rt.room_type_id = #{roomId}
+
+    </select>
+
+    <!-- ===============================
+         4. 날짜별 가격 조회 
+         =============================== -->
+    <select id="selectCalendarPrice" parameterType="int" resultType="map">
+
+	    SELECT
+	        TO_CHAR(s.stay_date, 'YYYY-MM-DD') AS stay_date,
+	
+	        ROUND(
+	            rt.base_price
+	            * NVL((
+	                SELECT se.price_rate
+	                FROM SEASON se
+	                WHERE s.stay_date BETWEEN se.start_date AND se.end_date
+	                ORDER BY se.priority DESC
+	                FETCH FIRST 1 ROWS ONLY
+	            ), 1)
+	            * NVL(wr.rate_multiplier, 1)
+	        ) AS final_price,
+	
+	        s.available_count
+	
+	    FROM ROOM_STOCK s
+	    JOIN ROOM_TYPE rt
+	      ON s.room_type_id = rt.room_type_id
+	
+	    LEFT JOIN WEEKDAY_RATE wr
+	      ON wr.fk_hotel_id = rt.fk_hotel_id
+	     AND wr.day_of_week = TO_NUMBER(TO_CHAR(s.stay_date, 'D'))
+	
+	    WHERE s.room_type_id = #{value}
+	      AND s.stay_date BETWEEN TRUNC(SYSDATE)
+                    AND ADD_MONTHS(TRUNC(SYSDATE), 12)
+	
+	    ORDER BY s.stay_date	
+	
+	</select>
+	
+	<!-- 비교 모달용 (비교함에 담긴 객실 id리스트를 기준으로 객실 정보 조회하기)  푸터 -->
+	<select id="selectRoomsByIds" parameterType="list" resultType="RoomTypeDTO">
+	    SELECT *
+	    FROM room_type
+	    WHERE room_type_id IN
+	    <foreach collection="list" item="id" open="(" close=")" separator=",">
+	        #{id}
+	    </foreach>
+	</select>
+	
+	
+	
+</mapper>

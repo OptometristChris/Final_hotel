@@ -1,81 +1,119 @@
 <!DOCTYPE html>
-<html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::div.container})}" 
-      lang="ko" 
-      xmlns:th="http://www.thymeleaf.org"> 
-<!-- ::title 은   현재 페이지의 title   태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 첫번째 파라미터로 전달한다. -->
-<!-- ::link  는   현재 페이지의 link    태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 두번째 파라미터로 전달한다. -->
-<!-- ::style 은   현재 페이지의 style   태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 세번째 파라미터로 전달한다. -->
-<!-- ::script 는  현재 페이지의 script  태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 네번째 파라미터로 전달한다. -->
-<!-- ::div.container 은 현재 페이지의 div.container 태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 다섯번째 파라미터로 전달한다. --> 
-<!-- 타임리프는 백엔드 서버에서 HTML을 동적으로 렌더링하는 용도로 사용된다. -->
+<html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::div.container})}"
+      lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
 
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>비밀번호 변경 결과</title>
 
 <link rel="stylesheet" href="">
 
-<style type="text/css"></style>
+<style>
+  :root{
+    --bg: #f6f1ea;
+    --panel: #ffffff;
+    --line: #eadfd3;
+    --line-2: #d8c6b3;
+    --text: #2a2320;
+    --muted: #7a6a61;
+    --brand: #8b6a52;
+    --danger: #c94b4b;
+    --ok: #2f7d4c;
+    --shadow: 0 18px 45px rgba(54, 38, 25, .10);
+    --radius: 18px;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, "Apple SD Gothic Neo", sans-serif;
+    background: radial-gradient(1200px 600px at 20% 10%, #fff, transparent 55%),
+                radial-gradient(900px 500px at 80% 90%, #fff, transparent 50%),
+                var(--bg);
+    color: var(--text);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px 14px;
+  }
+  .wrap{ width: 420px; max-width: 100%; }
+  .brandbar{ display:flex; justify-content:center; margin-bottom: 14px; letter-spacing:.14em; font-weight: 800; color: var(--brand); }
+  .card{ background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow:hidden; }
+  .header{ padding: 20px 18px 12px; text-align:center; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #fff, #fff7ef); }
+  .header h1{ margin:0; font-size: 20px; letter-spacing:.04em; }
+  .body{ padding: 18px; }
 
-<!--/* 
-      자바스크립트 인라인 
-      th:inline="javascript" 은 스크립트 태그 내에서 Thymeleaf 문법([[...]])을 해석할 수 있게 해주는 설정이다.
-      JavaScript 안에서 Thymeleaf 값을 넣을 때는 th:inline="javascript" 와 /*[[뭐뭐뭐]]*/ 구문을 사용해야 한다. 
-      
-      // const result = [[${result}]]; // requestScope 데이터는 보통 모델에 담겨 전달된다.
-   
-      // 위의 것을 사용해도 정상적으로 작동은 하지만 소스에서 오류표시가 나와서 찝찝하다. 
-      // 왜냐하면 const result = [[${result}]]; 코드에서 IDE(IntelliJ, VS Code, Eclipse 등)가 오류를 표시하는 이유는, 
-      // 자바스크립트 문법 입장에서는 [[ ]]가 유효하지 않은 문법이기 때문이다.
-      // 이를 해결하고 오류 표시를 없애려면 Thymeleaf의 자바스크립트 내추럴 템플릿(Natural Templates) 주석 문법을 사용하면 된다.
-   
-      // 그래서 아래와 같이 [[${result}]] 대신 주석 처리된 문법인 const result = /*[[${result}]]*/ 0; 을 사용한다.
-*/-->
+  .ok{
+    color:#fff; background: var(--ok);
+    border-radius: 12px; padding:10px; font-weight:900; margin-bottom:12px;
+  }
+  .fail{
+    color:#fff; background: var(--danger);
+    border-radius: 12px; padding:10px; font-weight:900; margin-bottom:12px;
+  }
+
+  .box{
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px;
+    background:#fffaf5;
+    color: var(--muted);
+    line-height:1.6;
+    font-size:13px;
+  }
+
+  .btnrow{ display:flex; gap:10px; margin-top:14px; }
+  .btn{
+    flex:1; border:0; border-radius:14px; padding:12px 14px;
+    font-weight:900; cursor:pointer; letter-spacing:.04em;
+  }
+  .btn-main{ background: linear-gradient(180deg, var(--brand), #6f513f); color:#fff; }
+  .btn-sub{ background:#fff; color: var(--brand); border:1px solid var(--line-2); }
+</style>
+
 <script th:inline="javascript">
- /*<![CDATA[*/
-
-   const result = /*[[${result}]]*/ 0;
-
-   if (result == 1) {
-       alert("비밀번호가 변경되었습니다.");
-       location.href = /*[[@{/index}]]*/ '';
-   } else {
-       alert("비밀번호 변경에 실패하였습니다.");
-       window.history.back();
-   }
-
-/*	
-	location.href="javascript:history.go(-2);";  // 이전이전 페이지로 이동 
-	location.href="javascript:history.go(-1);";  // 이전 페이지로 이동
-	location.href="javascript:history.go(0);";   // 현재 페이지로 이동(==새로고침) 캐시에서 읽어옴.
-	location.href="javascript:history.go(1);";   // 다음 페이지로 이동.
-	
-	location.href="javascript:history.back();";       // 이전 페이지로 이동 
-	location.href="javascript:location.reload(true)"; // 현재 페이지로 이동(==새로고침) 서버에 가서 다시 읽어옴. 
-	location.href="javascript:history.forward();";    // 다음 페이지로 이동.
-*/
-
-/* === 새로고침(다시읽기) 방법 3가지 차이점 ===
-	>>> 1. 일반적인 다시읽기 <<<
-	window.location.reload();
-	==> 이렇게 하면 컴퓨터의 캐시에서 우선 파일을 찾아본다.
-	    없으면 서버에서 받아온다. 
-	
-	>>> 2. 강력하고 강제적인 다시읽기 <<<
-	window.location.reload(true);
-	==> true 라는 파라미터를 입력하면, 무조건 서버에서 직접 파일을 가져오게 된다.
-	    캐시는 완전히 무시된다.
-	
-	>>> 3. 부드럽고 소극적인 다시읽기 <<<
-	history.go(0);
-	==> 이렇게 하면 캐시에서 현재 페이지의 파일들을 항상 우선적으로 찾는다.
-*/
- /*]]>*/	
+/*<![CDATA[*/
+  // result 값으로 자동 이동하고 싶으면 여기서 처리 가능.
+  // const result = /*[[${result}]]*/ 0;
+/*]]>*/
 </script>
 
 <body>
-	<div class="container">
-   
-	</div>
+<div class="container">
+  <div class="wrap">
+    <div class="brandbar">CIEL</div>
+
+    <section class="card" aria-label="비밀번호 변경 결과 카드">
+      <div class="header">
+        <h1>비밀번호 변경 결과</h1>
+      </div>
+
+      <div class="body">
+        <div th:if="${result == 1}">
+          <div class="ok">비밀번호가 변경되었습니다.</div>
+          <div class="box">
+            보안을 위해 정기적으로 비밀번호를 변경하는 것을 권장합니다.
+          </div>
+          <div class="btnrow">
+            <button class="btn btn-main" type="button" th:onclick="|location.href='@{/index}'|">메인으로</button>
+            <button class="btn btn-sub" type="button" th:onclick="|location.href='@{/security/member/mypage}'|">마이페이지</button>
+          </div>
+        </div>
+
+        <div th:if="${result != 1}">
+          <div class="fail">비밀번호 변경에 실패했습니다.</div>
+          <div class="box">
+            입력값을 다시 확인한 후 재시도해주세요.
+          </div>
+          <div class="btnrow">
+            <button class="btn btn-main" type="button" th:onclick="|history.back()|">이전으로</button>
+            <button class="btn btn-sub" type="button" th:onclick="|location.href='@{/security/member/mypage}'|">마이페이지</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
 </body>
-</html> 
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>예약 정보 입력</title>
+</head>
+<body>
+
+<h2>예약 정보 입력</h2>
+
+<hr>
+
+<!-- 선택한 날짜 정보 표시 -->
+<p>
+    체크인: <span th:text="${check_in}"></span><br>
+    체크아웃: <span th:text="${check_out}"></span>
+</p>
+
+<hr>
+
+<form id="reservationForm">
+
+    <!--  hidden으로 값 유지 (중요) -->
+    <input type="hidden" name="room_type_id" th:value="${room_type_id}">
+    <input type="hidden" name="check_in" th:value="${check_in}">
+    <input type="hidden" name="check_out" th:value="${check_out}">
+
+    <!-- 투숙 인원 (나중에 DTO에 연결 가능) -->
+    <label>투숙 인원:</label>
+    <input type="number" name="guest_count" value="2" min="1" max="4">
+
+    <br><br>
+
+    <!-- 조식 옵션 (나중에 확장 가능) -->
+    <label>
+        <input type="checkbox" name="breakfast" value="Y">
+        조식 추가
+    </label>
+
+    <br><br>
+
+    <button type="button" onclick="requestPay()">결제하기</button>
+
+</form>
+
+<script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+
+<script>
+    var IMP = window.IMP;
+    IMP.init("imp76388561"); 
+
+    function requestPay() {
+
+        var amount = 100; // 테스트용
+
+        var merchantUid = "hotel_" + new Date().getTime();
+
+        IMP.request_pay({
+            pg: "html5_inicis",   
+            pay_method: "card",
+            merchant_uid: merchantUid,
+            name: "호텔 예약 결제",
+            amount: amount,
+            buyer_name: "테스트사용자",
+            buyer_tel: "01012345678"
+        }, function (rsp) {
+
+            if (rsp.success) {
+
+                //  서버로 결제 검증 요청
+                fetch("/final_hotel/payment/verify", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        imp_uid: rsp.imp_uid,
+                        merchant_uid: rsp.merchant_uid,
+                        
+                        room_type_id: document.querySelector("input[name='room_type_id']").value,
+                        check_in: document.querySelector("input[name='check_in']").value,
+                        check_out: document.querySelector("input[name='check_out']").value,
+                        guest_count: document.querySelector("input[name='guest_count']").value,
+                        breakfast: document.querySelector("input[name='breakfast']")?.checked ? "Y" : "N"
+                    })
+                })
+                .then(res => res.text())
+                .then(data => {
+                    alert(data);
+                    // 필요하면 예약 완료 페이지로 이동
+                    // location.href = "/final_hotel/reservation/complete";
+                });
+
+            } else {
+                alert("결제 실패: " + rsp.error_msg);
+            }
+
+        });
+    }
+</script>
+</body>
+</html>

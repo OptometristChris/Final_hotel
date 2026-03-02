@@ -211,6 +211,61 @@
 	    INSERT INTO tbl_loginhistory(historyno, member_no, logindate, clientip)
 	    VALUES(seq_historyno.nextval, #{memberNo}, SYSDATE, #{clientip})
 	</insert>
+	
+	
+	<!-- =========================================================
+	     9) 아이디 찾기 / 비밀번호 찾기
+	     ========================================================= -->
+	<!-- 아이디 찾기: name + (email or mobile) -->
+	<select id="findMemberId" parameterType="HashMap" resultType="String">
+		SELECT memberid
+		FROM tbl_member_security
+		WHERE name = #{name}
+		<choose>
+			<when test="email != null and email != ''">
+				AND email = #{email}
+			</when>
+			<when test="mobile != null and mobile != ''">
+				AND mobile = #{mobile}
+			</when>
+			<otherwise>
+				<!-- email/mobile 둘 다 없으면 매칭 불가 -->
+				AND 1 = 0
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 비밀번호 찾기 본인확인: memberid + (email or mobile) 일치여부 -->
+	<select id="verifyMemberForPwReset" parameterType="HashMap" resultType="Integer">
+		SELECT count(*)
+		FROM tbl_member_security
+		WHERE memberid = #{memberid}
+		<choose>
+			<when test="email != null and email != ''">
+				AND email = #{email}
+			</when>
+			<when test="mobile != null and mobile != ''">
+				AND mobile = #{mobile}
+			</when>
+			<otherwise>
+				AND 1 = 0
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 임시 비밀번호(BCrypt 해시)로 업데이트 + 변경일 갱신 -->
+	<update id="updatePasswordForTemp" parameterType="HashMap">
+		UPDATE tbl_member_security
+		SET passwd = #{passwd},
+		    passwd_modify_date = SYSDATE
+		WHERE memberid = #{memberid}
+	</update>
+	
+	
+	<!-- id로 이메일 정보 얻기 -->
+	<select id="findEmailByMemberid" parameterType="String" resultType="String">
+	  SELECT email
+	  FROM tbl_member_security
+	  WHERE memberid = #{memberid}
+	</select>
 
 
 </mapper>
