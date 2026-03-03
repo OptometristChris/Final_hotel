@@ -2,6 +2,7 @@ package com.spring.app.hk.reservation.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class ReservationService_imple implements ReservationService {
 
     // 결제 성공 후 db 저장하기
     @Override
-    public void saveReservation(Map<String, String> map) {
+    public String saveReservation(Map<String, String> map) {
 
         Map<String, Object> paraMap = new HashMap<>(map);
 
@@ -61,7 +62,26 @@ public class ReservationService_imple implements ReservationService {
 
         // 5) RESERVATION insert
         reservationDAO.insertReservation(paraMap);
+        
+        // reservation_id는 selectKey 때문에 들어있음
+        Long reservationId = (Long) paraMap.get("reservation_id");
 
         System.out.println("예약 + 결제 저장 완료");
+       
+        // DB에서 만드는 것과 동일한 코드 생성
+        String reservationCode =
+                "R"
+                + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+                + "-"
+                + String.format("%04d", reservationId);
+
+        return reservationCode;
     }
+
+    
+    // 예약 완료 페이지
+	@Override
+	public Map<String, Object> getReservationByCode(String code) {
+		return reservationDAO.findByReservationCode(code);
+	}
 }

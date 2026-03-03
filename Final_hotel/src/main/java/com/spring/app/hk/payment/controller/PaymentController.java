@@ -99,25 +99,15 @@ public class PaymentController {
         // 4️. 예약 DB 저장 (MyBatis)
         // ==========================================
         // JS에서 room_type_id, check_in, check_out 등 함께 전달해야 함
-        reservationService.saveReservation(map); // 여기 
+        // 예약 저장 + 코드 받기
+        String reservationCode =
+                reservationService.saveReservation(map);
 
         // ==========================================
         // 5️. 클라이언트에 성공 응답
-        // ==========================================
-        return ResponseEntity.ok("예약이 완료되었습니다.");
+        // ==========================================  
+        return ResponseEntity.ok(reservationCode);    
+        
     }
     
-    
-    // 에약번호 리턴
-    @PostMapping("/payment/verify")
-    @ResponseBody
-    public String verifyPayment(@RequestBody Map<String, String> map) {
-
-        reservationService.saveReservation(map);
-
-        // 예시: 생성된 예약번호 반환
-        String reservationNo = "R20250211-0001";
-
-        return reservationNo;
-    }
 }

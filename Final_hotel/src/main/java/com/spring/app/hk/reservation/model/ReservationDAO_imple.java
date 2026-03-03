@@ -23,4 +23,10 @@ public class ReservationDAO_imple implements ReservationDAO {
     public int insertReservation(Map<String, Object> paraMap) {
         return sqlsession.insert("reservation.insertReservation", paraMap);
     }
+
+    // 예약 완료 페이지
+    @Override
+    public Map<String, Object> findByReservationCode(String reservationCode) {
+        return sqlsession.selectOne("reservation.findByReservationCode", reservationCode);
+    }
 }

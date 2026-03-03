@@ -85,10 +85,14 @@
                     })
                 })
                 .then(res => res.text())
-                .then(data => {
-                    alert(data);
-                    // 필요하면 예약 완료 페이지로 이동
-                    // location.href = "/final_hotel/reservation/complete";
+                .then(code => {
+                	alert("예약이 완료되었습니다.");
+                	
+                	// 예약 완료 페이지 이동
+                    location.href = "/final_hotel/reservation/complete?code=" + code;
+                })
+                .catch(err => {
+                    alert("결제 처리 중 오류 발생");
                 });
 
             } else {

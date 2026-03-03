@@ -10,6 +10,9 @@ public interface ReservationDAO {
 	// reservation 테이블에 insert
     int insertReservation(Map<String, Object> paraMap);
 
+    // 예약 완료 페이지
+    Map<String, Object> findByReservationCode(String reservationCode);
+
 	
 
 }

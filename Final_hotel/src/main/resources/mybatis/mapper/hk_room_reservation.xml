@@ -37,7 +37,7 @@
 	<!-- reservation 테이블에 insert -->
 	<insert id="insertReservation" parameterType="map">
 
-	    <!-- reservation_id만 selectKey -->
+	    <!-- reservation_id만 생성 -->
 	    <selectKey keyProperty="reservation_id"
 	               resultType="long"
 	               order="BEFORE">
@@ -62,7 +62,7 @@
 	    VALUES (
 	        #{reservation_id},
 	        'R' || TO_CHAR(SYSDATE,'YYYYMMDD') || '-' ||
-	        LPAD(#{reservation_id}, 4, '0'),
+	        LPAD(#{reservation_id},4,'0'),
 	        #{member_no},
 	        #{room_type_id},
 	        #{payment_id},
@@ -76,5 +76,23 @@
 	        #{refund_amount}
 	    )
 	</insert>
+	
+	<!-- 예약 완료 페이지 -->
+	<select id="findByReservationCode"
+        parameterType="string"
+        resultType="map">
+
+	    SELECT
+	        reservation_code,
+	        checkin_date,
+	        checkout_date,
+	        total_price,
+	        guest_count,
+	        reservation_status,
+	        cancel_deadline
+	    FROM RESERVATION
+	    WHERE reservation_code = #{value}
+	
+	</select>
 
 </mapper>

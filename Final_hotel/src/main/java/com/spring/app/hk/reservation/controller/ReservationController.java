@@ -35,6 +35,7 @@ public class ReservationController {
         return "hk/reservation/form";
     }
     
+    
     // 예약 저장용
     @PostMapping("/save")
     public String saveReservation(@RequestParam Map<String, String> map) {
@@ -42,6 +43,24 @@ public class ReservationController {
         reservationService.saveReservation(map);
 
         return "redirect:/reservation/success";
+    }
+    
+    
+    // 예약 완료 페이지
+    @GetMapping("/complete")
+    public String reservationComplete(@RequestParam("code") String code,
+                                      Model model) {
+
+    	System.out.println("넘어온 code = " + code);
+    	
+        Map<String,Object> reservation =
+                reservationService.getReservationByCode(code);
+
+        System.out.println("조회 결과 = " + reservation);
+        
+        model.addAttribute("reservation", reservation);
+
+        return "hk/reservation/complete";
     }
     
 }
