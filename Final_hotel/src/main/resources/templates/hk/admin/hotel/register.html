@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<title>호텔 등록</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function(){
+
+    $("#btnRegister").click(function(){
+
+        const formData =
+            new FormData($("form[name='hotelFrm']").get(0));
+
+        $.ajax({
+            url: "/myspringboot/admin/hotel/register",
+            type: "post",
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            success: function(json){
+
+                if(json.result == 1){
+                    alert("호텔 등록 성공");
+                    location.href = "/myspringboot/admin/hotel/list";
+                }
+                else{
+                    alert("등록 실패");
+                }
+            },
+            error: function(request, status, error){
+                alert("code: " + request.status + "\n"
+                    + "message: " + request.responseText + "\n"
+                    + "error: " + error);
+            }
+        });
+
+    });
+
+});
+</script>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>호텔 등록</h2>
+
+    <form name="hotelFrm" enctype="multipart/form-data">
+
+        호텔명 <br>
+        <input type="text" name="hotel_name" required><br><br>
+
+        주소 <br>
+        <input type="text" name="address"><br><br>
+
+        연락처 <br>
+        <input type="text" name="contact"><br><br>
+
+        설명 <br>
+        <textarea name="hotel_desc" rows="5" cols="50"></textarea><br><br>
+
+        대표 이미지 <br>
+        <input type="file" name="mainImage" accept="image/*"><br><br>
+
+        <input type="button" id="btnRegister" value="등록">
+        <input type="reset" value="취소">
+
+    </form>
+
+</div>
+
+</body>
+</html>

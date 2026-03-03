@@ -25,6 +25,7 @@ public class PaymentController {
     @Value("${iamport.api-secret}")
     private String apiSecret;
 
+    // 예약
     @PostMapping("/verify")
     public ResponseEntity<String> verify(@RequestBody Map<String, String> map) {
 
@@ -91,7 +92,7 @@ public class PaymentController {
             // 👉 실서비스 전환 시 반드시 정상 검증 로직 복구 필요
             // =========================================================
 
-            System.out.println("결제 검증 실패했지만 예약은 진행 (임시 처리)");
+            //System.out.println("결제 검증 실패했지만 예약은 진행 (임시 처리)");
         }
 
         // ==========================================
@@ -101,8 +102,22 @@ public class PaymentController {
         reservationService.saveReservation(map); // 여기 
 
         // ==========================================
-        // 5️⃣ 클라이언트에 성공 응답
+        // 5️. 클라이언트에 성공 응답
         // ==========================================
         return ResponseEntity.ok("예약이 완료되었습니다.");
+    }
+    
+    
+    // 에약번호 리턴
+    @PostMapping("/payment/verify")
+    @ResponseBody
+    public String verifyPayment(@RequestBody Map<String, String> map) {
+
+        reservationService.saveReservation(map);
+
+        // 예시: 생성된 예약번호 반환
+        String reservationNo = "R20250211-0001";
+
+        return reservationNo;
     }
 }
