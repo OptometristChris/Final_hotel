@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hotel">
+
+    <!-- 호텔 insert -->
+    <insert id="insertHotel">
+
+        <selectKey keyProperty="hotel_id" resultType="int" order="BEFORE">
+            select seq_hotel_id.nextval from dual
+        </selectKey>
+
+        insert into tbl_hotel
+        (hotel_id,
+         hotel_name,
+         address,
+         contact,
+         hotel_desc,
+         approve_status,
+         active_yn,
+         created_by)
+        values
+        (#{hotel_id},
+         #{hotel_name},
+         #{address},
+         #{contact},
+         #{hotel_desc},
+         #{approve_status},
+         #{active_yn},
+         #{created_by})
+    </insert>
+
+    <!-- 이미지 insert -->
+    <insert id="insertHotelImage">
+        insert into HOTEL_IMAGE
+        (image_id,
+         fk_hotel_id,
+         image_url,
+         is_main,
+         sort_order)
+        values
+        (SEQ_HOTEL_IMAGE.nextval,
+         #{fk_hotel_id},
+         #{image_url},
+         #{is_main},
+         #{sort_order})
+    </insert>
+
+</mapper>
