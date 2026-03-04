@@ -37,6 +37,12 @@ public class HotelDAO_imple implements HotelDAO {
         return sqlsession.insert("hotel.insertHotelImage", paraMap);
     }
 
+    // 호텔 상세페이지 내 수정하기
+	@Override
+	public int updateHotel(Map<String, Object> param) {
+		 return sqlsession.update("hotel.updateHotel", param);
+	}
+
 	
 
 	

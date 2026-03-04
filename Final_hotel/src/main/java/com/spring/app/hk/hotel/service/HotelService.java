@@ -14,5 +14,8 @@ public interface HotelService {
     // 호텔 상세페이지 이동
 	Map<String, Object> getHotelDetail(Long hotelId);
 
+	 // 호텔 상세페이지 내 수정하기
+	int updateHotel(Map<String, Object> param);
+
 	
 }

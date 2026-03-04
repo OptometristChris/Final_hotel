@@ -56,6 +56,19 @@ public class HotelController {
         return "hk/admin/hotel/detail";
     }
     
+    // 호텔 상세페이지 내 수정하기
+    @PostMapping("update")
+    @ResponseBody
+    public Map<String,Object> updateHotel(@RequestBody Map<String,Object> param){ // 호텔 상세페이지 내 수정 완료 클릭 후 json 받는 용도
+
+        int result = hotelService.updateHotel(param);
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("result", result);
+
+        return map;
+    }
+    
 
     // 등록 페이지 이동
 	@PreAuthorize("hasRole('ROLE_HQ')")

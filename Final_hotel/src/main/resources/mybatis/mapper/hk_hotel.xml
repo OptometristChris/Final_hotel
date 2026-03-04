@@ -42,7 +42,22 @@
 		
 		WHERE H.HOTEL_ID = #{hotelId}
 		
-		</select>
+	</select>
+		
+		
+	<!-- 호텔 상세페이지 내 수정하기 -->	
+	<update id="updateHotel">
+
+		UPDATE TBL_HOTEL
+		SET
+		    HOTEL_NAME = #{hotel_name},
+		    ADDRESS = #{address},
+		    CONTACT = #{contact},
+		    HOTEL_DESC = #{hotel_desc}
+		WHERE HOTEL_ID = #{hotel_id}
+		
+	</update>	
+	
 	
     <!-- 호텔 insert -->
     <insert id="insertHotel">
