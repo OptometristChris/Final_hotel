@@ -41,16 +41,19 @@ public class HotelController {
         return "hk/admin/hotel/list";
     }
     
+    
+    // 호텔 상세페이지 이동
+    
 
     // 등록 페이지 이동
-	/* @PreAuthorize("hasRole('ROLE_HQ')") */
+	@PreAuthorize("hasRole('ROLE_HQ')")
     @GetMapping("register")
     public String registerPage() {
         return "hk/admin/hotel/register";
     }
 
     // 호텔 등록
-	/* @PreAuthorize("hasRole('ROLE_HQ')") */
+	@PreAuthorize("hasRole('ROLE_HQ')")
     @PostMapping("register")
     @ResponseBody
     public Map<String, Object> register(
