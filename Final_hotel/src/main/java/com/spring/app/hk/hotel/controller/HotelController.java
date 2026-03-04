@@ -1,16 +1,20 @@
 package com.spring.app.hk.hotel.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.io.File;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.app.common.FileManager;
 import com.spring.app.hk.hotel.service.HotelService;
+
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +29,18 @@ public class HotelController {
 
     @Value("${file.images-dir}")
     private String imagesDir;
+
+    // 호텔 리스트 가져오기
+    @GetMapping("list")
+    public String hotelList(Model model){
+
+        List<Map<String,Object>> hotelList = hotelService.getHotelList();
+
+        model.addAttribute("hotelList", hotelList);
+
+        return "hk/admin/hotel/list";
+    }
+    
 
     // 등록 페이지 이동
 	/* @PreAuthorize("hasRole('ROLE_HQ')") */
@@ -54,11 +70,14 @@ public class HotelController {
             // 대표 이미지 업로드
             if(!mainImage.isEmpty()) {
 
-                String savedName =
-                        fileManager.doFileUpload(
-                                mainImage.getBytes(),
-                                mainImage.getOriginalFilename(),
-                                imagesDir);
+            	// 업로드 위치 : file_images/hotel/파일명.jpg
+            	String hotelPath = imagesDir + File.separator + "hotel";
+
+            	String savedName =
+            	        fileManager.doFileUpload(
+            	                mainImage.getBytes(),
+            	                mainImage.getOriginalFilename(),
+            	                hotelPath);
 
                 paraMap.put("main_image", savedName);
             }
@@ -73,4 +92,7 @@ public class HotelController {
 
         return Map.of("result", 1);
     }
+    
+    
+    
 }

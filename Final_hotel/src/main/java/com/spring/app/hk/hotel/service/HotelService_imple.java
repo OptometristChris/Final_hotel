@@ -1,6 +1,7 @@
 package com.spring.app.hk.hotel.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -23,6 +24,13 @@ public class HotelService_imple implements HotelService {
     @Value("${file.images-dir}")
     private String imagesDir;
 
+    // 호텔 리스트 가져오기
+    @Override
+	public List<Map<String, Object>> getHotelList() {
+    	  return hotelDAO.selectHotelList();
+	}
+    
+    
     @Override
     public void saveHotel(Map<String, String> map) {
 
@@ -41,8 +49,10 @@ public class HotelService_imple implements HotelService {
         // 3️. 대표 이미지 처리
         if(map.get("main_image") != null) {
 
+        	String imagePath = "/file_images/hotel/" + map.get("main_image");
+        	
             paraMap.put("fk_hotel_id", hotelId);
-            paraMap.put("image_url", map.get("main_image"));
+            paraMap.put("image_url", imagePath);
             paraMap.put("is_main", "Y");
             paraMap.put("sort_order", 1);
 
@@ -51,4 +61,6 @@ public class HotelService_imple implements HotelService {
 
         System.out.println("호텔 + 이미지 저장 완료");
     }
+
+	
 }

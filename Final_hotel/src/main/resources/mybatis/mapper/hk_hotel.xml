@@ -5,6 +5,22 @@
 
 <mapper namespace="hotel">
 
+	<!-- 호텔 리스트 가져오기 -->
+	<select id="selectHotelList" resultType="map">
+
+		SELECT
+		    h.hotel_id,
+		    h.hotel_name,
+		    h.approve_status,
+		    i.image_url
+		FROM tbl_hotel h
+		LEFT JOIN hotel_image i
+		ON h.hotel_id = i.fk_hotel_id
+		AND i.is_main = 'Y'
+		ORDER BY h.hotel_id
+		
+		</select>
+	
     <!-- 호텔 insert -->
     <insert id="insertHotel">
 
