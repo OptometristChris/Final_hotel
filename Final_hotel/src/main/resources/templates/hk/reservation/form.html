@@ -176,7 +176,7 @@ function requestPay() {
         pay_method: "card",
         merchant_uid: "hotel_" + new Date().getTime(),
         name: "호텔 예약 결제",
-        amount: totalAmount,
+        amount: 100,
         buyer_name: "테스트사용자",
         buyer_tel: "01012345678"
     }, function (rsp) {
