@@ -1,23 +1,28 @@
 package com.spring.app.hk.hotel.controller;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.io.File;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.app.common.FileManager;
 import com.spring.app.hk.hotel.service.HotelService;
-import com.spring.app.jh.security.domain.Session_AdminDTO;
+import com.spring.app.jh.security.domain.CustomAdminDetails;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 
 @Controller
 @RequiredArgsConstructor
@@ -115,21 +120,25 @@ public class HotelController {
         try {
 
         	// 로그인한 관리자 정보 가져오기
-            Session_AdminDTO loginAdmin = (Session_AdminDTO) authentication.getPrincipal();
+        	CustomAdminDetails loginAdmin = (CustomAdminDetails) authentication.getPrincipal();
 
-            Map<String,Object> paraMap = new HashMap<>(map);
-            
-            // 관리자 번호
-            paraMap.put("admin_no", loginAdmin.getAdmin_no());
+			Integer adminNo = loginAdmin.getAdminDto().getAdmin_no();
+			String adminType = loginAdmin.getAdminDto().getAdmin_type();
 
-            // 승인 상태
-            // 총괄 관리자 등록시 approved로 저장
-            if("HQ".equals(loginAdmin.getAdmin_type())){
-                paraMap.put("approve_status","APPROVED");
-            }else{
-            	// 지점관리자 등록 신청시 pending으로 저장
-                paraMap.put("approve_status","PENDING");
-            }
+			Map<String,Object> paraMap = new HashMap<>(map);
+
+			// 관리자 번호
+			paraMap.put("admin_no", adminNo);
+
+			// 활성 여부
+			paraMap.put("active_yn","Y");
+
+			// 승인 상태
+			if("HQ".equals(adminType)){
+			    paraMap.put("approve_status","APPROVED");
+			}else{
+			    paraMap.put("approve_status","PENDING");
+			}
                       
             // 대표 이미지 업로드
             if(!mainImage.isEmpty()) {

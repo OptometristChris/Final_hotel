@@ -88,30 +88,31 @@
 		
 	
     <!-- 호텔 DB insert -->
-    <insert id="insertHotel">
-        <selectKey keyProperty="hotel_id" resultType="int" order="BEFORE">
-            select seq_hotel.nextval from dual
-        </selectKey>
+  <insert id="insertHotel">
 
-        insert into tbl_hotel
-	        (hotel_id,
-	         hotel_name,
-	         address,
-	         contact,
-	         hotel_desc,
-	         approve_status,
-	         active_yn,
-	         created_by)
-        values
-	        (#{hotel_id},
-	         #{hotel_name},
-	         #{address},
-	         #{contact},
-	         #{hotel_desc},
-	         #{approve_status},
-	         #{active_yn},
-	         #{created_by})
-    </insert>
+    <selectKey keyProperty="hotel_id" resultType="int" order="BEFORE">
+        select seq_hotel.nextval from dual
+    </selectKey>
+
+    insert into tbl_hotel
+        (hotel_id,
+         hotel_name,
+         address,
+         contact,
+         hotel_desc,
+         approve_status,
+         active_yn,
+         admin_no)
+    values
+        (#{hotel_id},
+         #{hotel_name},
+         #{address},
+         #{contact},
+         #{hotel_desc},
+         #{approve_status},
+         #{active_yn},
+         #{admin_no})
+	</insert>
 
 
     <!-- 이미지 insert -->
