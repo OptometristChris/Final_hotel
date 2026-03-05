@@ -143,9 +143,9 @@ public class MemberController {
         if (token != null) token.getToken();
     	
        
-       // 이미 로그인 했다면 인덱스로
+       // 이미 일반회원, 어드민, 게스트로 로그인 했다면 인덱스로
        HttpSession session = request.getSession(false);
-	   if(session != null && session.getAttribute("sessionMemberDTO") != null) {
+	   if(session != null && (session.getAttribute("sessionMemberDTO") != null || session.getAttribute("guestSession") != null || session.getAttribute("sessionAdminDTO") != null) ) {
 	       return "redirect:/index";
 	   }
     	

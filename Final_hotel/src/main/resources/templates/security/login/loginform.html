@@ -1,13 +1,7 @@
 <!DOCTYPE html>
-<html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::div.container})}"
+<html th:replace="~{js/layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::div.container})}"
       lang="ko"
       xmlns:th="http://www.thymeleaf.org">
-<!-- ::title 은   현재 페이지의 title   태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 첫번째 파라미터로 전달한다. -->
-<!-- ::link  는   현재 페이지의 link    태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 두번째 파라미터로 전달한다. -->
-<!-- ::style 은   현재 페이지의 style   태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 세번째 파라미터로 전달한다. -->
-<!-- ::script 는  현재 페이지의 script  태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 네번째 파라미터로 전달한다. -->
-<!-- ::div.container 은 현재 페이지의 div.container 태그를 읽어다가 templates/layout/layout_main.html 파일의 th:fragment="layout(title, link, css, script, content)" 에 있는 다섯번째 파라미터로 전달한다. -->
-<!-- 타임리프는 백엔드 서버에서 HTML을 동적으로 렌더링하는 용도로 사용된다. -->
 
 <head>
 <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}"/>
@@ -18,237 +12,273 @@
 <link rel="stylesheet" href="">
 
 <style>
-  :root{
-    /* 연갈색 테마 (업로드 로그인.html 기반) */
-    --bg: #f6f1ea;
-    --panel: #ffffff;
-    --line: #eadfd3;
-    --line-2: #d8c6b3;
-    --text: #2a2320;
-    --muted: #7a6a61;
+ :root{
+  --bg:#fff;
+  --line:#e9e9e9;
+  --text:#111;
+  --muted:#6f6f6f;
+  --danger:#c94b4b;
+}
 
-    --brand: #8b6a52;
-    --brand-2: #b08a6e;
-    --accent: #cda57a;
-    --danger: #c94b4b;
+/* 페이지 전체 여백/정렬 (헤더에 가려지지 않게 위쪽 여백 충분히) */
+.login-bg{
+  background: var(--bg);
+  min-height: calc(100vh - 40px);
+  display:flex;
+  justify-content:center;
+  padding: 110px 16px 110px;
+}
 
-    --shadow: 0 18px 45px rgba(54, 38, 25, .10);
-    --radius: 18px;
-  }
+/* 바깥은 넓게(흰 여백 많이) */
+.wrap{
+  width: 920px;
+  max-width: 100%;
+}
 
-  /* layout_main이 bootstrap을 깔아두므로,
-     로그인 페이지 전용으로만 '컨테이너 영역'을 카드처럼 보이게 한다. */
+/* 타이틀 */
+.header{
+  text-align:center;
+  margin: 0 0 42px;
+}
+.header h1{
+  margin:0;
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.header p{
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* 카드: 박스감은 얇게(자연스럽게) */
+.card{
+  background:#fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 0;
+}
+
+/* 탭 영역: 가운데 정렬 + 적당히 모이게 */
+.tabs{
+  width: 680px;
+  max-width: 100%;
+  margin: 0 auto;
+  display:flex;
+  justify-content:center;     /* 좌우 끝 X, 가운데 모으기 */
+  gap: 140px;                 /* 탭 사이 거리(필요시 120~160 조절) */
+  position:relative;
+  padding: 18px 0 16px;
+}
+.tabs::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:1px;
+  background: var(--line);
+}
+
+/* 탭: “칸” 전체 클릭 가능하도록 박스화 */
+.tab{
+  border:0;
+  background:transparent;
+  cursor:pointer;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  min-width: 160px;
+  padding: 12px 24px;
+  border-radius: 10px;
+
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--muted);
+  position:relative;
+}
+
+.tab[aria-selected="true"]{
+  color: var(--text);
+}
+
+/* 선택 밑줄: 각 탭 아래로 */
+.tab[aria-selected="true"]::after{
+  content:"";
+  position:absolute;
+  left: 18px;
+  right: 18px;
+  bottom: -17px;              /* tabs 라인에 닿게 */
+  height:3px;
+  background: var(--text);
+  border-radius: 999px;
+}
+
+/* 폼 영역(입력창 길이) */
+.body{
+  width: 680px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding-top: 34px;
+  padding-bottom: 30px;       /* 하단 숨통 */
+}
+
+/* 탭 전환용: active 아닌 폼 숨김 */
+.form{ display:none; }
+.form.active{ display:block; }
+
+/* 라벨 */
+.label{
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+/* 입력창 */
+.field{ margin-bottom: 16px; }
+
+.input{
+  width:100%;
+  height: 56px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  outline:none;
+  background:#fff;
+  font-size: 15px;
+  color: var(--text);
+}
+.input:focus{
+  border-color:#111;
+}
+
+/* 체크/보안 줄 */
+.rowline{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin: 8px 0 18px;
+  gap: 12px;
+}
+
+.check{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  margin:0;
+  font-size: 14px;
+  color: var(--text);
+}
+.check input{
+  width:16px;
+  height:16px;
+  accent-color:#111;
+}
+
+.secure{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.lock{
+  width:22px;
+  height:22px;
+  display:grid;
+  place-items:center;
+  border-radius:999px;
+  background:#f4f4f4;
+  border:1px solid var(--line);
+}
+
+/* 관리자 로그인 링크 */
+.admin-link{
+  cursor:pointer;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  text-decoration:none;
+}
+.admin-link:hover{
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* 버튼 */
+.btnx{
+  width:100%;
+  height: 58px;
+  border:0;
+  border-radius: 6px;
+  background:#111;
+  color:#fff;
+  font-size: 16px;
+  font-weight: 800;
+  cursor:pointer;
+}
+.btnx:active{ transform: translateY(1px); }
+
+/* 하단 링크 + 아래 공간 확보 */
+.links{
+  margin-top: 24px;
+  padding-bottom: 14px;
+  display:flex;
+  justify-content:center;
+  gap: 14px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.links a{
+  color: var(--muted);
+  text-decoration:none;
+}
+.links a:hover{
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* 서버 메시지/에러 박스 */
+.server-msg, .error{
+  width: 680px;
+  max-width: 100%;
+  margin: 0 auto 16px;
+  background: #fff1f1;
+  color: #8f2b2b;
+  border: 1px solid rgba(201,75,75,.25);
+  border-radius: 8px;
+  padding: 12px 12px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.error{ display:none; margin-top: 16px; }
+.error.show{ display:block; }
+
+/* 모바일 */
+@media (max-width: 520px){
   .login-bg{
-    background: radial-gradient(1200px 600px at 20% 10%, #fff, transparent 55%),
-                radial-gradient(900px 500px at 80% 90%, #fff, transparent 50%),
-                var(--bg);
-    min-height: calc(100vh - 40px);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:28px 14px;
+    padding-top: 86px;
+    padding-bottom: 90px;
   }
-
-  .wrap{ width: 380px; max-width: 100%; }
-
-  .brandbar{
-    display:flex;
-    justify-content:center;
-    margin-bottom: 14px;
-    letter-spacing:.14em;
-    font-weight: 800;
-    color: var(--brand);
+  .header h1{
+    font-size: 36px;
   }
-
-  .card{
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow:hidden;
-  }
-
-  .header{
-    padding: 20px 18px 12px;
-    text-align:center;
-    border-bottom: 1px solid var(--line);
-    background: linear-gradient(180deg, #fff, #fff7ef);
-  }
-  .header h1{ margin:0; font-size: 20px; letter-spacing:.04em; }
-  .header p{ margin: 6px 0 0; color: var(--muted); font-size: 13px; }
-
   .tabs{
-    display:flex;
-    border-bottom: 1px solid var(--line);
-    background: #fffaf5;
+    gap: 26px;
   }
   .tab{
-    flex:1;
-    border:0;
-    background: transparent;
-    padding: 12px 10px;
-    font-weight: 700;
-    color: var(--muted);
-    cursor:pointer;
-    position:relative;
+    min-width: 120px;
+    padding: 10px 16px;
   }
-  .tab[aria-selected="true"]{
-    color: var(--brand);
-    background: #fff;
-  }
-  .tab[aria-selected="true"]::after{
-    content:"";
-    position:absolute;
-    left:14px; right:14px; bottom:-1px;
-    height:3px;
-    background: var(--accent);
-    border-radius: 999px;
-  }
-
-  .body{ padding: 18px; }
-
-  .form{ display:none; }
-  .form.active{ display:block; }
-
-  .field{ margin-bottom: 12px; }
-  .label{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom: 6px;
-    font-size: 13px;
-    color: var(--muted);
-    font-weight: 700;
-  }
-  .input{
-    width:100%;
-    padding: 12px 12px;
-    border: 1px solid var(--line-2);
-    border-radius: 12px;
-    outline:none;
-    background: #fff;
-    font-size: 14px;
-    transition: border-color .15s, box-shadow .15s;
-  }
-  .input:focus{
-    border-color: var(--accent);
-    box-shadow: 0 0 0 4px rgba(205,165,122,.22);
-  }
-
-  .rowline{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    margin: 10px 0 14px;
-  }
-  .check{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    color: var(--muted);
-    font-size: 13px;
-    user-select:none;
-    margin:0;
-  }
-  .check input{ width:16px; height:16px; accent-color: var(--accent); }
-
-  .secure{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    color: var(--muted);
-    font-size: 12px;
-  }
-  .lock{
-    width:22px; height:22px;
-    border-radius: 999px;
-    display:grid;
-    place-items:center;
-    background: rgba(205,165,122,.18);
-    border: 1px solid rgba(205,165,122,.35);
-    color: var(--brand);
-    font-weight: 900;
-  }
-
-  .btnx{
-    width:100%;
-    border:0;
-    border-radius: 14px;
-    padding: 12px 14px;
-    font-weight: 800;
-    cursor:pointer;
-    background: linear-gradient(180deg, var(--brand), #6f513f);
-    color:#fff;
-    letter-spacing: .04em;
-    transition: transform .06s ease, filter .15s ease;
-  }
-  .btnx:active{ transform: translateY(1px); }
-  .btnx:hover{ filter: brightness(1.02); }
-
-  .links{
-    margin-top: 12px;
-    display:flex;
-    justify-content:center;
-    gap:12px;
-    flex-wrap:wrap;
-    color: var(--muted);
-    font-size: 12.5px;
-  }
-  .links a{
-    color: var(--muted);
-    text-decoration:none;
-    border-bottom: 1px dashed transparent;
-  }
-  .links a:hover{
-    color: var(--brand);
-    border-bottom-color: rgba(139,106,82,.5);
-  }
-
-  /* 서버 msg(로그인Fail 등) */
-  .server-msg{
-    margin-bottom: 12px;
-    font-size: 12.5px;
-    color:#fff;
-    background: var(--danger);
-    border-radius: 12px;
-    padding: 10px 10px;
-    line-height: 1.45;
-  }
-
-  /* 프론트 유효성 에러 */
-  .error{
-    display:none;
-    margin-top: 10px;
-    font-size: 12.5px;
-    color: #fff;
-    background: var(--danger);
-    border-radius: 12px;
-    padding: 10px 10px;
-    line-height: 1.45;
-  }
-  .error.show{ display:block; }
-
-  /* 관리자 로그인 버튼(링크처럼) */
-  .admin-link{
-    cursor:pointer;
-    font-size: 12px;
-    color: var(--brand);
-    font-weight: 800;
-    text-decoration:none;
-    border-bottom: 1px dashed transparent;
-    white-space: nowrap;
-  }
-  .admin-link:hover{
-    border-bottom-color: rgba(139,106,82,.5);
-  }
+}
 </style>
 
-<!--/*
-  자바스크립트 인라인
-  th:inline="javascript" 은 스크립트 태그 내에서 Thymeleaf 문법([[...]])을 해석할 수 있게 해주는 설정이다.
-  JavaScript 안에서 Thymeleaf 값을 넣을 때는 th:inline="javascript" 와 /*[[뭐뭐뭐]]*/ 구문을 사용해야 한다.
-*/-->
 <script th:inline="javascript">
 /*<![CDATA[*/
 
@@ -299,11 +329,9 @@ $(document).ready(function(){
       return false;
     }
 
-    // 여기서부터 Spring Security가 /security/loginEnd로 인증 처리
     return true;
   });
 
-  // Enter로도 submit되지만 UX상 비밀번호에서 Enter 처리도 유지
   $("#passwd").keydown(function(event){
     if(event.keyCode == 13){
       $("#panel-member").submit();
@@ -340,7 +368,6 @@ $(document).ready(function(){
       return false;
     }
 
-    // /guest/loginEnd 로 전송(옵션2: 로그인 성공 시 즉시 guest 계정 생성)
     return true;
   });
 
@@ -349,14 +376,14 @@ $(document).ready(function(){
     const ctxPath = /*[[@{/}]]*/ "";
     location.href = `${ctxPath}admin/login`;
   });
-  
-  //페이지 로드 시 tab 파라미터로 초기 탭 설정
+
+  // 페이지 로드 시 tab 파라미터로 초기 탭 설정
   const params = new URLSearchParams(window.location.search);
   const tab = params.get("tab");
   if(tab === "guest") setTab("guest");
-  else setTab("member"); // 기본 member
+  else setTab("member");
 
-}); // end of ready
+});
 
 /*]]>*/
 </script>
@@ -367,13 +394,14 @@ $(document).ready(function(){
 <div class="container">
   <div class="login-bg">
     <div class="wrap">
-      <div class="brandbar">CIEL</div>
+
+      <!-- 상단 타이틀 영역(리워즈풍) -->
+      <div class="header">
+        <h1>로그인</h1>
+        <p>연갈색 테마 · 회원/비회원 탭</p>
+      </div>
 
       <section class="card" aria-label="로그인 카드">
-        <div class="header">
-          <h1>로그인</h1>
-          <p>연갈색 테마 · 회원/비회원 탭</p>
-        </div>
 
         <div class="tabs" role="tablist" aria-label="로그인 방식 선택">
           <button class="tab" id="tab-member" role="tab" aria-selected="true" aria-controls="panel-member" type="button">회원</button>
@@ -387,9 +415,6 @@ $(document).ready(function(){
 
           <!-- =======================
                회원 로그인 (Spring Security)
-               - memberChain: loginProcessingUrl("/security/loginEnd")
-               - usernameParameter("memberid")
-               - passwordParameter("passwd")
                ======================= -->
           <form class="form active"
                 id="panel-member"
@@ -399,11 +424,10 @@ $(document).ready(function(){
                 method="post"
                 th:action="@{/security/loginEnd}">
 
-            <!-- CSRF (Spring Security 사용시 403 방지) -->
             <input type="hidden"
-		       th:if="${_csrf != null}"
-		       th:name="${_csrf.parameterName}"
-		       th:value="${_csrf.token}" />
+                   th:if="${_csrf != null}"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}" />
 
             <div class="field">
               <div class="label"><span>아이디 또는 이메일</span></div>
@@ -429,7 +453,6 @@ $(document).ready(function(){
 
             <div class="rowline" style="margin-top:0;">
               <span></span>
-              <!-- 회원 로그인 화면에서 관리자 로그인 페이지로 이동 -->
               <span class="admin-link" id="goAdminLogin">관리자 로그인 →</span>
             </div>
 
@@ -447,9 +470,7 @@ $(document).ready(function(){
           </form>
 
           <!-- =======================
-               비회원 로그인 (옵션2: 로그인 성공 시 즉시 guest 계정 생성)
-               - POST /guest/loginEnd
-               - param: name, phone
+               비회원 로그인
                ======================= -->
           <form class="form"
                 id="panel-guest"
@@ -458,11 +479,10 @@ $(document).ready(function(){
                 method="post"
                 th:action="@{/guest/loginEnd}">
 
-            <!-- CSRF (Spring Security 사용시 403 방지) -->
             <input type="hidden"
-		       th:if="${_csrf != null}"
-		       th:name="${_csrf.parameterName}"
-		       th:value="${_csrf.token}" />
+                   th:if="${_csrf != null}"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}" />
 
             <div class="field">
               <div class="label"><span>휴대폰번호</span></div>

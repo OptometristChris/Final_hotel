@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::div.container})}"
+<html th:replace="~{js/layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::div.container})}"
       lang="ko"
       xmlns:th="http://www.thymeleaf.org">
 
@@ -10,85 +10,112 @@
 <link rel="stylesheet" href="">
 
 <style>
-/* ===== 업로드한 마이페이지.html 기반 스타일 그대로 이식 ===== */
+/* ===== MYPAGE FINAL (INDEX THEME) ===== */
 :root{
-  --bg:#ffffff;
-  --line:#dcdcdc;
-  --muted:#666;
-  --text:#111;
-  --card:#fff;
-  --shadow:0 8px 24px rgba(0,0,0,.06);
-  --radius:14px;
-  --radius-lg:18px;
-  --pad:18px;
-  --max:1200px;
+  --bg:#f6f1ea;
+  --panel:#ffffff;
+  --line:#eadfd3;
+  --text:#2a2320;
+  --muted:#7a6a61;
+
+  --brand:#8b6a52;
+  --accent:#d4af37;
+
+  --shadow: 0 18px 45px rgba(54, 38, 25, .10);
+
+  /* ✅ “각지게” : 라운드 줄임 */
+  --radius:12px;
+  --radius-lg:14px;
+
+  /* ✅ 헤더에 안 가리게(필요하면 90~130에서 조절) */
+  --header-offset: 110px;
+
+  /* ✅ 좌우 여백 줄이기 */
+  --max: 1380px;
+  --pad: 18px;
 }
+
 *{box-sizing:border-box}
 body{
   margin:0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
   color:var(--text);
-  background:#fafafa;
+  background: var(--bg);
 }
 
+a{ color: inherit; text-decoration:none; }
+a:hover{ text-decoration:none; }
+
+/* ===== Layout ===== */
 .layout{
-  max-width:var(--max);
-  margin:0 auto;
-  padding:22px 16px 40px;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 18px 18px 60px;
   display:grid;
-  grid-template-columns:260px 1fr;
-  gap:18px;
+  grid-template-columns: 260px 1fr;
+  gap: 16px;
   align-items:start;
 }
 
+/* ===== Sidebar (sticky) ===== */
 .sidebar{
-  background:var(--bg);
+  background: var(--panel);
   border:1px solid var(--line);
-  border-radius:var(--radius-lg);
-  box-shadow:var(--shadow);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
   overflow:hidden;
-  position:sticky;
-  top:14px;
+  position: sticky;
+  top: var(--header-offset);         /* ✅ 헤더 아래로 내림 */
 }
+
 .side-title{
   padding:16px 16px 14px;
   border-bottom:1px solid var(--line);
-  font-weight:800;
+  font-weight:900;
   text-align:center;
 }
+
 .side-section{
   padding:14px 14px 10px;
-  border-bottom:1px solid #eee;
+  border-bottom:1px solid var(--line);
 }
 .side-section:last-child{border-bottom:none;}
+
 .side-section h3{
   margin:0 0 10px;
   font-size:13px;
-  color:#222;
-  letter-spacing:.2px;
+  color: var(--text);
+  letter-spacing:-.2px;
 }
+
 .side-section a{
   display:flex;
   align-items:center;
   justify-content:space-between;
   padding:10px 10px;
-  border-radius:10px;
-  color:#222;
-  text-decoration:none;
+  border-radius: 10px;
+  color: var(--text);
   font-size:14px;
 }
-.side-section a:hover{ background:#f3f3f3; }
-.side-section a span{ color:var(--muted); font-size:12px; }
-
-.main{ min-width:0; }
-.page-title{
-  font-size:28px;
-  margin:4px 0 14px;
-  font-weight:900;
-  letter-spacing:-.3px;
+.side-section a:hover{
+  background: rgba(139,106,82,.10);
+}
+.side-section a span{
+  color: var(--muted);
+  font-size:12px;
 }
 
-.section{ margin-bottom:18px; }
+/* ===== Main ===== */
+.main{ min-width:0; }
+.page-title{
+  font-size: 32px;
+  margin: 6px 0 16px;
+  font-weight: 950;
+  letter-spacing:-.6px;
+}
+
+/* ===== Sections / Cards ===== */
+.section{ margin-top: 16px; }
 .section-head{
   display:flex;
   align-items:flex-end;
@@ -99,83 +126,168 @@ body{
 .section-head h2{
   margin:0;
   font-size:22px;
-  font-weight:900;
-  letter-spacing:-.3px;
+  font-weight:950;
+  letter-spacing:-.4px;
 }
 .section-head p{
   margin:0;
   font-size:13px;
-  color:var(--muted);
+  color: var(--muted);
 }
 
 .card{
-  background:var(--card);
+  background: var(--panel);
   border:1px solid var(--line);
-  border-radius:var(--radius-lg);
-  box-shadow:var(--shadow);
-  padding:var(--pad);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: var(--pad);
 }
 
-/* Summary cards */
+/* ===== Top area ===== */
+.mypage-top{
+  border-radius: var(--radius-lg);
+  overflow:hidden;
+  border:1px solid var(--line);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+/* 인덱스 느낌의 상단 바 */
+.mypage-topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:16px 18px;
+  background: var(--brand);
+  color:#fff;
+}
+.topbar-left{display:flex;flex-direction:column;gap:10px;}
+
+.user-chip{display:flex;align-items:center;gap:10px;font-weight:900;}
+.user-icon{
+  width:30px;height:30px;border-radius:999px;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.22);
+  font-size:16px;
+}
+.user-name{font-size:18px;letter-spacing:-.2px;}
+
+.name-go-edit{
+  width:28px;height:28px;border-radius:999px;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:#fff;font-size:18px;font-weight:900;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.22);
+  line-height:1;
+}
+.name-go-edit:hover{background:rgba(255,255,255,.28);}
+
+.sns-row{display:flex;align-items:center;gap:10px;font-size:14px;}
+.sns-label{opacity:.9;}
+.sns-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 10px;border-radius:999px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.22);
+  font-weight:800;
+}
+.sns-dot{
+  width:10px;height:10px;border-radius:999px;
+  background: var(--accent);
+  display:inline-block;
+}
+
+.grade-card{ padding:18px; background:#fff; }
+.grade-card-body{
+  display:grid;
+  grid-template-columns: 240px 1fr;
+  gap:16px;
+  align-items:center;
+}
+.grade-logo-area{display:flex;flex-direction:column;align-items:flex-start;gap:10px;}
+.grade-logo{
+  width:110px;height:110px;border-radius:999px;
+  border:2px solid rgba(42,35,32,.65);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:6px;
+  background: rgba(212,175,55,.10);
+}
+.grade-letter{font-size:44px;font-weight:950;line-height:1;}
+.grade-label{font-size:12px;color:var(--muted);font-weight:800;}
+.grade-now{font-size:14px;color:#333;}
+.grade-now b{font-weight:950;}
+
+.benefit-area{display:flex;justify-content:flex-end;}
+.benefit-box{
+  width:min(460px,100%);
+  border:1px solid var(--line);
+  border-radius: var(--radius);
+  padding:14px 16px;
+  background:#fff;
+}
+.benefit-title{ font-weight:950; font-size:16px; margin-bottom:6px; }
+.benefit-sub{ color:var(--muted); font-size:12px; margin-bottom:10px; }
+.benefit-list{ margin:0; padding-left:18px; color:var(--text); line-height:1.7; font-size:13px; }
+
+/* ===== Grids ===== */
 .grid3{
   display:grid;
   grid-template-columns:repeat(3, 1fr);
   gap:12px;
 }
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+/* Summary mini cards */
 .mini{
   padding:16px;
   display:flex;
   gap:14px;
   align-items:center;
   cursor:pointer;
-  text-decoration:none;
   color:inherit;
+  transition: transform .12s ease;
 }
-.mini:hover{ transform:translateY(-1px); }
+.mini:hover{ transform: translateY(-2px); }
+
 .icon{
-  width:66px;height:66px;
-  border:2px solid #111;
+  width:62px;height:62px;
+  border:2px solid rgba(42,35,32,.65);
   border-radius:999px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight:900;
+  font-weight:950;
   font-size:22px;
+  background: rgba(212,175,55,.10);
 }
-.mini .info{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-  min-width:0;
-}
-.mini .info .title{ font-weight:900; font-size:16px; }
-.mini .info .desc{
-  color:var(--muted);
-  font-size:13px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.mini .arrow{ color:#222; font-weight:900; font-size:18px; }
 
-/* 2 cards */
-.grid2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
+.mini .info{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0;}
+.mini .info .title{font-weight:950;font-size:16px;}
+.mini .info .desc{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mini .arrow{color:var(--text);font-weight:950;font-size:18px;}
+
+/* kv blocks */
 .kv{
   display:grid;
   grid-template-columns:120px 1fr;
   gap:10px;
   font-size:14px;
   padding:14px;
+  border:1px solid var(--line);
+  border-radius: var(--radius);
+  background:#fff;
 }
 .kv .k{ color:var(--muted); }
-.kv .v{ font-weight:800; }
+.kv .v{ font-weight:950; }
 
-/* Favorites */
+/* favorites */
 .favorites{
   display:flex;
   align-items:center;
@@ -196,20 +308,21 @@ body{
   background:var(--line);
 }
 .fav-icon{
-  width:58px;height:58px;
-  border:2px solid #111;
+  width:56px;height:56px;
+  border:2px solid rgba(42,35,32,.65);
   border-radius:999px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight:900;
+  font-weight:950;
   font-size:18px;
+  background: rgba(212,175,55,.10);
 }
-.fav-text{ display:flex; flex-direction:column; gap:2px; }
-.fav-text b{ font-size:15px; }
-.fav-text span{ font-size:13px; color:var(--muted); }
+.fav-text{display:flex;flex-direction:column;gap:2px;}
+.fav-text b{font-size:15px;}
+.fav-text span{font-size:13px;color:var(--muted);}
 
-/* Promos */
+/* promos */
 .promos{
   display:grid;
   grid-template-columns:repeat(3, 1fr);
@@ -217,160 +330,103 @@ body{
 }
 .promo{
   padding:14px;
-  text-decoration:none;
   color:inherit;
+  transition: transform .12s ease;
 }
+.promo:hover{ transform: translateY(-2px); }
+
 .promo .thumb{
   height:110px;
-  border-radius:14px;
+  border-radius: var(--radius);
   border:1px solid var(--line);
-  background:#f3f3f3;
+  background: rgba(139,106,82,.10);
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight:800;
-  color:#777;
+  font-weight:900;
+  color:var(--muted);
   margin-bottom:12px;
 }
-.promo h3{
-  margin:0 0 8px;
-  font-size:16px;
-  font-weight:900;
-}
-.promo .meta{
-  margin:0;
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.6;
-}
-.promo:hover{ transform:translateY(-1px); }
+.promo h3{margin:0 0 8px;font-size:16px;font-weight:950;}
+.promo .meta{margin:0;font-size:12px;color:var(--muted);line-height:1.6;}
 
-/* Sticky reserve */
-.reserve-sticky{
-  position:fixed;
-  right:22px;
-  bottom:22px;
-  width:140px;
-  height:140px;
-  border-radius:999px;
-  border:3px solid #111;
-  background:#fff;
-  box-shadow:var(--shadow);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-decoration:none;
-  color:#111;
-  font-weight:900;
-  font-size:22px;
-  z-index:50;
-}
-.reserve-sticky:hover{ transform:translateY(-2px); }
-
+/* ===== Responsive ===== */
 @media (max-width: 980px){
-  .layout{ grid-template-columns:1fr; }
+  .layout{ grid-template-columns:1fr; padding: 12px 14px 60px; }
   .sidebar{ position:relative; top:auto; }
   .grid3{ grid-template-columns:1fr; }
   .grid2{ grid-template-columns:1fr; }
   .promos{ grid-template-columns:1fr; }
-  .reserve-sticky{ width:120px;height:120px;font-size:20px; }
+  .grade-card-body{ grid-template-columns:1fr; gap:14px; }
+  .benefit-area{ justify-content:flex-start; }
 }
 
-/* ===== Top Area(업로드 파일의 상단/등급 카드) ===== */
-.mypage-top{
-  border-radius: 18px;
-  overflow: hidden;
-  border:1px solid #dcdcdc;
-  background:#fff;
-}
-.name-go-edit{
-  width:28px;height:28px;
-  border-radius:999px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  text-decoration:none;
-  color:#fff;
-  font-size:18px;
-  font-weight:900;
-  background:rgba(255,255,255,.18);
-  border:1px solid rgba(255,255,255,.22);
-  line-height:1;
-}
-.name-go-edit:hover{ background:rgba(255,255,255,.28); }
-.mypage-topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:14px;
-  padding:18px 18px;
-  background:#6f6663;
-  color:#fff;
-}
-.topbar-left{display:flex;flex-direction:column;gap:10px;}
-.user-chip{display:flex;align-items:center;gap:10px;font-weight:800;}
-.user-icon{
-  width:30px;height:30px;border-radius:999px;
-  display:inline-flex;align-items:center;justify-content:center;
-  background:rgba(255,255,255,.18);
-  font-size:16px;
-}
-.user-name{font-size:18px;letter-spacing:.2px;}
-.sns-row{display:flex;align-items:center;gap:10px;font-size:14px;}
-.sns-label{opacity:.9;}
-.sns-pill{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:6px 10px;border-radius:999px;
-  background:rgba(255,255,255,.12);
-  border:1px solid rgba(255,255,255,.22);
-  font-weight:700;
-}
-.sns-dot{
-  width:10px;height:10px;border-radius:999px;
-  background:#ffd400;
-  display:inline-block;
-}
-
-.grade-card{ padding:22px 18px 18px; background:#fff; }
-.grade-card-body{
-  display:grid;
-  grid-template-columns: 260px 1fr;
-  gap:18px;
-  align-items:center;
-}
-.grade-logo-area{
+/* ===== 인덱스 스타일 예약 플로팅 버튼 ===== */
+.fixed-reserve-btn{
+  position: fixed;
+  right: 40px;
+  bottom: 40px;
+  width: 90px;
+  height: 90px;
+  background-color: rgba(70, 60, 50, 0.85);
+  color: white;
+  border-radius: 50%;
   display:flex;
   flex-direction:column;
-  align-items:flex-start;
-  gap:12px;
-  padding-left:6px;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  z-index:2500;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.12);
 }
-.grade-logo{
-  width:120px;height:120px;border-radius:999px;
-  border:2px solid #111;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  gap:6px;
+.fixed-reserve-btn:hover{
+  background-color: var(--accent);
+  transform: scale(1.05);
+  color:#000;
 }
-.grade-letter{font-size:46px;font-weight:900;line-height:1;}
-.grade-label{font-size:12px;color:#666;font-weight:700;}
-.grade-now{font-size:14px;color:#333;}
-.grade-now b{font-weight:900;}
-.benefit-area{display:flex;justify-content:flex-end;}
-.benefit-box{
-  width:min(420px, 100%);
-  border:1px solid #dcdcdc;
-  border-radius:14px;
-  padding:14px 16px;
+.reserve-quick-tab{
+  position: fixed;
+  right: 40px;
+  bottom: 140px;
+  width: 360px;
+  background: rgba(255,255,255,0.98);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+  display:none;
+  z-index:2400;
+  animation: slideUp .25s ease;
+}
+.reserve-quick-tab.active{display:block;}
+.tab-header{display:flex;background:#f4f4f4;border-radius:15px 15px 0 0;overflow:hidden;}
+.tab-btn{flex:1;padding:16px;border:none;font-weight:900;color:#666;cursor:pointer;}
+.tab-btn.active{background:#1a1a1a;color:#fff;}
+.tab-body{padding:22px;}
+.reserve-field{
+  width:100%;
+  padding:14px;
+  margin-bottom:12px;
   background:#fff;
+  border:1px solid var(--line);
+  border-radius:10px;
+  font-size:14px;
+  color:var(--text);
 }
-.benefit-title{ font-weight:900; font-size:16px; margin-bottom:6px; }
-.benefit-sub{ color:#666; font-size:12px; margin-bottom:10px; }
-.benefit-list{ margin:0; padding-left:18px; color:#222; line-height:1.7; font-size:13px; }
-
-@media (max-width: 900px){
-  .grade-card-body{grid-template-columns:1fr;gap:14px;}
-  .benefit-area{justify-content:flex-start;}
+.search-submit-btn{
+  width:100%;
+  padding:14px;
+  background:#1a1a1a;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-weight:950;
+  cursor:pointer;
+}
+@keyframes slideUp{
+  from{opacity:0;transform:translateY(14px);}
+  to{opacity:1;transform:translateY(0);}
 }
 </style>
 
@@ -431,7 +487,7 @@ body{
       </div>
     </aside>
 
-    <main class="main">
+    <main class="main" style="margin-top: 80px;">
       <div class="page-title">마이페이지</div>
 
       <!-- 상단/등급 카드(업로드 파일 구조 유지) :contentReference[oaicite:5]{index=5} -->
