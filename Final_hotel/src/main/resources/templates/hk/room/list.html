@@ -12,6 +12,7 @@ body {
     font-family: 'Pretendard', sans-serif;
     background: #fff;
     color: #111;
+    
 }
 
 #roomListArea {
@@ -206,6 +207,11 @@ h1 {
     border: none;
     outline: none;
 }
+
+#compareBar{
+    position: fixed;
+    bottom: 80px;   /* footer 높이 만큼 */
+}
 </style>
 
 <!-- FullCalendar CSS -->
@@ -256,8 +262,11 @@ h1 {
 
             <select name="hotel">
                 <option value="">호텔 전체</option>
-                <option value="1">호텔 시엘</option>
-                <option value="2">르시엘</option>
+                
+               <option th:each="hotel : ${hotelList}"
+				        th:value="${hotel.HOTEL_ID}"
+				        th:text="${hotel.HOTEL_NAME}">
+				</option>
             </select>
 
             <select name="room_grade">

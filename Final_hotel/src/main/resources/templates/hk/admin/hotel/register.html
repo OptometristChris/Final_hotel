@@ -17,7 +17,7 @@ $(document).ready(function(){
             new FormData($("form[name='hotelFrm']").get(0));
 
         $.ajax({
-            url: "/myspringboot/admin/hotel/register",
+            url: "[[@{/admin/hotel/register}]]",
             type: "post",
             data: formData,
             processData: false,
@@ -27,7 +27,7 @@ $(document).ready(function(){
 
                 if(json.result == 1){
                     alert("호텔 등록 성공");
-                    location.href = "/myspringboot/admin/hotel/list";
+                    location.href = "/final_hotel/admin/hotel/list";
                 }
                 else{
                     alert("등록 실패");

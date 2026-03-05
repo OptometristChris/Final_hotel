@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.spring.app.jh.security.domain.Session_MemberDTO;
+import com.spring.app.hk.hotel.service.HotelService;
 import com.spring.app.hk.room.domain.RoomTypeDTO;
 import com.spring.app.hk.room.service.RoomTypeService;
 
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class RoomController {
 
     private final RoomTypeService roomService;
+    private final HotelService hotelService;
 
     /* ==============================
        1. 객실 목록 페이지 조회
@@ -32,13 +34,18 @@ public class RoomController {
     @GetMapping("/room/list")
     public ModelAndView roomList(ModelAndView mav) {
 
+    	// 객실 목록
         List<RoomTypeDTO> roomList = roomService.getRoomList();
 
+        // 호텔 목록
+        List<Map<String,Object>> hotelList = hotelService.getHotelList();
+        
         // 디버깅용
         System.out.println("roomList size = " + roomList.size());
         System.out.println(roomList);
 
         mav.addObject("roomList", roomList);
+        mav.addObject("hotelList", hotelList);
         mav.setViewName("hk/room/list");
 
         return mav;
