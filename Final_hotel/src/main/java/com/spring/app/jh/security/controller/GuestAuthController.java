@@ -9,7 +9,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.spring.app.common.util.LookupKeyUtil;
 import com.spring.app.jh.security.domain.MemberDTO;
 import com.spring.app.jh.security.domain.Session_GuestDTO;
-import com.spring.app.jh.security.model.MemberDAO;
 import com.spring.app.jh.security.service.GuestAuthService;
 
 import jakarta.servlet.http.HttpSession;
@@ -28,8 +27,8 @@ public class GuestAuthController {
 	}
 
 	@PostMapping("/guest/loginEnd")
-    public String loginEnd(@RequestParam String name,
-                           @RequestParam String phone,
+    public String loginEnd(@RequestParam("name") String name,
+                           @RequestParam("phone") String phone,
                            HttpSession session,
                            RedirectAttributes redirectAttributes) throws Exception {
 
