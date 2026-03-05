@@ -27,8 +27,8 @@ public class GuestAuthController {
 	}
 
 	@PostMapping("/guest/loginEnd")
-    public String loginEnd(@RequestParam("guestName") String name,
-                           @RequestParam("guestPhone") String phone,
+    public String loginEnd(@RequestParam("name") String name,
+                           @RequestParam("phone") String phone,
                            HttpSession session,
                            RedirectAttributes redirectAttributes) throws Exception {
 
