@@ -94,23 +94,23 @@
         </selectKey>
 
         insert into tbl_hotel
-        (hotel_id,
-         hotel_name,
-         address,
-         contact,
-         hotel_desc,
-         approve_status,
-         active_yn,
-         created_by)
+	        (hotel_id,
+	         hotel_name,
+	         address,
+	         contact,
+	         hotel_desc,
+	         approve_status,
+	         active_yn,
+	         created_by)
         values
-        (#{hotel_id},
-         #{hotel_name},
-         #{address},
-         #{contact},
-         #{hotel_desc},
-         #{approve_status},
-         #{active_yn},
-         #{created_by})
+	        (#{hotel_id},
+	         #{hotel_name},
+	         #{address},
+	         #{contact},
+	         #{hotel_desc},
+	         #{approve_status},
+	         #{active_yn},
+	         #{created_by})
     </insert>
 
 
@@ -132,31 +132,25 @@
     
     
     <!-- 2. 호텔 승인관리 -->
-    <!-- 호텔 상태 변경 -->
-    <update id="updateHotelStatus">	
-		UPDATE tbl_hotel
-		SET approve_status = #{status}
-		WHERE hotel_id = #{hotelId}	
-	</update>
-	
-	
-	<!-- 호텔 승인 히스토리 -->
-	<insert id="insertApprovalHistory">	
-		INSERT INTO hotel_approval_history
-		(
-		history_id,
-		fk_hotel_id,
-		status,
-		reason,
-		decided_at
-		)
-		VALUES
-		(
-		seq_hotel_approval_history.nextval,
-		#{hotelId},
-		#{status},
-		#{reason},
-		SYSDATE
-		)	
-	</insert>
+	<!-- 지점관리자 호텔 조회 -->
+	<select id="selectHotelListByManager" parameterType="int" resultType="map">
+
+		SELECT
+		    h.hotel_id,
+		    h.hotel_name,
+		    h.approve_status,
+		    i.image_url
+		
+		FROM tbl_hotel h
+		
+		LEFT JOIN hotel_image i
+		ON h.hotel_id = i.fk_hotel_id
+		AND i.is_main = 'Y'
+		
+		WHERE h.admin_no = #{adminNo}
+		AND h.active_yn = 'Y'
+		
+		ORDER BY h.hotel_id DESC
+		
+		</select>
 </mapper>

@@ -48,12 +48,9 @@ public class HotelService_imple implements HotelService {
     
     // 호텔 등록하기
     @Override
-    public void saveHotel(Map<String, String> map) {
-
-        Map<String, Object> paraMap = new HashMap<>(map);
+    public void saveHotel(Map<String, Object> paraMap) {
 
         // 1️. 기본값 세팅
-        paraMap.put("approve_status", "PENDING");
         paraMap.put("active_yn", "Y");
 
         // 2️. 호텔 insert
@@ -63,9 +60,9 @@ public class HotelService_imple implements HotelService {
         int hotelId = (int) paraMap.get("hotel_id");
 
         // 3️. 대표 이미지 처리
-        if(map.get("main_image") != null) {
+        if(paraMap.get("main_image") != null) {
 
-        	String imagePath = "/file_images/hotel/" + map.get("main_image");
+        	String imagePath = "/file_images/hotel/" + paraMap.get("main_image");
         	
             paraMap.put("fk_hotel_id", hotelId);
             paraMap.put("image_url", imagePath);
@@ -92,25 +89,12 @@ public class HotelService_imple implements HotelService {
 		  return hotelDAO.deleteHotel(hotel_id);
 	}
 	
-	
-	
-	// 호텔 등록 승인요청(지점관리자)
+
+
+	// 지점관리자 호텔 조회
 	@Override
-	public void requestApproval(Long hotelId){
-
-	    hotelDAO.updateHotelStatus(hotelId,"PENDING");
-	    hotelDAO.insertApprovalHistory(hotelId,"PENDING",null);
-
-	}
-
-
-	// 상태 변경
-	@Override
-	public void changeStatus(Long hotelId, String status, String reason){
-
-	    hotelDAO.updateHotelStatus(hotelId,status);
-	    hotelDAO.insertApprovalHistory(hotelId,status,reason);
-
+	public List<Map<String, Object>> getHotelListByManager(Integer adminNo) {
+		  return hotelDAO.selectHotelListByManager(adminNo);
 	}
 
 

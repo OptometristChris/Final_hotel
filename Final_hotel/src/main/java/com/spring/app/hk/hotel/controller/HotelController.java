@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.app.common.FileManager;
 import com.spring.app.hk.hotel.service.HotelService;
-
+import com.spring.app.jh.security.domain.Session_AdminDTO;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +32,7 @@ public class HotelController {
 
     //  ======================== 1. 호텔 CRUD ============================
     // 호텔 리스트 가져오기
+    @PreAuthorize("hasRole('ADMIN_HQ')")
     @GetMapping("list")
     public String hotelList(Model model){
 
@@ -46,6 +47,7 @@ public class HotelController {
     
     
     // 호텔 상세페이지 이동
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("detail")
     public String hotelDetail(@RequestParam("hotel_id") Long hotelId,
                               Model model){
@@ -61,6 +63,7 @@ public class HotelController {
     
     
     // 호텔 상세페이지 내 수정하기
+    @PreAuthorize("hasRole('ADMIN_HQ')")
     @PostMapping("update")
     @ResponseBody
     public Map<String,Object> updateHotel(@RequestBody Map<String,Object> param){ // 호텔 상세페이지 내 수정 완료 클릭 후 json 받는 용도
@@ -75,6 +78,7 @@ public class HotelController {
     
 
     // 호텔 상세페이지 내 비활성화하기
+    @PreAuthorize("hasRole('ADMIN_HQ')")
     @PostMapping("delete")
     @ResponseBody
     public Map<String,Object> deleteHotel(@RequestBody Map<String,Object> param){
@@ -91,7 +95,7 @@ public class HotelController {
       
     
     // 등록 페이지 이동
-	//@PreAuthorize("hasRole('ROLE_HQ')")
+	@PreAuthorize("hasRole('ADMIN_HQ')")
     @GetMapping("register")
     public String registerPage() {
         return "hk/admin/hotel/register";
@@ -99,23 +103,34 @@ public class HotelController {
 
     
     // 호텔 등록
-	//@PreAuthorize("hasRole('ROLE_HQ')")
+	@PreAuthorize("hasRole('ADMIN_HQ')")
     @PostMapping("register")
     @ResponseBody
     public Map<String, Object> register(
             @RequestParam Map<String, String> map,
-            @RequestParam("mainImage") MultipartFile mainImage
-          /*  Authentication authentication*/
+            @RequestParam("mainImage") MultipartFile mainImage,
+            Authentication authentication
     ) {
-
-        Map<String, String> paraMap = new HashMap<>(map);
 
         try {
 
-            // 로그인한 관리자 ID 저장
-			/* paraMap.put("created_by", authentication.getName()); */
-        	paraMap.put("created_by", "DEV_TEST");
+        	// 로그인한 관리자 정보 가져오기
+            Session_AdminDTO loginAdmin = (Session_AdminDTO) authentication.getPrincipal();
 
+            Map<String,Object> paraMap = new HashMap<>(map);
+            
+            // 관리자 번호
+            paraMap.put("admin_no", loginAdmin.getAdmin_no());
+
+            // 승인 상태
+            // 총괄 관리자 등록시 approved로 저장
+            if("HQ".equals(loginAdmin.getAdmin_type())){
+                paraMap.put("approve_status","APPROVED");
+            }else{
+            	// 지점관리자 등록 신청시 pending으로 저장
+                paraMap.put("approve_status","PENDING");
+            }
+                      
             // 대표 이미지 업로드
             if(!mainImage.isEmpty()) {
 
@@ -144,86 +159,7 @@ public class HotelController {
 
 
     
-//  ======================== 2. 호텔 승인관리 ============================
-    // 승인 요청 (지점 관리자)
-    @PostMapping("requestApproval")
-    @ResponseBody
-    public Map<String,Object> requestApproval(@RequestBody Map<String,Object> param){
-
-        Long hotelId = Long.parseLong(param.get("hotel_id").toString());
-
-        hotelService.requestApproval(hotelId);
-
-        return Map.of("result",1);
-    }
-
-
-    // 검토 시작 (총괄 관리자)
-    @PostMapping("review")
-    @ResponseBody
-    public Map<String,Object> review(@RequestBody Map<String,Object> param){
-
-        Long hotelId = Long.parseLong(param.get("hotel_id").toString());
-
-        hotelService.changeStatus(hotelId,"UNDER_REVIEW",null);
-
-        return Map.of("result",1);
-    }
-
-
-    // 승인
-    @PostMapping("approve")
-    @ResponseBody
-    public Map<String,Object> approve(@RequestBody Map<String,Object> param){
-
-        Long hotelId = Long.parseLong(param.get("hotel_id").toString());
-
-        hotelService.changeStatus(hotelId,"APPROVED",null);
-
-        return Map.of("result",1);
-    }
-
-
-    // 수정 요청
-    @PostMapping("needRevision")
-    @ResponseBody
-    public Map<String,Object> needRevision(@RequestBody Map<String,Object> param){
-
-        Long hotelId = Long.parseLong(param.get("hotel_id").toString());
-        String reason = param.get("reason").toString();
-
-        hotelService.changeStatus(hotelId,"NEED_REVISION",reason);
-
-        return Map.of("result",1);
-    }
-
-
-    // 반려
-    @PostMapping("reject")
-    @ResponseBody
-    public Map<String,Object> reject(@RequestBody Map<String,Object> param){
-
-        Long hotelId = Long.parseLong(param.get("hotel_id").toString());
-        String reason = param.get("reason").toString();
-
-        hotelService.changeStatus(hotelId,"REJECTED",reason);
-
-        return Map.of("result",1);
-    }
-
-
-    // 재신청 (브랜치 관리자)
-    @PostMapping("resubmit")
-    @ResponseBody
-    public Map<String,Object> resubmit(@RequestBody Map<String,Object> param){
-
-        Long hotelId = Long.parseLong(param.get("hotel_id").toString());
-
-        hotelService.changeStatus(hotelId,"PENDING",null);
-
-        return Map.of("result",1);
-    }
-    
+  
     
     
     

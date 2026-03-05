@@ -15,19 +15,18 @@ public class HotelDAO_imple implements HotelDAO {
     private SqlSessionTemplate sqlsession;
 
     // 호텔 리스트 가져오기
-    // 운영중
+    // 운영중 리스트
     @Override
     public List<Map<String,Object>> selectApprovedHotelList(){
         return sqlsession.selectList("hotel.selectApprovedHotelList");
     }
 
-    // 심사대기
+    // 심사대기 리스트
     @Override
     public List<Map<String,Object>> selectPendingHotelList(){
         return sqlsession.selectList("hotel.selectPendingHotelList");
     }
 	
-    
     // 호텔 상세페이지 이동
     @Override
 	public Map<String, Object> selectHotelDetail(Long hotelId) {
@@ -58,33 +57,12 @@ public class HotelDAO_imple implements HotelDAO {
 	    return sqlsession.update("hotel.deleteHotel", hotel_id);
 	}
 
+
 	
-	
-	
-	// 호텔 승인 상태 변경
+	// 지점관리자 호텔 조회
 	@Override
-	public void updateHotelStatus(Long hotelId, String status) {
-
-		Map<String,Object> paraMap = new HashMap<>();
-
-		paraMap.put("hotelId", hotelId);
-		paraMap.put("status", status);
-
-		sqlsession.update("hotel.updateHotelStatus", paraMap);
-	}
-
-
-	// 호텔 승인/반려 이력 저장
-	@Override
-	public void insertApprovalHistory(Long hotelId, String status, Object reason) {
-
-		Map<String,Object> paraMap = new HashMap<>();
-
-		paraMap.put("hotelId", hotelId);
-		paraMap.put("status", status);
-		paraMap.put("reason", reason);
-
-		sqlsession.insert("hotel.insertApprovalHistory", paraMap);
+	public List<Map<String, Object>> selectHotelListByManager(Integer adminNo) {
+		return sqlsession.selectList("hotel.selectHotelListByManager", adminNo);
 	}
 
 	

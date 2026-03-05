@@ -26,12 +26,10 @@ public interface HotelDAO {
 	int deleteHotel(int hotel_id);
 
 	
-	
-	// 호텔 승인 상태 변경
-	void updateHotelStatus(Long hotelId, String string);
 
-	// 호텔 승인/반려 이력 저장
-	void insertApprovalHistory(Long hotelId, String string, Object object);
+	
+	// 지점관리자 호텔 조회
+	List<Map<String, Object>> selectHotelListByManager(Integer adminNo);
 
 	
 	

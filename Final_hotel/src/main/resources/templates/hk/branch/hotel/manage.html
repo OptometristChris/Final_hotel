@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+
+<meta charset="UTF-8">
+<title>브랜치 호텔 관리</title>
+
+<style>
+
+/* 카드 */
+.hotel-card{
+border-radius:10px;
+overflow:hidden;
+margin-bottom:20px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+transition:0.2s;
+}
+
+.hotel-card:hover{
+transform:translateY(-3px);
+}
+
+/* 이미지 */
+.hotel-img{
+width:100%;
+height:200px;
+object-fit:cover;
+}
+
+/* 카드 body */
+.hotel-body{
+padding:15px;
+}
+
+.hotel-name{
+font-size:18px;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- ===================== 제목 ===================== -->
+
+<div class="d-flex justify-content-between align-items-center my-4">
+
+<h2>내 호텔 관리</h2>
+
+<button class="btn btn-primary"
+data-bs-toggle="modal"
+data-bs-target="#hotelModal">
+호텔 등록 신청
+</button>
+
+</div>
+
+
+<!-- ===================== 호텔 리스트 ===================== -->
+
+<div class="row">
+
+<div class="col-md-4"
+th:each="hotel : ${hotelList}">
+
+<div class="hotel-card">
+
+<img class="hotel-img"
+th:src="@{${hotel.IMAGE_URL}}">
+
+<div class="hotel-body">
+
+<div class="hotel-name"
+th:text="${hotel.HOTEL_NAME}">
+</div>
+
+<!-- 상태 표시 -->
+
+<div class="mt-2">
+
+<span th:if="${hotel.APPROVE_STATUS=='PENDING'}"
+class="badge bg-warning">
+승인대기
+</span>
+
+<span th:if="${hotel.APPROVE_STATUS=='APPROVED'}"
+class="badge bg-success">
+운영중
+</span>
+
+<span th:if="${hotel.APPROVE_STATUS=='NEED_REVISION'}"
+class="badge bg-secondary">
+수정요청
+</span>
+
+<span th:if="${hotel.APPROVE_STATUS=='REJECTED'}"
+class="badge bg-danger">
+반려
+</span>
+
+</div>
+
+
+<!-- 버튼 -->
+
+<div class="mt-3">
+
+<a class="btn btn-sm btn-secondary"
+th:href="@{/admin/hotel/detail(hotel_id=${hotel.HOTEL_ID})}">
+상세보기
+</a>
+
+<button th:if="${hotel.APPROVE_STATUS=='NEED_REVISION'}"
+class="btn btn-sm btn-warning"
+th:onclick="'resubmit('+${hotel.HOTEL_ID}+ ')'">
+재신청
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ===================== 호텔 등록 모달 ===================== -->
+
+<div class="modal fade"
+id="hotelModal"
+tabindex="-1">
+
+<div class="modal-dialog">
+
+<div class="modal-content">
+
+<div class="modal-header">
+
+<h5 class="modal-title">
+호텔 등록 신청
+</h5>
+
+<button type="button"
+class="btn-close"
+data-bs-dismiss="modal">
+</button>
+
+</div>
+
+
+<div class="modal-body">
+
+<form id="hotelForm">
+
+<div class="mb-3">
+
+<label>호텔 이름</label>
+
+<input type="text"
+name="hotel_name"
+class="form-control">
+
+</div>
+
+
+<div class="mb-3">
+
+<label>주소</label>
+
+<input type="text"
+name="address"
+class="form-control">
+
+</div>
+
+
+<div class="mb-3">
+
+<label>연락처</label>
+
+<input type="text"
+name="contact"
+class="form-control">
+
+</div>
+
+
+<div class="mb-3">
+
+<label>호텔 설명</label>
+
+<textarea name="hotel_desc"
+class="form-control"></textarea>
+
+</div>
+
+
+<div class="mb-3">
+
+<label>대표 이미지</label>
+
+<input type="file"
+name="mainImage"
+class="form-control">
+
+</div>
+
+</form>
+
+</div>
+
+
+<div class="modal-footer">
+
+<button class="btn btn-primary"
+onclick="registerHotel()">
+등록 신청
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script
+src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+<script>
+
+/* ===============================
+호텔 등록 신청
+=============================== */
+
+function registerHotel(){
+
+let form = document.getElementById("hotelForm");
+
+let formData = new FormData(form);
+
+fetch("/admin/hotel/register",{
+
+method:"POST",
+body:formData
+
+})
+.then(res=>res.json())
+.then(data=>{
+
+alert("호텔 등록 신청 완료");
+
+location.reload();
+
+})
+
+}
+
+
+/* ===============================
+재신청
+=============================== */
+
+function resubmit(hotelId){
+
+fetch("/admin/hotel/resubmit",{
+
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+hotel_id:hotelId
+})
+
+})
+.then(res=>res.json())
+.then(()=>{
+
+alert("재신청 완료");
+
+location.reload();
+
+})
+
+}
+
+</script>
+
+</body>
+</html>
