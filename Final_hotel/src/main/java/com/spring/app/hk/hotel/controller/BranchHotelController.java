@@ -43,6 +43,18 @@ public class BranchHotelController {
         List<Map<String,Object>> hotelList =
         hotelService.getHotelListByManager(adminNo);
 
+        // 호텔 없는 경우
+        if(hotelList == null || hotelList.isEmpty()){
+            model.addAttribute("status","NONE");
+            return "hk/branch/hotel/manage";
+        }
+
+        Map<String,Object> hotel = hotelList.get(0);
+
+        String approveStatus =
+                (String)hotel.get("APPROVE_STATUS");
+        
+        model.addAttribute("status", approveStatus);
         model.addAttribute("hotelList", hotelList);
 
         return "hk/branch/hotel/manage";
