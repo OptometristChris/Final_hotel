@@ -72,16 +72,23 @@
 		            </div>
 		        </div>
                 
-                <th:block sec:authorize="isAnonymous()">
+                <th:block th:if="${#authorization.expression('isAnonymous()') and session.Session_GuestDTO == null}">
                     <a th:href="@{/security/login}">로그인</a>
-                    <a th:href="@{/member/register}">회원가입</a>
+                    <a th:href="@{/security/memberRegister}">회원가입</a>
                 </th:block>
+
                 <th:block sec:authorize="isAuthenticated()">
                     <span class="user-welcome"><i class="fas fa-user-circle mr-1"></i> <span sec:authentication="name"></span>님 환영합니다</span>
-                    <a th:href="@{/member/mypage}">마이페이지</a>
+                    <a th:href="@{/security/member/mypage}">마이페이지</a>
                     <a href="#" onclick="document.getElementById('logout-form').submit();">로그아웃</a>
                     <form id="logout-form" th:action="@{/security/logout}" method="post" style="display: none;"></form>
                 </th:block>
+
+                <th:block th:if="${session.Session_GuestDTO != null}">
+                    <span class="user-welcome"><i class="fas fa-user mr-1"></i> <span th:text="${session.Session_GuestDTO.guestName}"></span>님(비회원)</span>
+                    <a th:href="@{/guest/logout}">로그아웃</a>
+                </th:block>
+
                 <a href="#">예약조회</a>
             </div>
         </div>
@@ -129,6 +136,16 @@
             $(window).scroll(function() {
                 if ($(window).scrollTop() > 50) { $navSection.addClass('scrolled'); } 
                 else { $navSection.removeClass('scrolled'); }
+            });
+
+            // 드롭다운 작동 보정 (부트스트랩 4용)
+            $('.dropdown-toggle').on('click', function(e) {
+                $(this).parent().toggleClass('show');
+            });
+            $(document).on('click', function (e) {
+                if (!$('.custom-dropdown').is(e.target) && $('.custom-dropdown').has(e.target).length === 0) {
+                    $('.custom-dropdown').removeClass('show');
+                }
             });
         });
     </script>
