@@ -81,7 +81,7 @@
         <div class="footer-group">
 		    <a th:href="@{/notice/list(hotelId=${notice.fkHotelId})}" class="btn-list">목록</a>
 		    
-		    <div class="admin-btns" sec:authorize="hasRole('ADMIN')">
+		    <div class="admin-btns" sec:authorize="hasRole('ADMIN_BRANCH')">
 		        <button type="button" class="btn btn-light border" 
 		                th:onclick="|location.href='@{/notice/edit/{id}(id=${notice.noticeId}, hotelId=${notice.fkHotelId})}'|">수정</button>
 		        
@@ -89,7 +89,7 @@
 		                onclick="deleteNotice()">삭제</button>
 		    </div>
 		    
-		    <form id="deleteFrm" th:action="@{/notice/delete}" method="post" style="display:none;" sec:authorize="hasRole('ADMIN')">
+		    <form id="deleteFrm" th:action="@{/notice/delete}" method="post" style="display:none;" sec:authorize="hasRole('ADMIN_BRANCH')">
 		        <input type="hidden" name="noticeId" th:value="${notice.noticeId}">
 		    </form>
 	    </div>

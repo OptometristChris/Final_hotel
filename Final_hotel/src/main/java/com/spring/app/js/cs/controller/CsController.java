@@ -2,6 +2,8 @@ package com.spring.app.js.cs.controller;
 
 import java.util.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,27 +25,31 @@ public class CsController {
     /**
      * [사용자] FAQ + QnA 통합 고객지원 메인 페이지
      * @param hotelId : 1(호텔 시엘), 2(르시엘) - 기본값 1
+     * @param searchKeyword : 검색어 추가
      */
     @GetMapping("/list")
     public ModelAndView csMain(ModelAndView mav, 
                                @RequestParam(value = "hotelId", defaultValue = "1") String hotelId,
+                               @RequestParam(value = "searchKeyword", defaultValue = "") String searchKeyword, // 검색어 파라미터 추가
                                HttpServletRequest request) {
 
         // 1. 페이징 설정
-        String str_currentShowPageNo = request.getParameter("currentShowPageNo");
+        // HTML에서 curPage로 넘기므로 currentShowPageNo 대신 curPage로 받거나 호환되게 처리
+        String str_currentShowPageNo = request.getParameter("curPage"); 
         int currentShowPageNo = (str_currentShowPageNo == null) ? 1 : Integer.parseInt(str_currentShowPageNo);
 
         Map<String, String> paraMap = new HashMap<>();
         paraMap.put("hotelId", hotelId);
+        paraMap.put("searchKeyword", searchKeyword); // [중요] DB 조회를 위해 검색어 추가
 
         // 2. FAQ 조회
         List<Map<String, String>> faqList = service.getFaqListByHotel(hotelId);
 
         // 3. QnA 조회 및 페이징 계산
-        int totalCount = service.getQnaTotalCount(paraMap);
+        // getQnaTotalCount 쿼리 내부에 searchKeyword 조건이 들어있어야 정확한 페이지수가 계산됩니다.
+        int totalCount = service.getQnaTotalCount(paraMap); 
         int sizePerPage = 10; 
         
-        // [추가] 전체 페이지 수 계산
         int totalPage = (int) Math.ceil((double) totalCount / sizePerPage);
         
         int startRno = ((currentShowPageNo - 1) * sizePerPage) + 1;
@@ -54,15 +60,15 @@ public class CsController {
         
         List<Map<String, String>> qnaList = service.getQnaListWithPaging(paraMap);
 
-        // 4. 뷰 전달 데이터 설정 (이 부분이 중요합니다!)
+        // 4. 뷰 전달 데이터 설정
         mav.addObject("faqList", faqList);
         mav.addObject("qnaList", qnaList);
         mav.addObject("hotelId", hotelId); 
+        mav.addObject("searchKeyword", searchKeyword); // [중요] 페이지 이동 시 검색어 유지를 위해 뷰로 다시 전달
         mav.addObject("totalCount", totalCount);
         
-        // [수정 포인트] HTML에서 사용하는 변수명과 일치시켜야 함
-        mav.addObject("curPage", currentShowPageNo);  // HTML의 ${curPage}
-        mav.addObject("totalPage", totalPage);        // HTML의 ${totalPage}
+        mav.addObject("curPage", currentShowPageNo);  
+        mav.addObject("totalPage", totalPage);        
         
         mav.setViewName("js/cs/csList");
         
@@ -74,8 +80,19 @@ public class CsController {
      */
     @GetMapping("/qnaWrite")
     public ModelAndView qnaWrite(ModelAndView mav, 
-                                 // 수정: value 속성 추가
-                                 @RequestParam(value = "hotelId") String hotelId) {
+                                 @RequestParam(value = "hotelId") String hotelId,
+                                 HttpSession session,
+                                 java.security.Principal principal) {
+        
+        boolean isMember = (principal != null);
+        boolean isGuest = (session.getAttribute("Session_GuestDTO") != null);
+
+        if (!isMember && !isGuest) {
+            mav.addObject("message", "로그인이 필요한 서비스입니다.");
+            mav.addObject("loc", "/security/login"); 
+            mav.setViewName("msg"); 
+            return mav;
+        }
         
         mav.addObject("hotelId", hotelId);
         mav.setViewName("js/cs/qnaWrite");
@@ -83,32 +100,30 @@ public class CsController {
     }
     
     @PostMapping("/qnaWriteEnd")
-    public ModelAndView qnaWriteEnd(ModelAndView mav, HttpServletRequest request) {
+    public ModelAndView qnaWriteEnd(ModelAndView mav, HttpServletRequest request, HttpSession session, java.security.Principal principal) {
         
         String hotelId = request.getParameter("fk_hotel_id");
         String title = request.getParameter("title");
         String content = request.getParameter("content");
-        String writer_name = request.getParameter("writer_name");
-        
-        // [수정 포인트 1] DB 제약조건 CHECK (is_secret IN ('Y', 'N'))에 맞춤
-        String is_secret = request.getParameter("is_secret"); 
-        
-        // 체크박스 value가 "1"로 설정되어 있다면 "Y", 아니면 "N"으로 변환
-        if("1".equals(is_secret)) {
-            is_secret = "Y";
-        } else {
-            is_secret = "N";
-        }
+        String is_secret = "1".equals(request.getParameter("is_secret")) ? "Y" : "N";
 
         Map<String, String> paraMap = new HashMap<>();
         paraMap.put("fk_hotel_id", hotelId);
         paraMap.put("title", title);
         paraMap.put("content", content);
-        paraMap.put("writer_name", writer_name);
         paraMap.put("is_secret", is_secret);
-        
-        // [참고] 만약 서비스/매퍼에서 status를 직접 넣는다면 여기서 "WAITING"을 추가하세요.
-        // paraMap.put("status", "WAITING"); 
+
+        if (principal != null) {
+            paraMap.put("writer_name", principal.getName()); 
+        } else {
+            com.spring.app.jh.security.domain.Session_GuestDTO guest = 
+                (com.spring.app.jh.security.domain.Session_GuestDTO) session.getAttribute("Session_GuestDTO");
+            
+            if (guest != null) {
+                paraMap.put("writer_name", guest.getGuestName());
+                paraMap.put("lookup_key", guest.getLookupKey()); 
+            }
+        }
 
         int n = service.insertQna(paraMap);
 
@@ -136,29 +151,31 @@ public class CsController {
         return mav;
     }
     
-    // 삭제하기
     @GetMapping("/qnaDelete")
     public String qnaDelete(@RequestParam("qna_id") String qnaId, 
                             @RequestParam("hotelId") String hotelId,
-                            java.security.Principal principal, // Principal 주입
+                            java.security.Principal principal, 
+                            HttpSession session,
                             RedirectAttributes rttr) {
 
-        // 로그인이 안 된 경우
-        if (principal == null) {
-            rttr.addFlashAttribute("message", "로그인이 필요합니다.");
-            return "redirect:/login";
+        Map<String, String> qna = service.getQnaDetail(qnaId);
+        String writerIdInDb = String.valueOf(qna.get("WRITER_NAME"));
+        
+        boolean isOwner = false;
+
+        if (principal != null && principal.getName().equals(writerIdInDb)) {
+            isOwner = true;
+        } 
+        else {
+            com.spring.app.jh.security.domain.Session_GuestDTO guest = 
+                (com.spring.app.jh.security.domain.Session_GuestDTO) session.getAttribute("Session_GuestDTO");
+            
+            if (guest != null && guest.getGuestName().equals(writerIdInDb)) {
+                isOwner = true; 
+            }
         }
 
-        // 시큐리티에 등록된 사용자 아이디(username) 가져오기
-        String loginId = principal.getName(); 
-
-        // 2. 게시글 상세 정보 조회
-        Map<String, String> qna = service.getQnaDetail(qnaId);
-        
-        // 3. 본인 확인 (기존 로그 확인 결과 WRITER_NAME에 아이디가 들어있으므로)
-        String writerId = String.valueOf(qna.get("WRITER_NAME"));
-
-        if (loginId.equals(writerId)) {
+        if (isOwner) {
             service.deleteQna(qnaId);
             rttr.addFlashAttribute("message", "삭제되었습니다.");
         } else {
@@ -167,5 +184,4 @@ public class CsController {
 
         return "redirect:/cs/list?hotelId=" + hotelId;
     }
-    
 }

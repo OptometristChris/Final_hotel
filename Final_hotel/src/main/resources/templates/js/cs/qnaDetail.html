@@ -76,13 +76,25 @@
             <div class="btn-group">
 			    <a th:href="@{/cs/list(hotelId=${qna['FK_HOTEL_ID']})}" class="btn-custom btn-list">목록으로</a>
 			
-			    <button type="button" 
-			            class="btn-custom btn-delete" 
-			            onclick="goDelete()"
-			            th:if="${#authorization.expression('hasRole(''ADMIN'')')} or (${#authorization.expression('isAuthenticated()')} and ${#authentication.name == qna['WRITER_NAME']})">
-			        삭제하기
-			    </button>
-		    </div>
+			    <th:block th:with="
+			        isAdmin=${#authorization.expression('hasRole(''ADMIN'')')},
+			        isMemberOwner=${#authorization.expression('isAuthenticated()') and #authentication.name == qna['WRITER_NAME']},
+			        isGuestOwner=${session.Session_GuestDTO != null and session.Session_GuestDTO.guestName == qna['WRITER_NAME']}
+			    ">
+			        <a th:if="${isMemberOwner or isGuestOwner}" 
+			           th:href="@{/cs/qnaUpdate(qnaId=${qna['QNA_ID']}, hotelId=${qna['FK_HOTEL_ID']})}" 
+			           class="btn-custom btn-list" style="border: 1px solid #1a1a1a; color: #1a1a1a;">
+			            수정하기
+			        </a>
+			
+			        <button type="button" 
+			                class="btn-custom btn-delete" 
+			                onclick="goDelete()"
+			                th:if="${isAdmin or isMemberOwner or isGuestOwner}">
+			            삭제하기
+			        </button>
+			    </th:block>
+			</div>
         </div>
         
         <div th:if="${qna == null}" class="text-center py-5">

@@ -25,8 +25,8 @@
         SELECT count(*)
         FROM QUESTIONS
         WHERE fk_hotel_id = #{hotelId}
-        <if test='searchWord != null and searchWord != ""'>
-            AND (title LIKE '%'||#{searchWord}||'%' OR content LIKE '%'||#{searchWord}||'%')
+        <if test='searchKeyword != null and searchKeyword != ""'>
+            AND (title LIKE '%'||#{searchKeyword}||'%' OR content LIKE '%'||#{searchKeyword}||'%')
         </if>
     </select>
 
@@ -39,8 +39,8 @@
                 TO_CHAR(created_at, 'yyyy-mm-dd') AS created_at
             FROM QUESTIONS
             WHERE fk_hotel_id = #{hotelId}
-            <if test='searchWord != null and searchWord != ""'>
-                AND (title LIKE '%'||#{searchWord}||'%' OR content LIKE '%'||#{searchWord}||'%')
+            <if test='searchKeyword != null and searchKeyword != ""'>
+                AND (title LIKE '%'||#{searchKeyword}||'%' OR content LIKE '%'||#{searchKeyword}||'%')
             </if>
         ) V
         WHERE RNUM BETWEEN #{startRno} AND #{endRno}
