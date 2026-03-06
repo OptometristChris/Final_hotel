@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="adminRoom">
+	
+	<select id="getRoomList" resultType="com.spring.app.hk.room.domain.RoomTypeDTO">
+
+	SELECT
+	    r.ROOM_TYPE_ID      AS room_type_id,
+	    r.FK_HOTEL_ID       AS brand_id,
+	    h.HOTEL_NAME        AS hotel_name,
+	    r.ROOM_GRADE        AS room_grade,
+	    r.BED_TYPE          AS bed_type,
+	    r.VIEW_TYPE         AS view_type,
+	    r.ROOM_NAME         AS room_name,
+	    r.ROOM_SIZE         AS room_size,
+	    r.MAX_CAPACITY      AS max_capacity,
+	    r.TOTAL_COUNT       AS total_count,
+	    r.BASE_PRICE        AS base_price
+	FROM ROOM_TYPE r
+	JOIN TBL_HOTEL h
+	ON r.FK_HOTEL_ID = h.HOTEL_ID
+	WHERE r.IS_ACTIVE = 'Y'
+	ORDER BY h.HOTEL_NAME
+	
+	</select>
+	
+	
+</mapper>

@@ -1,4 +1,4 @@
-package com.spring.app.hk.hotel.controller;
+package com.spring.app.hk.admin.hotel.controller;
 
 import java.util.List;
 import java.util.Map;

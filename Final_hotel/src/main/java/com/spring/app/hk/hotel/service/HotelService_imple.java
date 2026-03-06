@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.spring.app.common.FileManager;
-import com.spring.app.hk.hotel.model.HotelDAO;
+import com.spring.app.hk.admin.hotel.model.HotelDAO;
 
 import lombok.RequiredArgsConstructor;
 

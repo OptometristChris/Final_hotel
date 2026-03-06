@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>객실 관리</title>
+
+<style>
+
+body{
+    font-family: Arial;
+}
+
+table{
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td{
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#f2f2f2;
+}
+
+.title{
+    margin-bottom:20px;
+}
+
+.btn-area{
+    margin-bottom:15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2 class="title">객실 관리</h2>
+
+<div class="btn-area">
+    <a th:href="@{/admin/room/register}">
+        <button>객실 등록</button>
+    </a>
+</div>
+
+<table>
+
+<thead>
+<tr>
+    <th>호텔</th>
+    <th>객실명</th>
+    <th>등급</th>
+    <th>침대</th>
+    <th>뷰</th>
+    <th>최대인원</th>
+    <th>재고</th>
+    <th>가격</th>
+    <th>관리</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr th:each="room : ${roomList}">
+
+<td th:text="${room.hotel_name}"></td>
+<td th:text="${room.room_name}"></td>
+<td th:text="${room.room_grade}"></td>
+<td th:text="${room.bed_type}"></td>
+<td th:text="${room.view_type}"></td>
+<td th:text="${room.max_capacity}"></td>
+<td th:text="${room.total_count}"></td>
+<td th:text="${room.base_price}"></td>
+
+<td>
+    <a th:href="@{/admin/room/edit/{id}(id=${room.room_type_id})}">
+        수정
+    </a>
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</body>
+</html>
