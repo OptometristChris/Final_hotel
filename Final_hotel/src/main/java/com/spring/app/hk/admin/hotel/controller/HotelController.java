@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.app.common.FileManager;
-import com.spring.app.hk.hotel.service.HotelService;
+import com.spring.app.hk.admin.hotel.service.HotelService;
 import com.spring.app.jh.security.domain.CustomAdminDetails;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +30,8 @@ import lombok.RequiredArgsConstructor;
 public class HotelController {
 
     private final HotelService hotelService;
+  
+    // 이미지 업로드 위해 추가
     private final FileManager fileManager;
 
     @Value("${file.images-dir}")

@@ -41,9 +41,11 @@ th{
 
 <h2 class="title">객실 관리</h2>
 
+<h3 th:text="'호텔 : ' + ${hotelName}"></h3>
+
 <div class="btn-area">
     <a th:href="@{/admin/room/register}">
-        <button>객실 등록</button>
+        <button>객실 등록 신청</button>
     </a>
 </div>
 
@@ -51,7 +53,8 @@ th{
 
 <thead>
 <tr>
-    <th>호텔</th>
+	<th>호텔</th>
+    <th>사진명</th>   
     <th>객실명</th>
     <th>등급</th>
     <th>침대</th>
@@ -68,6 +71,11 @@ th{
 <tr th:each="room : ${roomList}">
 
 <td th:text="${room.hotel_name}"></td>
+
+<td>
+    <img th:src="@{${room.image_url}}"
+        style="width:150px;height:100px;object-fit:cover;border-radius:4px;">
+</td>
 <td th:text="${room.room_name}"></td>
 <td th:text="${room.room_grade}"></td>
 <td th:text="${room.bed_type}"></td>

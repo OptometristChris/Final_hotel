@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.spring.app.jh.security.domain.Session_MemberDTO;
-import com.spring.app.hk.hotel.service.HotelService;
+import com.spring.app.hk.admin.hotel.service.HotelService;
 import com.spring.app.hk.room.domain.RoomTypeDTO;
 import com.spring.app.hk.room.service.RoomTypeService;
 
