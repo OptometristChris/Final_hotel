@@ -232,7 +232,6 @@
 	                
 	                <div class="room-img-container" style="aspect-ratio: 16 / 9; width: 100%; overflow: hidden; background: #f0f0f0;">
 	                    <img th:src="${#strings.startsWith(room.image_url, 'http')} ? ${room.image_url} : @{${room.image_url}}"
-	                         onerror="this.src='/images/js/noimage.png'"
 	                         class="w-100 h-100" 
 	                         style="object-fit: cover; transition: transform 0.5s ease;">
 	                </div>

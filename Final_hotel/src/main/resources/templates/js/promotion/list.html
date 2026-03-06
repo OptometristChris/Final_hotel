@@ -47,6 +47,38 @@
             .btn-view:hover { background: #1a1a1a; color: #fff; }
 
             .no-list { grid-column: 1/-1; text-align: center; padding: 100px 0; color: #bbb; font-size: 1.2rem; }
+            
+            /* 관리자 액션 영역 및 버튼 스타일 */
+			.admin-action-area {
+			    display: flex;
+			    justify-content: flex-end;
+			}
+			
+			.btn-admin-add {
+			    background-color: #d4af37;
+			    color: #fff;
+			    padding: 12px 25px;
+			    font-size: 0.95rem;
+			    font-weight: 600;
+			    text-decoration: none;
+			    border: 1px solid #d4af37;
+			    transition: 0.3s;
+			    display: inline-flex;
+			    align-items: center;
+			    gap: 8px;
+			}
+			
+			.btn-admin-add:hover {
+			    background-color: #1a1a1a;
+			    border-color: #1a1a1a;
+			    color: #fff;
+			    text-decoration: none;
+			    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+			}
+			
+			.btn-admin-add i {
+			    font-size: 1.1rem;
+			}
         </style>
     </th:block>
 </head>
@@ -67,6 +99,16 @@
             <a th:href="@{/promotion/list(hotelId=1)}" class="tab-link" th:classappend="${hotelId == 1} ? 'active'">호텔 시엘</a>
             <a th:href="@{/promotion/list(hotelId=2)}" class="tab-link" th:classappend="${hotelId == 2} ? 'active'">르 시엘</a>
         </div>
+        
+        <div class="admin-action-area" 
+		     sec:authorize="hasAnyRole('ADMIN_BRANCH', 'ROLE_ADMIN_BRANCH')" 
+		     style="max-width: 1200px; margin: 0 auto 30px; padding: 0 20px; text-align: right;">
+		    
+		    <a th:href="@{/promotion/write(hotelId=${hotelId})}" 
+		       class="btn-admin-add">
+		        <i class="bi bi-plus-lg"></i> 프로모션 등록하기
+		    </a>
+		</div>
 
         <div class="promo-grid">
             <div th:if="${#lists.isEmpty(promoList)}" class="no-list">

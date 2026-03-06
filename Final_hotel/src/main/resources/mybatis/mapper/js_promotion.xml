@@ -42,4 +42,47 @@
 	      AND ROWNUM = 1
 	</select>
 
+	<insert id="insertPromotionMaster" parameterType="HashMap">
+	    <selectKey keyProperty="promotion_id" resultType="int" order="BEFORE">
+	        SELECT SEQ_PROMOTION_ID.NEXTVAL FROM DUAL
+	    </selectKey>
+	    INSERT INTO PROMOTION_MASTER (
+	        promotion_id, fk_hotel_id, title, price, 
+	        discount_rate, discount_amount, 
+	        start_date, end_date, is_active
+	    ) VALUES (
+	        #{promotion_id}, #{fk_hotel_id}, #{title}, #{price}, 
+	        #{discount_rate}, #{discount_amount}, 
+	        TO_DATE(#{start_date}, 'YYYY-MM-DD'), TO_DATE(#{end_date}, 'YYYY-MM-DD'), #{is_active}
+	    )
+	</insert>
+	
+	<insert id="insertPromotionBanner" parameterType="HashMap">
+	    INSERT INTO PROMOTION_BANNER (
+	        banner_id, fk_promotion_id, fk_hotel_id, banner_type, 
+	        title, subtitle, benefits, image_url, sort_order, active_yn
+	    ) VALUES (
+	        SEQ_PROMO_BANNER_ID.NEXTVAL, 
+	        #{promotion_id},  #{fk_hotel_id}, 
+	        #{banner_type}, 
+	        #{title}, 
+	        #{subtitle}, 
+	        #{benefits}, 
+	        #{image_url, jdbcType=VARCHAR}, 
+	        #{sort_order}, 
+	        'Y'
+	    )
+	</insert>
+
+	<!-- 프로모션 삭제 -->
+	<delete id="deletePromotionBanner" parameterType="int">
+	    DELETE FROM PROMOTION_BANNER 
+	    WHERE FK_PROMOTION_ID = #{promotionId}
+	</delete>
+	
+	<delete id="deletePromotionMaster" parameterType="int">
+	    DELETE FROM PROMOTION_MASTER 
+	    WHERE PROMOTION_ID = #{promotionId}
+	</delete>
+
 </mapper>
