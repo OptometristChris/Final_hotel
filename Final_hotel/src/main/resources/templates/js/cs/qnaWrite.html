@@ -93,11 +93,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="secret-wrap">
-                        <input type="checkbox" name="is_secret" value="1">
-                        <span>비밀글로 문의하기 (작성자 본인만 확인 가능)</span>
-                    </label>
-                </div>
+				    <label>
+				        <input type="checkbox" name="is_secret" value="1"> 비밀글로 문의하기
+				    </label>
+				</div>
 
                 <div class="btn-group">
                     <a th:href="@{/cs/list(hotelId=${hotelId})}" class="btn-custom btn-cancel">취소</a>

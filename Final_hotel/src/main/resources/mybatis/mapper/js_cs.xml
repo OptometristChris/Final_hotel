@@ -31,20 +31,21 @@
     </select>
 
     <select id="getQnaListWithPaging" parameterType="HashMap" resultType="HashMap">
-        SELECT *
-        FROM (
-            SELECT 
-                ROW_NUMBER() OVER(ORDER BY created_at DESC) AS RNUM,
-                qna_id, title, writer_name, is_secret, status,
-                TO_CHAR(created_at, 'yyyy-mm-dd') AS created_at
-            FROM QUESTIONS
-            WHERE fk_hotel_id = #{hotelId}
-            <if test='searchKeyword != null and searchKeyword != ""'>
-                AND (title LIKE '%'||#{searchKeyword}||'%' OR content LIKE '%'||#{searchKeyword}||'%')
-            </if>
-        ) V
-        WHERE RNUM BETWEEN #{startRno} AND #{endRno}
-    </select>
+	    SELECT *
+	    FROM (
+	        SELECT 
+	            ROW_NUMBER() OVER(ORDER BY created_at DESC) AS RNUM,
+	            qna_id, title, writer_name, 
+	            is_secret,  status,
+	            TO_CHAR(created_at, 'yyyy-mm-dd') AS created_at
+	        FROM QUESTIONS
+	        WHERE fk_hotel_id = #{hotelId}
+	        <if test='searchKeyword != null and searchKeyword != ""'>
+	            AND (title LIKE '%'||#{searchKeyword}||'%' OR content LIKE '%'||#{searchKeyword}||'%')
+	        </if>
+	    ) V
+	    WHERE RNUM BETWEEN #{startRno} AND #{endRno}
+	</select>
 
     <select id="getQnaDetail" parameterType="String" resultType="HashMap">
 	    SELECT 

@@ -140,20 +140,54 @@ public class CsController {
     }
 
     /**
-     * [사용자] 1:1 문의 상세 보기
+     * [사용자] 1:1 문의 상세 보기 (비밀글 권한 체크 및 삭제버튼 권한 추가)
      */
     @GetMapping("/qnaDetail")
-    public ModelAndView qnaDetail(ModelAndView mav, @RequestParam(value = "qnaId") String qnaId) {
-        Map<String, String> qnaDetail = service.getQnaDetail(qnaId);
+    public ModelAndView qnaDetail(ModelAndView mav, 
+                                 @RequestParam(value = "qnaId") String qnaId,
+                                 HttpServletRequest request, 
+                                 HttpSession session,
+                                 java.security.Principal principal) {
         
-        mav.addObject("qna", qnaDetail);
+        Map<String, String> qna = service.getQnaDetail(qnaId);
+        String writerName = String.valueOf(qna.get("WRITER_NAME"));
+
+        // 1. 권한 체크 변수 생성
+        boolean isAdmin = request.isUserInRole("ADMIN_BRANCH") || request.isUserInRole("ROLE_ADMIN_BRANCH");
+        boolean isMemberOwner = (principal != null && principal.getName().equals(writerName));
+        
+        com.spring.app.jh.security.domain.Session_GuestDTO guest = 
+            (com.spring.app.jh.security.domain.Session_GuestDTO) session.getAttribute("Session_GuestDTO");
+        boolean isGuestOwner = (guest != null && guest.getGuestName().equals(writerName));
+
+        // 2. HTML의 th:if에서 사용할 수 있도록 전달 (이게 있어야 삭제 버튼이 보입니다)
+        mav.addObject("isAdmin", isAdmin);
+        mav.addObject("isMemberOwner", isMemberOwner);
+        mav.addObject("isGuestOwner", isGuestOwner);
+
+        // 3. 비밀글 접근 제한 로직
+        if ("Y".equals(qna.get("IS_SECRET"))) {
+            // 본인도 아니고 관리자도 아니면 접근 차단
+            if (!isAdmin && !isMemberOwner && !isGuestOwner) {
+                mav.addObject("message", "비밀글은 작성자와 관리자만 볼 수 있습니다.");
+                mav.addObject("loc", "javascript:history.back()");
+                mav.setViewName("msg");
+                return mav;
+            }
+        }
+        
+        mav.addObject("qna", qna);
         mav.setViewName("js/cs/qnaDetail"); 
         return mav;
     }
     
+    /**
+     * [사용자] 1:1 문의 삭제 (관리자 권한 추가)
+     */
     @GetMapping("/qnaDelete")
     public String qnaDelete(@RequestParam("qna_id") String qnaId, 
                             @RequestParam("hotelId") String hotelId,
+                            HttpServletRequest request, // 권한 체크용 추가
                             java.security.Principal principal, 
                             HttpSession session,
                             RedirectAttributes rttr) {
@@ -161,6 +195,8 @@ public class CsController {
         Map<String, String> qna = service.getQnaDetail(qnaId);
         String writerIdInDb = String.valueOf(qna.get("WRITER_NAME"));
         
+        // 권한 확인 (본인이거나 지점 관리자이거나)
+        boolean isAdmin = request.isUserInRole("ADMIN_BRANCH") || request.isUserInRole("ROLE_ADMIN_BRANCH");
         boolean isOwner = false;
 
         if (principal != null && principal.getName().equals(writerIdInDb)) {
@@ -175,11 +211,12 @@ public class CsController {
             }
         }
 
-        if (isOwner) {
+        // 본인이거나 관리자이면 삭제 실행
+        if (isOwner || isAdmin) {
             service.deleteQna(qnaId);
             rttr.addFlashAttribute("message", "삭제되었습니다.");
         } else {
-            rttr.addFlashAttribute("message", "본인만 삭제 가능합니다.");
+            rttr.addFlashAttribute("message", "삭제 권한이 없습니다.");
         }
 
         return "redirect:/cs/list?hotelId=" + hotelId;

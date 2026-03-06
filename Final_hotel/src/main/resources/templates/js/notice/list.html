@@ -162,10 +162,6 @@
             </a>
         </div>
         
-        <div style="color: red; background: yellow;">
-		    현재 로그인 권한: <span sec:authentication="principal.authorities"></span>
-		</div>
-        
         <div class="text-right mt-5" style="text-align: right;">
 		    <a th:href="@{/notice/write(hotelId=${hotelId})}" 
 		       sec:authorize="hasRole('ADMIN_BRANCH')" 

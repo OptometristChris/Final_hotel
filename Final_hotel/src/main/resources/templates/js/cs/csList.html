@@ -114,9 +114,9 @@
                    class="qna-item">
                     <div class="col-num" th:text="${totalCount - ((curPage-1) * 10) - status.index}">1</div>
                     <div class="col-title">
-                        <i th:if="${qna.IS_SECRET == '1'}" class="bi bi-lock-fill icon-lock"></i>
-                        <span th:text="${qna.TITLE}">문의 제목</span>
-                    </div>
+					    <i th:if="${qna.IS_SECRET == 'Y'}" class="bi bi-lock-fill icon-lock" style="color: #aaa; margin-right: 5px;"></i>
+					    <span th:text="${qna.TITLE}">문의 제목</span>
+					</div>
                     <div class="col-writer" th:text="${qna.WRITER_NAME}">홍*동</div>
                     <div class="col-date" th:text="${qna.CREATED_AT}">2024-03-05</div>
                     <div class="col-status">
