@@ -59,12 +59,15 @@
 
         <div class="field">
           <label>호텔ID(fk_hotel_id)</label>
-          <select name="fk_hotel_id" required>
-            <option value="">선택</option>
-            <option value="1">호텔 시엘</option>
-            <option value="2">르시엘</option>
-            <!-- [DUMMY] 추후 호텔 리스트를 model로 받으면 여기 option만 동적화 -->
-          </select>
+          <select name="fk_hotel_id" class="form-control">
+		  <!-- 수정 -->
+			<option value="">호텔 선택</option>			
+			<option th:each="hotel : ${hotelList}"
+			        th:value="${hotel.HOTEL_ID}"
+			        th:text="${hotel.HOTEL_NAME}">
+			</option>
+
+</select>
         </div>
 
         <!-- enabled는 기본 1로 강제(원하면 hidden 처리) -->
