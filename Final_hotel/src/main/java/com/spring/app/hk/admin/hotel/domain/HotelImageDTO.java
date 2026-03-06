@@ -1,4 +1,4 @@
-package com.spring.app.hk.hotel.domain;
+package com.spring.app.hk.admin.hotel.domain;
 
 import lombok.Data;
 

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.app.jh.ops.user.model.ShuttleOpsDAO">
+
+  <!-- 1) reservation + room_type + hotel (검증/화면용) -->
+  <select id="selectReservationForShuttle"
+          parameterType="long"
+          resultType="com.spring.app.jh.ops.user.domain.ReservationForShuttleDTO">
+    SELECT
+      r.reservation_id       AS reservationId,
+      r.member_no            AS memberNo,
+      r.room_type_id         AS roomTypeId,
+      rt.fk_hotel_id         AS hotelId,
+      h.hotel_name           AS hotelName,
+      r.guest_count          AS guestCount,
+      r.checkin_date         AS checkinDate,
+      r.checkout_date        AS checkoutDate,
+      r.reservation_status   AS reservationStatus
+    FROM RESERVATION r
+    JOIN ROOM_TYPE rt
+      ON rt.room_type_id = r.room_type_id
+    JOIN TBL_HOTEL h
+      ON h.hotel_id = rt.fk_hotel_id
+    WHERE r.reservation_id = #{reservationId}
+  </select>
+
+  <!-- 2) 호텔/leg_type 시간표 목록(+place_name) -->
+  <select id="selectTimetableList"
+          resultType="com.spring.app.jh.ops.user.domain.ShuttleTimetableDTO">
+    SELECT
+      t.timetable_id AS timetableId,
+      t.fk_hotel_id  AS hotelId,
+      t.leg_type     AS legType,
+      t.place_code   AS placeCode,
+      p.place_name   AS placeName,
+      t.depart_time  AS departTime
+    FROM TBL_SHUTTLE_TIMETABLE t
+    JOIN TBL_SHUTTLE_PLACE p
+      ON p.place_code = t.place_code
+    WHERE t.fk_hotel_id = #{hotelId}
+      AND t.leg_type    = #{legType}
+      AND t.active_yn   = 'Y'
+    ORDER BY t.depart_time ASC
+  </select>
+
+  <!-- 2-1) timetableId 단건 조회(조작 방지: hotelId/legType 검증용) -->
+  <select id="selectTimetableOne"
+          resultType="com.spring.app.jh.ops.user.domain.ShuttleTimetableDTO">
+    SELECT
+      t.timetable_id AS timetableId,
+      t.fk_hotel_id  AS hotelId,
+      t.leg_type     AS legType,
+      t.place_code   AS placeCode,
+      p.place_name   AS placeName,
+      t.depart_time  AS departTime
+    FROM TBL_SHUTTLE_TIMETABLE t
+    JOIN TBL_SHUTTLE_PLACE p
+      ON p.place_code = t.place_code
+    WHERE t.timetable_id = #{timetableId}
+  </select>
+
+  <!-- 3) slot_stock 화면용 -->
+  <select id="selectSlotForDisplay"
+          resultType="com.spring.app.jh.ops.user.domain.SlotStockDTO">
+    SELECT
+      capacity   AS capacity,
+      booked_qty AS bookedQty
+    FROM TBL_SHUTTLE_SLOT_STOCK
+    WHERE fk_timetable_id = #{timetableId}
+      AND ride_date = TRUNC(#{rideDate})
+  </select>
+
+  <!-- 4) slot_stock 락(오버부킹 방지) -->
+  <select id="selectSlotForUpdate"
+          resultType="com.spring.app.jh.ops.user.domain.SlotStockDTO">
+    SELECT
+      capacity   AS capacity,
+      booked_qty AS bookedQty
+    FROM TBL_SHUTTLE_SLOT_STOCK
+    WHERE fk_timetable_id = #{timetableId}
+      AND ride_date = TRUNC(#{rideDate})
+    FOR UPDATE
+  </select>
+
+  <update id="updateBookedQtyPlus">
+    UPDATE TBL_SHUTTLE_SLOT_STOCK
+    SET booked_qty = booked_qty + #{qty},
+        updated_at = SYSTIMESTAMP
+    WHERE fk_timetable_id = #{timetableId}
+      AND ride_date = TRUNC(#{rideDate})
+  </update>
+
+  <update id="updateBookedQtyMinus">
+    UPDATE TBL_SHUTTLE_SLOT_STOCK
+    SET booked_qty = booked_qty - #{qty},
+        updated_at = SYSTIMESTAMP
+    WHERE fk_timetable_id = #{timetableId}
+      AND ride_date = TRUNC(#{rideDate})
+  </update>
+
+  <!-- 5) booking 헤더 -->
+  <select id="selectBookingIdByReservation" resultType="long">
+    SELECT shuttle_booking_id
+    FROM TBL_SHUTTLE_BOOKING
+    WHERE fk_reservation_id = #{reservationId}
+  </select>
+
+  <insert id="insertBookingHeader">
+    INSERT INTO TBL_SHUTTLE_BOOKING
+    (shuttle_booking_id, fk_reservation_id, fk_hotel_id, fk_member_no, ride_date, status)
+    VALUES
+    (SEQ_TBL_SHUTTLE_BOOKING.NEXTVAL, #{reservationId}, #{hotelId}, #{memberNo}, TRUNC(#{rideDate}), 'BOOKED')
+  </insert>
+
+  <update id="updateHeaderCanceled">
+    UPDATE TBL_SHUTTLE_BOOKING
+    SET status='CANCELED', canceled_at=SYSTIMESTAMP
+    WHERE shuttle_booking_id = #{bookingId}
+  </update>
+
+  <!-- 6) leg -->
+  <select id="selectLegByBookingAndType"
+          resultType="com.spring.app.jh.ops.user.domain.ShuttleLegDTO">
+    SELECT
+      shuttle_leg_id        AS shuttleLegId,
+      fk_shuttle_booking_id AS shuttleBookingId,
+      fk_timetable_id       AS timetableId,
+      leg_type              AS legType,
+      ride_date             AS rideDate,
+      place_code            AS placeCode,
+      depart_time           AS departTime,
+      ticket_qty            AS ticketQty,
+      leg_status            AS legStatus
+    FROM TBL_SHUTTLE_BOOKING_LEG
+    WHERE fk_shuttle_booking_id = #{bookingId}
+      AND leg_type = #{legType}
+  </select>
+
+  <insert id="insertLeg">
+    INSERT INTO TBL_SHUTTLE_BOOKING_LEG
+    (shuttle_leg_id, fk_shuttle_booking_id, fk_timetable_id, leg_type, ride_date,
+     place_code, depart_time, ticket_qty, leg_status, created_at)
+    VALUES
+    (SEQ_TBL_SHUTTLE_BOOKING_LEG.NEXTVAL, #{bookingId}, #{timetableId}, #{legType}, TRUNC(#{rideDate}),
+     #{placeCode}, #{departTime}, #{ticketQty}, 'BOOKED', SYSTIMESTAMP)
+  </insert>
+
+  <update id="cancelLeg">
+    UPDATE TBL_SHUTTLE_BOOKING_LEG
+    SET leg_status='CANCELED', canceled_at=SYSTIMESTAMP
+    WHERE shuttle_leg_id = #{legId}
+      AND leg_status='BOOKED'
+  </update>
+
+</mapper>

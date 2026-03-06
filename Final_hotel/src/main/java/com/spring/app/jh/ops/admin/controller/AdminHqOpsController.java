@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.spring.app.hk.admin.hotel.service.HotelService;
 import com.spring.app.jh.ops.admin.service.AdminHqOpsService;
 import com.spring.app.jh.security.domain.AdminDTO;
 import com.spring.app.jh.security.domain.MemberDTO;
@@ -34,6 +35,8 @@ import lombok.RequiredArgsConstructor;
 public class AdminHqOpsController {
 
 	private final AdminHqOpsService adminHqOpsService;
+	
+	private final HotelService hotelService;
 
 
 	// ============================================================
@@ -64,11 +67,20 @@ public class AdminHqOpsController {
 		return "admin/hq/admin_list";
 	}
 
+	// 수정
 	@GetMapping("admins/new")
-	public String branchAdminCreateForm() {
-		return "admin/hq/admin_create_form";
+	public String branchAdminCreateForm(Model model) {
+
+	    List<Map<String,Object>> hotelList =
+	            hotelService.getApprovedHotelList();
+
+	    model.addAttribute("hotelList", hotelList);
+
+	    return "admin/hq/admin_create_form";
 	}
 
+	
+	
 	@PostMapping("admins")
 	public String branchAdminCreateEnd(AdminDTO adminDto, Model model) {
 

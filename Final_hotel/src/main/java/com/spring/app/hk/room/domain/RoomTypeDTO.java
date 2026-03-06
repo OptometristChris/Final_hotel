@@ -23,4 +23,9 @@ public class RoomTypeDTO {
     
     // room min price
     private Integer minPrice;
+    
+    
+    // ====== admin ====== 
+    private int total_count;
+    private String hotel_name;
 }
