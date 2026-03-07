@@ -8,435 +8,741 @@
 <title>마이페이지</title>
 
 <link rel="stylesheet" href="">
-
 <style>
-/* ===== MYPAGE FINAL (INDEX THEME) ===== */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600&display=swap');
+
+
+
 :root{
-  --bg:#f6f1ea;
+  --bg:#ffffff;
   --panel:#ffffff;
-  --line:#eadfd3;
-  --text:#2a2320;
-  --muted:#7a6a61;
+  --line:#e6e6e6;
+  --line-soft:#f1f1f1;
+  --text:#111111;
+  --muted:#777777;
 
-  --brand:#8b6a52;
-  --accent:#d4af37;
+  --brand:#1a1a1a;
+  --accent:#b89b72;
+  --accent-soft:#f8f5f1;
 
-  --shadow: 0 18px 45px rgba(54, 38, 25, .10);
+  --shadow: 0 12px 30px rgba(0,0,0,.05);
 
-  /* ✅ “각지게” : 라운드 줄임 */
-  --radius:12px;
-  --radius-lg:14px;
+  --radius: 8px;
+  --radius-lg: 10px;
 
-  /* ✅ 헤더에 안 가리게(필요하면 90~130에서 조절) */
   --header-offset: 110px;
-
-  /* ✅ 좌우 여백 줄이기 */
   --max: 1380px;
-  --pad: 18px;
+  --pad: 22px;
 }
 
 *{box-sizing:border-box}
+
 body{
   margin:0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
-  color:var(--text);
+  font-family: "Noto Serif KR", serif;
   background: var(--bg);
+  color: var(--text);
 }
 
 a{ color: inherit; text-decoration:none; }
-a:hover{ text-decoration:none; }
+a:hover{ text-decoration:none; color: inherit; }
+
+.container{
+  width:100%;
+}
+
+.reserve-quick-tab {
+    position: fixed;
+    right: 40px;
+    bottom: 140px;
+    width: 360px;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    display: none;
+    z-index: 2400;
+    animation: slideUp 0.4s ease;
+}
+.reserve-quick-tab.active {
+    display: block;
+}
+
+.tab-header {
+    display: flex;
+    background: #f4f4f4;
+    border-radius: 15px 15px 0 0;
+    overflow: hidden;
+}
+.tab-btn {
+    flex: 1;
+    padding: 18px;
+    border: none;
+    font-weight: 700;
+    color: #666;
+    transition: 0.3s;
+    cursor: pointer;
+    background: transparent;
+}
+.tab-btn.active {
+    background: #1a1a1a;
+    color: #fff;
+}
+.tab-body {
+    padding: 30px;
+}
+
+.reserve-field {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #f8f9fa;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    text-align: left;
+    font-size: 0.95rem;
+    display: block;
+    color: #333;
+}
+
+.search-submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
 /* ===== Layout ===== */
 .layout{
   max-width: var(--max);
   margin: 0 auto;
-  padding: 18px 18px 60px;
+  padding: 80px 24px 80px;
   display:grid;
-  grid-template-columns: 260px 1fr;
-  gap: 16px;
+  grid-template-columns: 270px 1fr;
+  gap: 28px;
   align-items:start;
 }
 
-/* ===== Sidebar (sticky) ===== */
+/* ===== Sidebar ===== */
 .sidebar{
+  position: sticky;
+  top: var(--header-offset);
   background: var(--panel);
   border:1px solid var(--line);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
   overflow:hidden;
-  position: sticky;
-  top: var(--header-offset);         /* ✅ 헤더 아래로 내림 */
 }
 
 .side-title{
-  padding:16px 16px 14px;
+  padding:22px 20px;
   border-bottom:1px solid var(--line);
-  font-weight:900;
   text-align:center;
+  font-size:1.15rem;
+  font-weight:500;
+  letter-spacing:2px;
+  background:#fafafa;
 }
 
 .side-section{
-  padding:14px 14px 10px;
+  padding:18px 18px 14px;
   border-bottom:1px solid var(--line);
 }
-.side-section:last-child{border-bottom:none;}
+.side-section:last-child{ border-bottom:none; }
 
 .side-section h3{
-  margin:0 0 10px;
-  font-size:13px;
+  margin:0 0 12px;
+  font-size:0.92rem;
+  font-weight:500;
   color: var(--text);
-  letter-spacing:-.2px;
 }
 
 .side-section a{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:10px 10px;
-  border-radius: 10px;
-  color: var(--text);
-  font-size:14px;
+  padding:11px 10px;
+  margin-bottom:4px;
+  font-size:0.95rem;
+  color:#333;
+  border-radius: 6px;
+  transition: background .2s ease, color .2s ease, transform .2s ease;
 }
 .side-section a:hover{
-  background: rgba(139,106,82,.10);
+  background:#f7f7f7;
+  color:#000;
+  transform: translateX(2px);
 }
 .side-section a span{
-  color: var(--muted);
-  font-size:12px;
+  color:#999;
+  font-size:0.85rem;
 }
 
 /* ===== Main ===== */
-.main{ min-width:0; }
-.page-title{
-  font-size: 32px;
-  margin: 6px 0 16px;
-  font-weight: 950;
-  letter-spacing:-.6px;
+.main{
+  min-width:0;
+  margin-top: 0 !important;
 }
 
-/* ===== Sections / Cards ===== */
-.section{ margin-top: 16px; }
+.page-title{
+  margin: 6px 0 26px;
+  font-size: 2.25rem;
+  font-weight:400;
+  letter-spacing:4px;
+  text-align:left;
+  color:#111;
+}
+
+/* ===== Section ===== */
+.section{
+  margin-top: 28px;
+}
 .section-head{
   display:flex;
   align-items:flex-end;
   justify-content:space-between;
   gap:12px;
-  margin:0 0 10px;
+  margin-bottom: 14px;
 }
 .section-head h2{
   margin:0;
-  font-size:22px;
-  font-weight:950;
-  letter-spacing:-.4px;
+  font-size:1.6rem;
+  font-weight:400;
+  letter-spacing:1px;
+  color:#111;
 }
 .section-head p{
   margin:0;
-  font-size:13px;
+  font-size:0.88rem;
   color: var(--muted);
 }
 
+/* ===== Common Card ===== */
 .card{
   background: var(--panel);
   border:1px solid var(--line);
   border-radius: var(--radius-lg);
+  box-shadow: none;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.card:hover{
+  transform: translateY(-3px);
   box-shadow: var(--shadow);
-  padding: var(--pad);
+  border-color:#d8d8d8;
 }
 
-/* ===== Top area ===== */
+/* ===== Top Profile ===== */
 .mypage-top{
+  background:#fff;
+  border:1px solid var(--line);
   border-radius: var(--radius-lg);
   overflow:hidden;
-  border:1px solid var(--line);
-  background: var(--panel);
-  box-shadow: var(--shadow);
 }
 
-/* 인덱스 느낌의 상단 바 */
 .mypage-topbar{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:14px;
-  padding:16px 18px;
-  background: var(--brand);
+  padding:26px 28px;
+  background:#1a1a1a;
   color:#fff;
 }
-.topbar-left{display:flex;flex-direction:column;gap:10px;}
 
-.user-chip{display:flex;align-items:center;gap:10px;font-weight:900;}
-.user-icon{
-  width:30px;height:30px;border-radius:999px;
-  display:inline-flex;align-items:center;justify-content:center;
-  background:rgba(255,255,255,.18);
-  border:1px solid rgba(255,255,255,.22);
-  font-size:16px;
+.topbar-left{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
 }
-.user-name{font-size:18px;letter-spacing:-.2px;}
+
+.user-chip{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.user-icon{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.18);
+  font-size:1rem;
+}
+
+.user-name{
+  font-size:1.3rem;
+  font-weight:500;
+  letter-spacing:.4px;
+}
 
 .name-go-edit{
-  width:28px;height:28px;border-radius:999px;
-  display:inline-flex;align-items:center;justify-content:center;
-  color:#fff;font-size:18px;font-weight:900;
-  background:rgba(255,255,255,.18);
-  border:1px solid rgba(255,255,255,.22);
-  line-height:1;
-}
-.name-go-edit:hover{background:rgba(255,255,255,.28);}
-
-.sns-row{display:flex;align-items:center;gap:10px;font-size:14px;}
-.sns-label{opacity:.9;}
-.sns-pill{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:6px 10px;border-radius:999px;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
   background:rgba(255,255,255,.12);
-  border:1px solid rgba(255,255,255,.22);
-  font-weight:800;
+  border:1px solid rgba(255,255,255,.18);
+  color:#fff;
+  font-size:1rem;
+  transition: background .2s ease, transform .2s ease;
 }
+.name-go-edit:hover{
+  background:rgba(255,255,255,.22);
+  transform: translateX(2px);
+}
+
+.sns-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:0.95rem;
+}
+
+.sns-label{
+  color:rgba(255,255,255,.82);
+}
+
+.sns-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 12px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  font-size:0.9rem;
+}
+
 .sns-dot{
-  width:10px;height:10px;border-radius:999px;
+  width:9px;
+  height:9px;
+  border-radius:50%;
   background: var(--accent);
   display:inline-block;
 }
 
-.grade-card{ padding:18px; background:#fff; }
-.grade-card-body{
-  display:grid;
-  grid-template-columns: 240px 1fr;
-  gap:16px;
-  align-items:center;
-}
-.grade-logo-area{display:flex;flex-direction:column;align-items:flex-start;gap:10px;}
-.grade-logo{
-  width:110px;height:110px;border-radius:999px;
-  border:2px solid rgba(42,35,32,.65);
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  gap:6px;
-  background: rgba(212,175,55,.10);
-}
-.grade-letter{font-size:44px;font-weight:950;line-height:1;}
-.grade-label{font-size:12px;color:var(--muted);font-weight:800;}
-.grade-now{font-size:14px;color:#333;}
-.grade-now b{font-weight:950;}
-
-.benefit-area{display:flex;justify-content:flex-end;}
-.benefit-box{
-  width:min(460px,100%);
-  border:1px solid var(--line);
-  border-radius: var(--radius);
-  padding:14px 16px;
+.grade-card{
+  padding:30px 28px;
   background:#fff;
 }
-.benefit-title{ font-weight:950; font-size:16px; margin-bottom:6px; }
-.benefit-sub{ color:var(--muted); font-size:12px; margin-bottom:10px; }
-.benefit-list{ margin:0; padding-left:18px; color:var(--text); line-height:1.7; font-size:13px; }
+.grade-card-body{
+  display:grid;
+  grid-template-columns: 260px 1fr;
+  gap:28px;
+  align-items:center;
+}
 
-/* ===== Grids ===== */
+.grade-logo-area{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:12px;
+}
+
+.grade-logo{
+  width:112px;
+  height:112px;
+  border-radius:50%;
+  border:1px solid #222;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:#faf7f2;
+}
+.grade-letter{
+  font-size:2.7rem;
+  font-weight:600;
+  line-height:1;
+}
+.grade-label{
+  font-size:0.8rem;
+  color: var(--muted);
+}
+.grade-now{
+  font-size:1rem;
+  color:#333;
+}
+.grade-now b{
+  font-weight:600;
+}
+.grade-id{
+  color:#666;
+  font-size:0.85rem;
+}
+
+.benefit-area{
+  display:flex;
+  justify-content:flex-end;
+}
+.benefit-box{
+  width:min(500px,100%);
+  padding:20px 22px;
+  border:1px solid var(--line);
+  border-radius: var(--radius);
+  background:#fcfcfc;
+}
+.benefit-title{
+  font-size:1.05rem;
+  font-weight:500;
+  margin-bottom:6px;
+}
+.benefit-sub{
+  font-size:0.82rem;
+  color: var(--muted);
+  margin-bottom:12px;
+}
+.benefit-list{
+  margin:0;
+  padding-left:18px;
+  color:#333;
+  line-height:1.9;
+  font-size:0.95rem;
+}
+
+/* ===== Grid ===== */
 .grid3{
   display:grid;
   grid-template-columns:repeat(3, 1fr);
-  gap:12px;
+  gap:16px;
 }
 .grid2{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
+  grid-template-columns:repeat(2, 1fr);
+  gap:16px;
 }
 
-/* Summary mini cards */
+/* ===== Mini Summary Cards ===== */
 .mini{
-  padding:16px;
   display:flex;
-  gap:14px;
   align-items:center;
-  cursor:pointer;
-  color:inherit;
-  transition: transform .12s ease;
+  gap:16px;
+  padding:22px 20px;
+  min-height:118px;
 }
-.mini:hover{ transform: translateY(-2px); }
 
 .icon{
-  width:62px;height:62px;
-  border:2px solid rgba(42,35,32,.65);
-  border-radius:999px;
+  width:64px;
+  height:64px;
+  border:1px solid #1a1a1a;
+  border-radius:50%;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight:950;
-  font-size:22px;
-  background: rgba(212,175,55,.10);
+  background:#fafafa;
+  font-size:1.45rem;
+  flex-shrink:0;
 }
 
-.mini .info{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0;}
-.mini .info .title{font-weight:950;font-size:16px;}
-.mini .info .desc{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.mini .arrow{color:var(--text);font-weight:950;font-size:18px;}
+.mini .info{
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.mini .info .title{
+  font-size:1.08rem;
+  font-weight:500;
+  color:#111;
+}
+.mini .info .desc{
+  font-size:0.9rem;
+  color: var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.mini .arrow{
+  font-size:1.15rem;
+  color:#999;
+}
 
-/* kv blocks */
+/* ===== KV Box ===== */
 .kv{
   display:grid;
   grid-template-columns:120px 1fr;
-  gap:10px;
-  font-size:14px;
-  padding:14px;
+  gap:10px 12px;
+  padding:16px;
   border:1px solid var(--line);
   border-radius: var(--radius);
   background:#fff;
+  font-size:0.95rem;
 }
-.kv .k{ color:var(--muted); }
-.kv .v{ font-weight:950; }
+.kv .k{
+  color: var(--muted);
+}
+.kv .v{
+  color:#111;
+  font-weight:500;
+}
 
-/* favorites */
+/* ===== Favorites ===== */
 .favorites{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:16px;
-  padding:18px;
+  gap:18px;
+  padding:26px 22px;
 }
+
 .fav-item{
   display:flex;
   align-items:center;
-  gap:12px;
-  flex:1;
   justify-content:center;
+  gap:14px;
+  flex:1;
+  transition: transform .2s ease;
 }
+.fav-item:hover{
+  transform: translateY(-2px);
+}
+
 .divider{
   width:1px;
   align-self:stretch;
-  background:var(--line);
+  background: var(--line);
 }
+
 .fav-icon{
-  width:56px;height:56px;
-  border:2px solid rgba(42,35,32,.65);
-  border-radius:999px;
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  border:1px solid #1a1a1a;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight:950;
-  font-size:18px;
-  background: rgba(212,175,55,.10);
+  background:#fafafa;
+  font-size:1.25rem;
+  flex-shrink:0;
 }
-.fav-text{display:flex;flex-direction:column;gap:2px;}
-.fav-text b{font-size:15px;}
-.fav-text span{font-size:13px;color:var(--muted);}
+.fav-text{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.fav-text b{
+  font-size:1rem;
+  font-weight:500;
+}
+.fav-text span{
+  font-size:0.88rem;
+  color: var(--muted);
+}
 
-/* promos */
+/* ===== Promo Cards ===== */
 .promos{
   display:grid;
   grid-template-columns:repeat(3, 1fr);
-  gap:12px;
+  gap:16px;
 }
+
 .promo{
-  padding:14px;
-  color:inherit;
-  transition: transform .12s ease;
+  display:block;
+  padding:16px;
 }
-.promo:hover{ transform: translateY(-2px); }
 
 .promo .thumb{
-  height:110px;
-  border-radius: var(--radius);
+  height:170px;
   border:1px solid var(--line);
-  background: rgba(139,106,82,.10);
+  border-radius: 6px;
+  background: linear-gradient(135deg, #f7f7f7 0%, #efefef 100%);
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight:900;
-  color:var(--muted);
-  margin-bottom:12px;
-}
-.promo h3{margin:0 0 8px;font-size:16px;font-weight:950;}
-.promo .meta{margin:0;font-size:12px;color:var(--muted);line-height:1.6;}
-
-/* ===== Responsive ===== */
-@media (max-width: 980px){
-  .layout{ grid-template-columns:1fr; padding: 12px 14px 60px; }
-  .sidebar{ position:relative; top:auto; }
-  .grid3{ grid-template-columns:1fr; }
-  .grid2{ grid-template-columns:1fr; }
-  .promos{ grid-template-columns:1fr; }
-  .grade-card-body{ grid-template-columns:1fr; gap:14px; }
-  .benefit-area{ justify-content:flex-start; }
+  color:#777;
+  font-size:0.95rem;
+  margin-bottom:16px;
+  overflow:hidden;
 }
 
-/* ===== 인덱스 스타일 예약 플로팅 버튼 ===== */
-.fixed-reserve-btn{
-  position: fixed;
-  right: 40px;
-  bottom: 40px;
-  width: 90px;
-  height: 90px;
-  background-color: rgba(70, 60, 50, 0.85);
-  color: white;
-  border-radius: 50%;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  cursor:pointer;
-  z-index:2500;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
-  transition: all 0.3s ease;
-  border: 1px solid rgba(255,255,255,0.12);
+.promo h3{
+  margin:0 0 8px;
+  font-size:1.12rem;
+  font-weight:500;
+  line-height:1.5;
+  color:#111;
 }
-.fixed-reserve-btn:hover{
-  background-color: var(--accent);
-  transform: scale(1.05);
-  color:#000;
+.promo .meta{
+  margin:0;
+  font-size:0.86rem;
+  color: var(--muted);
+  line-height:1.8;
+  white-space:pre-line;
 }
-.reserve-quick-tab{
-  position: fixed;
-  right: 40px;
-  bottom: 140px;
-  width: 360px;
-  background: rgba(255,255,255,0.98);
-  backdrop-filter: blur(10px);
-  border-radius: 15px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
-  display:none;
-  z-index:2400;
-  animation: slideUp .25s ease;
+
+/* ===== Inline Links ===== */
+.inline-move{
+  display:inline-block;
+  margin-top:10px;
+  color:#111;
+  font-weight:500;
+  font-size:0.95rem;
+  transition: opacity .2s ease, transform .2s ease;
 }
-.reserve-quick-tab.active{display:block;}
-.tab-header{display:flex;background:#f4f4f4;border-radius:15px 15px 0 0;overflow:hidden;}
-.tab-btn{flex:1;padding:16px;border:none;font-weight:900;color:#666;cursor:pointer;}
-.tab-btn.active{background:#1a1a1a;color:#fff;}
-.tab-body{padding:22px;}
-.reserve-field{
-  width:100%;
-  padding:14px;
-  margin-bottom:12px;
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:10px;
-  font-size:14px;
-  color:var(--text);
+.inline-move:hover{
+  opacity:.8;
+  transform: translateX(2px);
 }
-.search-submit-btn{
-  width:100%;
-  padding:14px;
+
+/* --- 예약 플로팅 버튼 및 탭 --- */
+.fixed-reserve-btn {
+    position: fixed; right: 40px; bottom: 40px; width: 90px; height: 90px;
+    background-color: rgba(70, 60, 50, 0.85); color: white; border-radius: 50%;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    cursor: pointer; z-index: 2500; box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.1);
+}
+.fixed-reserve-btn:hover { background-color: #d4af37; transform: scale(1.05); color: #000; }
+
+/* ===== Floating Button ===== */
+.reserve-sticky{
+  position:fixed;
+  right:38px;
+  bottom:38px;
+  width:92px;
+  height:92px;
+  border-radius:50%;
   background:#1a1a1a;
   color:#fff;
-  border:none;
-  border-radius:10px;
-  font-weight:950;
-  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-size:0.98rem;
+  font-weight:500;
+  letter-spacing:.5px;
+  box-shadow: 0 16px 35px rgba(0,0,0,.18);
+  z-index:2500;
+  transition: transform .25s ease, background .25s ease, color .25s ease;
 }
-@keyframes slideUp{
-  from{opacity:0;transform:translateY(14px);}
-  to{opacity:1;transform:translateY(0);}
+.reserve-sticky:hover{
+  background:#fff;
+  color:#111;
+  border:1px solid #111;
+  transform: scale(1.05);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1100px){
+  .layout{
+    grid-template-columns:1fr;
+    padding: 56px 16px 70px;
+  }
+  .sidebar{
+    position:relative;
+    top:auto;
+  }
+  .grade-card-body{
+    grid-template-columns:1fr;
+  }
+  .benefit-area{
+    justify-content:flex-start;
+  }
+  .grid3{
+    grid-template-columns:1fr;
+  }
+  .grid2{
+    grid-template-columns:1fr;
+  }
+  .promos{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width: 680px){
+  .page-title{
+    font-size:1.8rem;
+    letter-spacing:2px;
+  }
+  .section-head{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .mypage-topbar{
+    padding:20px 18px;
+  }
+  .grade-card{
+    padding:22px 18px;
+  }
+  .favorites{
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .divider{
+    width:100%;
+    height:1px;
+  }
+  .reserve-sticky{
+    width:78px;
+    height:78px;
+    right:18px;
+    bottom:18px;
+    font-size:0.9rem;
+  }
 }
 </style>
 
 <style type="text/css"></style>
-
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script th:inline="javascript">
 /*<![CDATA[*/
-  // 필요 시: href="#" 클릭 막는 프로토타입 스크립트는 넣지 않음(실제 라우팅 붙일 예정)
+	$(document).ready(function() {
+        $('input[name="daterange"]').daterangepicker({
+            autoUpdateInput: false,
+            minDate: moment(),
+            opens: 'left',
+            locale: {
+                format: 'YYYY-MM-DD',
+                applyLabel: "적용",
+                cancelLabel: "취소",
+                daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+                monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"]
+            }
+        });
+
+        $('input[name="daterange"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(
+                picker.startDate.format('YYYY-MM-DD') + ' ~ ' +
+                picker.endDate.format('YYYY-MM-DD')
+            );
+        });
+    });
+    function toggleReserveTab() {
+        $('#reserveQuickTab').toggleClass('active');
+    }
+  function switchReserveTab(type) {
+      $('.tab-btn').removeClass('active');
+      $('#reserveType').val(type);
+
+      if (type === 'room') {
+          $('#tab-room-btn').addClass('active');
+          $('#room-fields').show();
+          $('#dining-fields').hide();
+      } else {
+          $('#tab-dining-btn').addClass('active');
+          $('#room-fields').hide();
+          $('#dining-fields').show();
+      }
+  }
 /*]]>*/
 </script>
+</head>
 
 <body>
 <div class="container"
@@ -462,9 +768,8 @@ a:hover{ text-decoration:none; }
 
   <div class="layout">
 
-    <!-- 사이드바(업로드 파일 구조 유지) :contentReference[oaicite:4]{index=4} -->
     <aside class="sidebar" aria-label="마이페이지 메뉴">
-      <div class="side-title">마이페이지</div>
+      <div class="side-title">MY PAGE</div>
 
       <div class="side-section">
         <h3>예약</h3>
@@ -487,10 +792,9 @@ a:hover{ text-decoration:none; }
       </div>
     </aside>
 
-    <main class="main" style="margin-top: 80px;">
-      <div class="page-title">마이페이지</div>
+    <main class="main">
+      <div class="page-title">MY PAGE</div>
 
-      <!-- 상단/등급 카드(업로드 파일 구조 유지) :contentReference[oaicite:5]{index=5} -->
       <section class="mypage-top">
         <div class="mypage-topbar">
           <div class="topbar-left">
@@ -516,10 +820,10 @@ a:hover{ text-decoration:none; }
             <div class="grade-logo-area">
               <div class="grade-logo" aria-label="등급 로고">
                 <div class="grade-letter" th:text="${gradeLetter}">S</div>
-                <div class="grade-label">등급</div>
+                <div class="grade-label">MEMBERSHIP</div>
               </div>
               <div class="grade-now">현재 등급: <b th:text="${gradeName}">Silver</b></div>
-              <div style="color:#666;font-size:12px;">회원ID: <b th:text="${userId}">hong123</b></div>
+              <div class="grade-id">회원ID: <b th:text="${userId}">hong123</b></div>
             </div>
 
             <div class="benefit-area">
@@ -537,7 +841,6 @@ a:hover{ text-decoration:none; }
         </div>
       </section>
 
-      <!-- 예약 요약 -->
       <section class="section">
         <div class="section-head">
           <h2>나의 예약</h2>
@@ -563,7 +866,7 @@ a:hover{ text-decoration:none; }
             <div class="arrow">›</div>
           </a>
 
-          <a class="card mini" th:href="@{/member/reservations/shuttle}" aria-label="셔틀버스 예약 내역">
+          <a class="card mini" th:href="@{/shuttle/confirm/view}" aria-label="셔틀버스 예약 내역">
             <div class="icon">🚌</div>
             <div class="info">
               <div class="title">셔틀버스 예약</div>
@@ -574,7 +877,6 @@ a:hover{ text-decoration:none; }
         </div>
       </section>
 
-      <!-- 결제/문의 -->
       <section class="section">
         <div class="section-head">
           <h2>결제 · 문의</h2>
@@ -582,28 +884,27 @@ a:hover{ text-decoration:none; }
         </div>
 
         <div class="grid2">
-          <div class="card">
-            <div style="font-weight:900;font-size:16px;margin-bottom:10px;">결제/환불 상태</div>
+          <div class="card" style="padding:20px;">
+            <div style="font-weight:500;font-size:1.05rem;margin-bottom:12px;">결제/환불 상태</div>
             <div class="kv">
               <div class="k">결제 대기</div><div class="v" th:text="|${payWaiting}건|">1건</div>
               <div class="k">결제 완료</div><div class="v" th:text="|${payDone}건|">4건</div>
               <div class="k">환불 진행</div><div class="v" th:text="|${refundDoing}건|">0건</div>
             </div>
-            <a th:href="@{/member/payments}" style="display:inline-block;margin-top:8px;font-weight:800;color:#111;text-decoration:none;">결제내역으로 이동 →</a>
+            <a th:href="@{/member/payments}" class="inline-move">결제내역으로 이동 →</a>
           </div>
 
-          <div class="card">
-            <div style="font-weight:900;font-size:16px;margin-bottom:10px;">내 QnA</div>
+          <div class="card" style="padding:20px;">
+            <div style="font-weight:500;font-size:1.05rem;margin-bottom:12px;">내 QnA</div>
             <div class="kv">
               <div class="k">미답변</div><div class="v" th:text="|${qnaOpen}건|">1건</div>
               <div class="k">답변 완료</div><div class="v" th:text="|${qnaDone}건|">5건</div>
             </div>
-            <a th:href="@{/member/qna}" style="display:inline-block;margin-top:8px;font-weight:800;color:#111;text-decoration:none;">내 문의로 이동 →</a>
+            <a th:href="@{/member/qna}" class="inline-move">내 문의로 이동 →</a>
           </div>
         </div>
       </section>
 
-      <!-- 관심목록 -->
       <section class="section">
         <div class="section-head">
           <h2>나의 관심목록</h2>
@@ -631,7 +932,6 @@ a:hover{ text-decoration:none; }
         </div>
       </section>
 
-      <!-- 추천상품(더미/DB 혼용) -->
       <section class="section">
         <div class="section-head">
           <h2><span th:text="${userName}">홍길동</span>님을 위한 추천 상품</h2>
@@ -642,21 +942,22 @@ a:hover{ text-decoration:none; }
           <a class="card promo" th:href="@{/promotion/detail/1}" aria-label="프로모션 1">
             <div class="thumb">프로모션 1</div>
             <h3 th:text="${promo1Title != null ? promo1Title : '르시엘 라운지바 + 객실 패키지'}">르시엘 라운지바 + 객실 패키지</h3>
-            <p class="meta" th:text="${promo1Meta != null ? promo1Meta : '예약기간: 2026-02-01 ~ 2026-02-28\n투숙기간: 2026-02-05 ~ 2026-03-10'}">
-              예약기간: 2026-02-01 ~ 2026-02-28<br/>투숙기간: 2026-02-05 ~ 2026-03-10
+            <p class="meta" th:text="${promo1Meta != null ? promo1Meta : '예약기간: 2026-02-01 ~ 2026-02-28&#10;투숙기간: 2026-02-05 ~ 2026-03-10'}">
+              예약기간: 2026-02-01 ~ 2026-02-28
+              투숙기간: 2026-02-05 ~ 2026-03-10
             </p>
           </a>
 
           <a class="card promo" th:href="@{/promotion/detail/2}" aria-label="프로모션 2">
             <div class="thumb">프로모션 2</div>
             <h3 th:text="${promo2Title != null ? promo2Title : '시엘 조식 포함 위크데이 특가'}">시엘 조식 포함 위크데이 특가</h3>
-            <p class="meta" th:text="${promo2Meta != null ? promo2Meta : '예약기간: 2026-02-01 ~ 2026-02-20\n투숙기간: 2026-02-03 ~ 2026-02-28'}"></p>
+            <p class="meta" th:text="${promo2Meta != null ? promo2Meta : '예약기간: 2026-02-01 ~ 2026-02-20&#10;투숙기간: 2026-02-03 ~ 2026-02-28'}"></p>
           </a>
 
           <a class="card promo" th:href="@{/promotion/detail/3}" aria-label="프로모션 3">
             <div class="thumb">프로모션 3</div>
             <h3 th:text="${promo3Title != null ? promo3Title : '롯데월드 입장권 + 객실 패키지'}">롯데월드 입장권 + 객실 패키지</h3>
-            <p class="meta" th:text="${promo3Meta != null ? promo3Meta : '예약기간: 2026-02-01 ~ 2026-03-15\n투숙기간: 2026-02-10 ~ 2026-04-10'}"></p>
+            <p class="meta" th:text="${promo3Meta != null ? promo3Meta : '예약기간: 2026-02-01 ~ 2026-03-15&#10;투숙기간: 2026-02-10 ~ 2026-04-10'}"></p>
           </a>
         </div>
       </section>
@@ -664,7 +965,39 @@ a:hover{ text-decoration:none; }
     </main>
   </div>
 
-  <a class="reserve-sticky" th:href="@{/index}" aria-label="예약하기">예약하기</a>
+    <div class="fixed-reserve-btn" onclick="toggleReserveTab()">
+      <i class="far fa-calendar-alt"></i>
+      <span>예약하기</span>
+    </div>
+    
+    <div id="reserveQuickTab" class="reserve-quick-tab">
+        <form th:action="@{/reservation/search}" method="get">
+            <div class="tab-header">
+                <input type="hidden" name="reserveType" id="reserveType" value="room">
+                <button type="button" class="tab-btn active" id="tab-room-btn" onclick="switchReserveTab('room')">객실</button>
+                <button type="button" class="tab-btn" id="tab-dining-btn" onclick="switchReserveTab('dining')">다이닝</button>
+            </div>
+            <div class="tab-body">
+                <select name="hotelId" class="reserve-field" required>
+                    <option value="" disabled selected hidden>호텔 선택</option>
+                    <option value="1">CIEL HOTEL</option>
+                    <option value="2">LE CIEL</option>
+                </select>
+                <div id="room-fields">
+                    <input type="text" name="daterange" class="reserve-field" placeholder="체크인 / 체크아웃" readonly style="background-color: #fff;">
+                </div>
+                <div id="dining-fields" style="display: none;">
+                    <input type="date" name="visitDate" class="reserve-field">
+                </div>
+                <select name="adults" class="reserve-field">
+                    <option value="1">성인 1명</option>
+                    <option value="2" selected>성인 2명</option>
+                    <option value="3">성인 3명</option>
+                </select>
+                <button type="submit" class="search-submit-btn">검색 하기</button>
+            </div>
+        </form>
+    </div>
 </div>
 </body>
 </html>

@@ -6,34 +6,135 @@
   <meta charset="utf-8"/>
   <title>셔틀 예약</title>
   <link rel="stylesheet" href="">
+
   <style>
     :root{--bg:#F7F2EC;--card:#fff;--line:#E3D6C9;--text:#2C2420;--muted:#7A6A5C;--brand:#7B5A46;--danger:#B42318;}
     body{background:var(--bg);color:var(--text);}
-    .container{max-width:1100px;margin:0 auto;padding:26px 18px;}
+    .container{max-width:1100px;margin:0 auto;padding:90px 18px 26px;}
+
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
     @media (max-width:980px){.grid{grid-template-columns:1fr;}}
+
     table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
-    th,td{padding:10px 10px;border-bottom:1px solid var(--line);font-size:13px;}
+    th,td{padding:10px 10px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle;}
     th{background:#FBF7F3;text-align:left;}
     tr:last-child td{border-bottom:none;}
+
     .pill{display:inline-flex;gap:8px;align-items:center;padding:7px 11px;border-radius:999px;border:1px solid var(--line);background:#FBF7F3;font-size:13px;}
     .muted{color:var(--muted);font-size:13px;}
-    .btn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px;font-weight:800;cursor:pointer;}
+
+    .btn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;font-weight:900;cursor:pointer;}
     .btn-primary{background:var(--brand);color:#fff;border-color:transparent;}
-    .btn-danger{background:var(--danger);color:#fff;border-color:transparent;}
-    .qty{width:80px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;}
-    .notice{padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:#E7F3EA;color:#2F7D57;font-size:13px;margin-bottom:10px;}
+    .btn:disabled{opacity:.55;cursor:not-allowed;}
+
+    .qty{width:90px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;}
+
+    .warn{
+      display:none;
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#FFF4E6;
+      color:#B15500;
+      font-size:13px;
+    }
+
+    .footerRow{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin-top:14px;
+    }
   </style>
+
   <script>
-  /*<![CDATA[*/
-  /*]]>*/
+    /*<![CDATA[*/
+    function toInt(v){
+      const n = parseInt(v, 10);
+      return isNaN(n) ? 0 : n;
+    }
+
+    function sumInputs(selector){
+      let s = 0;
+      document.querySelectorAll(selector).forEach(el => s += toInt(el.value));
+      return s;
+    }
+
+    function clampInput(el, max){
+      let v = toInt(el.value);
+      if (v < 0) v = 0;
+      if (v > max) v = max;
+      el.value = v;
+      return v;
+    }
+
+    function updateBlock(leg){
+      const maxTicket = toInt(document.getElementById("maxTicket").value);
+      const inputs = document.querySelectorAll(`input[data-leg="${leg}"]`);
+      const warnEl = document.getElementById(`${leg}Warn`);
+      const sumEl  = document.getElementById(`${leg}Sum`);
+
+      inputs.forEach(el => el.max = maxTicket);
+
+      const total = sumInputs(`input[data-leg="${leg}"]`);
+      if (sumEl) sumEl.textContent = total;
+
+      const ok = total <= maxTicket;
+      if (!ok){
+        warnEl.style.display = "block";
+        warnEl.innerText = `현재 합계 ${total}명 → 최대 ${maxTicket}명 초과입니다. (같은 방향 합계는 최대 티켓을 넘을 수 없음)`;
+      }
+      else{
+        warnEl.style.display = "none";
+      }
+      return ok;
+    }
+
+    function onQtyInput(e){
+      const el = e.target;
+      const leg = el.dataset.leg;
+      const maxTicket = toInt(document.getElementById("maxTicket").value);
+
+      clampInput(el, maxTicket);
+
+      const ok = updateBlock(leg);
+      if(!ok){
+        const prev = toInt(el.dataset.prev);
+        el.value = prev;
+        updateBlock(leg);
+        alert("같은 방향 합계가 최대 티켓 수를 초과할 수 없습니다.");
+      }
+      else{
+        el.dataset.prev = el.value;
+      }
+
+      const okTo = updateBlock("TO");
+      const okFrom = updateBlock("FROM");
+      document.getElementById("confirmBtn").disabled = !(okTo && okFrom);
+    }
+
+    function initQtyValidation(){
+      document.querySelectorAll('input[data-leg="TO"], input[data-leg="FROM"]').forEach(el => {
+        el.dataset.prev = el.value || "0";
+        el.addEventListener("input", onQtyInput);
+      });
+
+      const okTo = updateBlock("TO");
+      const okFrom = updateBlock("FROM");
+      document.getElementById("confirmBtn").disabled = !(okTo && okFrom);
+    }
+
+    document.addEventListener("DOMContentLoaded", initQtyValidation);
+    /*]]>*/
   </script>
 </head>
 
 <body>
 <div class="container">
 
+  <!-- 상단 요약 -->
   <div class="card">
     <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;">
       <div>
@@ -43,124 +144,129 @@
           호텔: <b th:text="${page.reservation.hotelName}"></b>
         </div>
       </div>
-      <div class="pill">최대 티켓: <b th:text="${page.reservation.guestCount}"></b></div>
+      <div class="pill">
+        최대 티켓:
+        <b th:text="${page.reservation.guestCount}"></b>
+      </div>
     </div>
     <div class="muted" style="margin-top:8px;">
-      취소 규정: 전날 18:00까지 / 시간 변경은 취소 후 재예약
+      안내: 같은 방향(호텔행/행선지행) 합계는 최대 티켓을 넘을 수 없습니다. / 시간 변경은 “입력 수정 후 예약 확정”으로 반영됩니다.
     </div>
   </div>
 
-  <div class="grid">
+  <!-- 확정 버튼 1개: TO/FROM을 한 번에 전송 -->
+  <form th:action="@{/shuttle/confirm}" method="post">
+    <input type="hidden" name="reservationId" th:value="${page.reservation.reservationId}">
+    <input type="hidden" id="maxTicket" th:value="${page.reservation.guestCount}">
+    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
-    <!-- TO_HOTEL -->
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <b>호텔행 (체크인)</b>
-        <span class="pill">탑승일: <b th:text="${#dates.format(page.toRideDate,'yyyy-MM-dd')}"></b></span>
-      </div>
+    <div class="grid">
 
-      <div th:if="${page.toBookedLeg != null and page.toBookedLeg.legStatus == 'BOOKED'}" class="notice">
-        이미 예약됨:
-        <b th:text="${page.toBookedLeg.placeCode}"></b> /
-        <b th:text="${page.toBookedLeg.departTime}"></b> /
-        <b th:text="${page.toBookedLeg.ticketQty}"></b>매
-        <form th:action="@{/shuttle/cancel}" method="post" style="display:inline;">
-          <input type="hidden" name="reservationId" th:value="${page.reservation.reservationId}">
-          <input type="hidden" name="legType" value="TO_HOTEL">
-          <button class="btn btn-danger" type="submit" style="margin-left:10px;">취소</button>
-          <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-        </form>
-      </div>
+      <!-- TO_HOTEL -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <b>호텔행 (체크인)</b>
+          <span class="pill">
+            탑승일: <b th:text="${#dates.format(page.toRideDate,'yyyy-MM-dd')}"></b>
+          </span>
+        </div>
 
-      <table>
-        <thead>
-        <tr>
-          <th style="width:90px;">시간</th>
-          <th>픽업</th>
-          <th style="width:90px;">잔여</th>
-          <th style="width:230px;">예약</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="t : ${page.toList}">
-          <td th:text="${t.departTime}"></td>
-          <td th:text="${t.placeName}"></td>
-          <td><b th:text="${t.remaining}"></b><span class="muted"> / </span><span class="muted" th:text="${t.capacity}"></span></td>
-          <td>
-            <form th:action="@{/shuttle/book}" method="post" style="display:flex;gap:8px;align-items:center;">
-              <input type="hidden" name="reservationId" th:value="${page.reservation.reservationId}">
-              <input type="hidden" name="legType" value="TO_HOTEL">
-              <input type="hidden" name="timetableId" th:value="${t.timetableId}">
-              <input class="qty" type="number" name="ticketQty" min="1" value="1"
+        <div class="muted" style="margin-bottom:8px;">
+          현재 합계: <b id="TOSum">0</b> 명
+        </div>
+        <div id="TOWarn" class="warn"></div>
+
+        <table>
+          <thead>
+          <tr>
+            <th style="width:90px;">시간</th>
+            <th>픽업</th>
+            <th style="width:90px;">잔여</th>
+            <th style="width:140px;">인원</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="t : ${page.toList}">
+            <td>
+              <input type="hidden" name="toTimetableIds" th:value="${t.timetableId}">
+              <span th:text="${t.departTime}"></span>
+            </td>
+            <td th:text="${t.placeName}"></td>
+            <td>
+              <b th:text="${t.remaining}"></b>
+              <span class="muted"> / </span>
+              <span class="muted" th:text="${t.capacity}"></span>
+            </td>
+            <td>
+              <input class="qty"
+                     type="number"
+                     name="toQtys"
+                     min="0"
                      th:attr="max=${page.reservation.guestCount}"
-                     th:disabled="${page.toBookedLeg != null and page.toBookedLeg.legStatus=='BOOKED'}">
-              <button class="btn btn-primary" type="submit"
-                      th:disabled="${(page.toBookedLeg != null and page.toBookedLeg.legStatus=='BOOKED') or (t.remaining <= 0)}">
-                예약
-              </button>
-              <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-            </form>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- FROM_HOTEL -->
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <b>행선지행 (체크아웃)</b>
-        <span class="pill">탑승일: <b th:text="${#dates.format(page.fromRideDate,'yyyy-MM-dd')}"></b></span>
+                     th:value="${t.myQty != null ? t.myQty : 0}"
+                     data-leg="TO">
+            </td>
+          </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div th:if="${page.fromBookedLeg != null and page.fromBookedLeg.legStatus == 'BOOKED'}" class="notice">
-        이미 예약됨:
-        <b th:text="${page.fromBookedLeg.placeCode}"></b> /
-        <b th:text="${page.fromBookedLeg.departTime}"></b> /
-        <b th:text="${page.fromBookedLeg.ticketQty}"></b>매
-        <form th:action="@{/shuttle/cancel}" method="post" style="display:inline;">
-          <input type="hidden" name="reservationId" th:value="${page.reservation.reservationId}">
-          <input type="hidden" name="legType" value="FROM_HOTEL">
-          <button class="btn btn-danger" type="submit" style="margin-left:10px;">취소</button>
-          <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-        </form>
-      </div>
+      <!-- FROM_HOTEL -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <b>행선지행 (체크아웃)</b>
+          <span class="pill">
+            탑승일: <b th:text="${#dates.format(page.fromRideDate,'yyyy-MM-dd')}"></b>
+          </span>
+        </div>
 
-      <table>
-        <thead>
-        <tr>
-          <th style="width:90px;">시간</th>
-          <th>도착지</th>
-          <th style="width:90px;">잔여</th>
-          <th style="width:230px;">예약</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="t : ${page.fromList}">
-          <td th:text="${t.departTime}"></td>
-          <td th:text="${t.placeName}"></td>
-          <td><b th:text="${t.remaining}"></b><span class="muted"> / </span><span class="muted" th:text="${t.capacity}"></span></td>
-          <td>
-            <form th:action="@{/shuttle/book}" method="post" style="display:flex;gap:8px;align-items:center;">
-              <input type="hidden" name="reservationId" th:value="${page.reservation.reservationId}">
-              <input type="hidden" name="legType" value="FROM_HOTEL">
-              <input type="hidden" name="timetableId" th:value="${t.timetableId}">
-              <input class="qty" type="number" name="ticketQty" min="1" value="1"
+        <div class="muted" style="margin-bottom:8px;">
+          현재 합계: <b id="FROMSum">0</b> 명
+        </div>
+        <div id="FROMWarn" class="warn"></div>
+
+        <table>
+          <thead>
+          <tr>
+            <th style="width:90px;">시간</th>
+            <th>도착지</th>
+            <th style="width:90px;">잔여</th>
+            <th style="width:140px;">인원</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="t : ${page.fromList}">
+            <td>
+              <input type="hidden" name="fromTimetableIds" th:value="${t.timetableId}">
+              <span th:text="${t.departTime}"></span>
+            </td>
+            <td th:text="${t.placeName}"></td>
+            <td>
+              <b th:text="${t.remaining}"></b>
+              <span class="muted"> / </span>
+              <span class="muted" th:text="${t.capacity}"></span>
+            </td>
+            <td>
+              <input class="qty"
+                     type="number"
+                     name="fromQtys"
+                     min="0"
                      th:attr="max=${page.reservation.guestCount}"
-                     th:disabled="${page.fromBookedLeg != null and page.fromBookedLeg.legStatus=='BOOKED'}">
-              <button class="btn btn-primary" type="submit"
-                      th:disabled="${(page.fromBookedLeg != null and page.fromBookedLeg.legStatus=='BOOKED') or (t.remaining <= 0)}">
-                예약
-              </button>
-              <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-            </form>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
+                     th:value="${t.myQty != null ? t.myQty : 0}"
+                     data-leg="FROM">
+            </td>
+          </tr>
+          </tbody>
+        </table>
 
-  </div>
+        <div class="footerRow">
+          <button id="confirmBtn" class="btn btn-primary" type="submit">예약 확정</button>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
 </div>
 </body>
 </html>

@@ -16,4 +16,7 @@ public class ShuttleTimetableDTO {
     private Integer capacity;
     private Integer bookedQty;
     private Integer remaining;
+
+    // ✅ 내가 이 시간표에 입력/예약한 수량(없으면 0)
+    private Integer myQty;
 }

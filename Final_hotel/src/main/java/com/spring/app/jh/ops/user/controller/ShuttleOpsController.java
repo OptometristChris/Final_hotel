@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import com.spring.app.jh.ops.user.domain.ShuttleConfirmPageDTO;
 import com.spring.app.jh.ops.user.domain.ShuttleReservePageDTO;
 import com.spring.app.jh.ops.user.service.ShuttleOpsService;
 import com.spring.app.jh.security.domain.Session_GuestDTO;
@@ -35,31 +36,42 @@ public class ShuttleOpsController {
 
         return "shuttle/reserve";
     }
+    
+    
 
-    @PostMapping("/book")
-    public String book(@RequestParam long reservationId,
-                       @RequestParam String legType,
-                       @RequestParam long timetableId,
-                       @RequestParam int ticketQty,
-                       HttpSession session) {
+    
+    @PostMapping("/confirm")
+    public String confirm(@RequestParam long reservationId,
+                          @RequestParam(required = false) java.util.List<Long> toTimetableIds,
+                          @RequestParam(required = false) java.util.List<Integer> toQtys,
+                          @RequestParam(required = false) java.util.List<Long> fromTimetableIds,
+                          @RequestParam(required = false) java.util.List<Integer> fromQtys,
+                          HttpSession session) {
 
         Integer memberNo = getSessionMemberNo(session);
         if (memberNo == null) return "redirect:/security/login";
 
-        shuttleService.bookLeg(reservationId, memberNo, legType, timetableId, ticketQty);
-        return "redirect:/shuttle/reserve?reservationId=" + reservationId;
+        shuttleService.confirm(reservationId, memberNo,
+                toTimetableIds, toQtys,
+                fromTimetableIds, fromQtys);
+
+        return "redirect:/shuttle/confirm/view";
     }
-
-    @PostMapping("/cancel")
-    public String cancel(@RequestParam long reservationId,
-                         @RequestParam String legType,
-                         HttpSession session) {
+    
+    @GetMapping("/confirm/view")
+    public String confirmView(HttpSession session, Model model) {
 
         Integer memberNo = getSessionMemberNo(session);
         if (memberNo == null) return "redirect:/security/login";
 
-        shuttleService.cancelLeg(reservationId, memberNo, legType);
-        return "redirect:/shuttle/reserve?reservationId=" + reservationId;
+        ShuttleConfirmPageDTO page = shuttleService.getConfirmPage(memberNo);
+
+        model.addAttribute("memberName", page.getMemberName());
+        model.addAttribute("memberNo", memberNo);
+        model.addAttribute("validCount", page.getValidCount());
+        model.addAttribute("cards", page.getCards());
+
+        return "shuttle/confirm_view";
     }
 
     private Integer getSessionMemberNo(HttpSession session) {
@@ -71,4 +83,6 @@ public class ShuttleOpsController {
 
         return null;
     }
+    
+    
 }

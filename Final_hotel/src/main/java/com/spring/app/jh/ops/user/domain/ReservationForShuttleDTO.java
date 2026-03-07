@@ -17,4 +17,9 @@ public class ReservationForShuttleDTO {
     private Date checkoutDate;
 
     private String reservationStatus; // CONFIRMED
+
+    // ===== confirm(view)에서 사용하는 확장 필드 =====
+    private String roomName;
+    private String roomImageUrl;
+    private String memberName;
 }
