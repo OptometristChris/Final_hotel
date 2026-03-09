@@ -98,6 +98,10 @@
         (hotel_id,
          hotel_name,
          address,
+         
+         LATITUDE,
+    	 LONGITUDE,
+         
          contact,
          hotel_desc,
          approve_status,
@@ -107,6 +111,10 @@
         (#{hotel_id},
          #{hotel_name},
          #{address},
+         
+          #{latitude},
+    	  #{longitude},
+         
          #{contact},
          #{hotel_desc},
          #{approve_status},
