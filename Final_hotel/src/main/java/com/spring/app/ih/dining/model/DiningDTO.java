@@ -21,4 +21,5 @@ public class DiningDTO {
     private String food_imgs;
     private String menu_pdf;
     private String extra_info;
+	private String available_times;
 }

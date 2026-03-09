@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::content})}">
+<head>
+    <title>CONFIRM RESERVATION | [[${res.diningName}]]</title>
+    
+    <th:block th:fragment="link"></th:block>
+    
+    <th:block th:fragment="style">
+	    <style>
+	        :root { --hotel-gold: #9d815d; --hotel-dark: #222222; }
+	        body { background-color: #f8f9fa; font-family: 'Noto Serif KR', serif; }
+	        
+	        .confirm-container { 
+	            max-width: 800px; margin: 50px auto; 
+	            background: white; padding: 60px; border-radius: 5px;
+	            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+	        }
+	        
+	        .info-row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #f2f2f2; }
+	        .info-label { color: #888; font-weight: 400; }
+	        .info-value { color: #222; font-weight: 500; }
+	        
+	        .price-box { background: #fafafa; padding: 30px; margin-top: 30px; border: 1px solid #eee; text-align: center; }
+	        .total-price { font-size: 2rem; color: var(--hotel-gold); font-weight: 700; }
+	        
+	        .btn-pay { 
+	            background: var(--hotel-dark); color: white !important; border: none;
+	            padding: 20px; width: 100%; font-size: 1.2rem; font-weight: bold;
+	            letter-spacing: 2px; margin-top: 30px; transition: 0.3s;
+	        }
+	        .btn-pay:hover { background: #000; }
+	    </style>
+	</th:block>
+
+	<th:block th:fragment="script">
+	    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+	    <script th:inline="javascript"> 
+	        
+	        //const contextPath = /*[[${#httpServletRequest != null ? #httpServletRequest.contextPath : ''}]]*/ '';
+	
+	        const currentDiningId = /*[[${res.diningId}]]*/ 0;
+	        
+	        function requestPay() {
+	            var IMP = window.IMP; 
+	            IMP.init("imp76388561"); 
+	
+	            var resData = /*[[${res}]]*/ {};
+	            var totalAmount = /*[[${totalAmount}]]*/ 0;
+	
+	            IMP.request_pay({
+	                pg: "html5_inicis",
+	                pay_method: "card",
+	                merchant_uid: "ORD_" + new Date().getTime(),
+	                name: "다이닝 예약금 결제",
+	                amount: 100, // 테스트용 100원
+	                buyer_email: resData.guestEmail || "",
+	                buyer_name: resData.guestName || "고객",
+	                buyer_tel: resData.guestPhone || ""
+	            }, function (rsp) {
+	                if (rsp.success) {
+	                    let moveUrl = "complete"
+	                                + "?imp_uid=" + rsp.imp_uid
+	                                + "&diningId=" + currentDiningId;
+	        
+	                    location.href = moveUrl;
+	                } else {
+	                    alert("결제 실패: " + rsp.error_msg);
+	                }
+	            });
+	        }
+	    </script>
+	</th:block>
+    
+        
+    
+</head>
+
+<body>
+    <th:block th:fragment="content">
+        <div class="confirm-container">
+            <div class="text-center mb-5">
+                <span style="color: var(--hotel-gold); letter-spacing: 3px;">CONFIRMATION</span>
+                <h2 class="mt-2">예약 정보 확인</h2>
+                <hr style="width: 40px; border-top: 2px solid var(--hotel-gold); margin: 20px auto;">
+                <p class="text-muted small">입력하신 정보가 맞는지 다시 한번 확인해 주세요.</p>
+            </div>
+
+            <div class="info-section">
+                <div class="info-row">
+                    <span class="info-label">예약 업장</span>
+                    <span class="info-value">[[${res.diningName}]]</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">예약 일시</span>
+                    <span class="info-value">[[${res.resDate}]] / [[${res.resTime}]]</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">예약 인원</span>
+                    <span class="info-value">성인 [[${res.adultCount}]] / 어린이 [[${res.childCount}]] / 유아 [[${res.infantCount}]]</span>
+                </div>
+                <div class="info-row" th:if="${res.specialRequests != null && res.specialRequests != ''}">
+                    <span class="info-label">요청 사항</span>
+                    <span class="info-value">[[${res.specialRequests}]]</span>
+                </div>
+            </div>
+
+            <div class="price-box">
+                <p class="mb-1 small text-muted">최종 결제 금액 (예약금)</p>
+                <div class="total-price">
+                    <span th:text="${#numbers.formatInteger(totalAmount, 3, 'COMMA')}">0</span>원
+                </div>
+                <p class="mt-2 small text-danger">* 예약금은 방문 시 전체 금액에서 차감됩니다.</p>
+            </div>
+
+            <button type="button" class="btn-pay shadow" onclick="requestPay()">
+                결제 및 예약 확정하기
+            </button>
+            
+            <div class="text-center mt-4">
+                <a href="javascript:history.back()" class="text-secondary small" style="text-decoration: underline;">정보 수정하기</a>
+            </div>
+        </div>
+    </th:block>
+</body>
+</html>
