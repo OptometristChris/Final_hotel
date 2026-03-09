@@ -106,6 +106,13 @@ button:hover {
 		            th:text="${i} + ' 명'">
 		    </option>
 		</select>
+		
+		 <hr>
+		
+		<h3>예약자 정보</h3>
+	    <p>예약자 : <span th:text="${memberName}"></span></p>
+		<p>연락처 : <span th:text="${memberMobile}"></span></p>
+		<p>이메일 : <span th:text="${memberEmail}"></span></p>
 
         <br><br>
 
@@ -177,8 +184,8 @@ function requestPay() {
         merchant_uid: "hotel_" + new Date().getTime(),
         name: "호텔 예약 결제",
         amount: 100,
-        buyer_name: "테스트사용자",
-        buyer_tel: "01012345678"
+        buyer_name: "[[${memberName}]]",
+        buyer_tel: "[[${memberMobile}]]"
     }, function (rsp) {
 
         if (rsp.success) {
@@ -189,6 +196,7 @@ function requestPay() {
                 body: JSON.stringify({
                     imp_uid: rsp.imp_uid,
                     merchant_uid: rsp.merchant_uid,
+                    member_no: "[[${memberNo}]]",
                     room_type_id: document.querySelector("input[name='room_type_id']").value,
                     check_in: document.querySelector("input[name='check_in']").value,
                     check_out: document.querySelector("input[name='check_out']").value,

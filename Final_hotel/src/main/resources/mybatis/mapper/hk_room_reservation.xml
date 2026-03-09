@@ -95,15 +95,16 @@
 	  <select id="findByReservationCode" parameterType="string" resultType="map">
 
 	    SELECT
-	        reservation_code,
-	        checkin_date,
-	        checkout_date,
-	        total_price,
-	        guest_count,
-	        reservation_status,
-	        cancel_deadline
-	    FROM RESERVATION
-	    WHERE reservation_code = #{value}
+		    r.reservation_code,
+		    m.name,
+		    r.checkin_date,
+		    r.checkout_date,
+		    r.total_price,
+		    r.guest_count
+		FROM reservation r
+		JOIN tbl_member_security m
+		ON r.member_no = m.member_no
+		WHERE r.reservation_code = #{value}
 	
 	  </select>
 

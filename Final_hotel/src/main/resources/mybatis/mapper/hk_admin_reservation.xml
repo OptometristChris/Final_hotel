@@ -10,12 +10,16 @@
 	<select id="getTodayCheckinList" resultType="map">	
 		SELECT
 		    r.reservation_id,
+		    m.name,
 		    rt.room_name,
 		    r.checkin_date,
 		    r.checkout_date,
 		    r.total_price,
 		    r.reservation_status
 		FROM reservation r
+		
+		JOIN TBL_MEMBER_SECURITY m
+		ON r.member_no = m.member_no
 		
 		JOIN room_type rt
 		ON r.room_type_id = rt.room_type_id
