@@ -63,99 +63,75 @@ public class PromotionController {
     @GetMapping("/write")
     public ModelAndView promotionWrite(@RequestParam("hotelId") String hotelId, ModelAndView mav) {
         mav.addObject("hotelId", hotelId);
-        // HTML 파일명이 promotionWrite.html인 경우 아래와 같이 설정
         mav.setViewName("js/promotion/write"); 
         return mav;
     }
 
     /**
-     * [관리자] 프로모션 등록 처리 (DB 저장 + 배포 폴더 + static 폴더 동시 저장)
+     * [관리자] 프로모션 등록 처리
      */
     @PostMapping("/writeEnd")
     public ModelAndView promotionWriteEnd(ModelAndView mav, 
                                          HttpServletRequest request,
-                                         HttpSession session,
+                                         @RequestParam(value="price", defaultValue="0") String price,
+                                         @RequestParam(value="discount_rate", defaultValue="0") String discountRate,
+                                         @RequestParam(value="discount_amount", defaultValue="0") String discountAmount,
                                          @RequestParam("attach") MultipartFile attach) {
         
-        // 1. 모든 파라미터 수집 (빠진 항목들 추가)
-        String hotelId = request.getParameter("fk_hotel_id");
-        String title = request.getParameter("title");
-        String price = request.getParameter("price");             // [추가]
-        String discountRate = request.getParameter("discount_rate");
-        String discountAmount = request.getParameter("discount_amount"); // [추가]
-        String startDate = request.getParameter("start_date");
-        String endDate = request.getParameter("end_date");
-        String subtitle = request.getParameter("subtitle");       // [추가]
-        String benefits = request.getParameter("benefits");       // [추가]
-        String sortOrder = request.getParameter("sort_order");     // [추가]
-        String isActive = request.getParameter("is_active");       // [추가]
-        String bannerType = request.getParameter("banner_type");   // [추가]
-
         Map<String, String> paraMap = new HashMap<>();
-        paraMap.put("fk_hotel_id", hotelId);
-        paraMap.put("title", title);
-        paraMap.put("price", (price == null || "".equals(price)) ? "0" : price); // null 방지
-        paraMap.put("discount_rate", (discountRate == null || "".equals(discountRate)) ? "0" : discountRate);
-        paraMap.put("discount_amount", (discountAmount == null || "".equals(discountAmount)) ? "0" : discountAmount);
-        paraMap.put("start_date", startDate);
-        paraMap.put("end_date", endDate);
-        paraMap.put("subtitle", subtitle);
-        paraMap.put("benefits", benefits);
-        paraMap.put("sort_order", (sortOrder == null) ? "1" : sortOrder);
-        paraMap.put("is_active", isActive);
-        paraMap.put("banner_type", bannerType);
+        
+        // 1. 일반 파라미터 수집 (request.getParameter 대신 안전하게 수집)
+        paraMap.put("fk_hotel_id", request.getParameter("fk_hotel_id"));
+        paraMap.put("title", request.getParameter("title"));
+        paraMap.put("start_date", request.getParameter("start_date"));
+        paraMap.put("end_date", request.getParameter("end_date"));
+        paraMap.put("subtitle", request.getParameter("subtitle"));
+        paraMap.put("benefits", request.getParameter("benefits"));
+        paraMap.put("sort_order", request.getParameter("sort_order"));
+        paraMap.put("is_active", request.getParameter("is_active"));
+        paraMap.put("banner_type", request.getParameter("banner_type"));
 
-     // 2. 파일 업로드 처리
+        // 2. 숫자형 데이터 정제 (콤마 제거 및 Null 방지)
+        // 자바스크립트에서 이미 제거했지만, 서버에서 한 번 더 처리하여 안전하게 만듭니다.
+        paraMap.put("price", price.replaceAll("[^0-9]", "")); 
+        paraMap.put("discount_rate", discountRate.isEmpty() ? "0" : discountRate);
+        paraMap.put("discount_amount", discountAmount.replaceAll("[^0-9]", ""));
+
+        // 3. 파일 업로드 처리 (이전과 동일)
         if (attach != null && !attach.isEmpty()) {
             String originalFilename = attach.getOriginalFilename();
-            
-            // 파일 이름을 먼저 Map에 넣어줍니다. (이게 빠져서 DB 에러가 난 것입니다!)
             paraMap.put("image_url", originalFilename); 
 
-            String root = session.getServletContext().getRealPath("/");
-            String deployPath = root + "file_images" + File.separator + "js";
-            
             String projectPath = System.getProperty("user.dir");
+            String deployPath = projectPath + File.separator + "file_images" + File.separator + "js";
             String staticPath = projectPath + File.separator + "src" + File.separator + "main" + 
                                 File.separator + "resources" + File.separator + "static" + 
                                 File.separator + "images" + File.separator + "js";
 
             try {
                 byte[] fileData = attach.getBytes();
-
-                // 1. 배포 경로 처리
                 File deployDir = new File(deployPath);
                 if(!deployDir.exists()) deployDir.mkdirs();
-                
-                File deployFile = new File(deployPath, originalFilename);
-                FileCopyUtils.copy(fileData, deployFile);
+                FileCopyUtils.copy(fileData, new File(deployPath, originalFilename));
 
-                // 2. static 경로 처리
                 File staticDir = new File(staticPath);
                 if(!staticDir.exists()) staticDir.mkdirs();
-                
-                File staticFile = new File(staticPath, originalFilename);
-                FileCopyUtils.copy(fileData, staticFile);
-
-                System.out.println("✅ 파일 저장 및 이름 Map 추가 완료: " + originalFilename);
-
+                FileCopyUtils.copy(fileData, new File(staticPath, originalFilename));
             } catch (IOException e) {
-                System.err.println("❌ 파일 저장 중 오류 발생!");
                 e.printStackTrace();
             }
         } else {
-            // 파일을 업로드하지 않았을 경우 기본값이나 빈 문자열 처리
             paraMap.put("image_url", ""); 
         }
 
-        // 3. DB Insert
+        // 4. DB Insert 및 응답 처리
         int n = promotionService.insertPromotion(paraMap);
-
+        
         if(n == 1) {
-            mav.addObject("message", "프로모션이 성공적으로 등록되었습니다.");
-            mav.addObject("loc", request.getContextPath() + "/promotion/list?hotelId=" + hotelId);
+            mav.addObject("message", "프로모션이 등록되었습니다.");
+            mav.addObject("loc", request.getContextPath() + "/promotion/list?hotelId=" + paraMap.get("fk_hotel_id"));
         } else {
-            mav.addObject("message", "DB 등록에 실패했습니다.");
+            mav.addObject("message", "등록 실패!");
             mav.addObject("loc", "javascript:history.back()");
         }
 
