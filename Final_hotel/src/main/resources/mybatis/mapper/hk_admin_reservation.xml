@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="adminReservation">
+
+	<!-- 오늘 체크인 -->
+	<select id="getTodayCheckinList" resultType="map">	
+		SELECT
+		    r.reservation_id,
+		    rt.room_name,
+		    r.checkin_date,
+		    r.checkout_date,
+		    r.total_price,
+		    r.reservation_status
+		FROM reservation r
+		
+		JOIN room_type rt
+		ON r.room_type_id = rt.room_type_id
+		
+		WHERE r.checkin_date >= TRUNC(SYSDATE)
+		AND r.checkin_date <![CDATA[ < ]]>  TRUNC(SYSDATE) + 1
+		AND r.reservation_status = 'CONFIRMED'
+		
+		ORDER BY r.checkin_date	
+	</select>
+	
+	
+	<!-- 오늘 체크아웃 -->
+	<select id="getTodayCheckoutList" resultType="map">
+		SELECT
+		    r.reservation_id,
+		    rt.room_name,
+		    r.checkin_date,
+		    r.checkout_date,
+		    r.total_price,
+		    r.reservation_status
+		FROM reservation r
+		
+		JOIN room_type rt
+		ON r.room_type_id = rt.room_type_id
+		
+		WHERE r.checkout_date >= TRUNC(SYSDATE)
+		AND r.checkout_date <![CDATA[ < ]]> TRUNC(SYSDATE) + 1
+		AND r.reservation_status = 'CHECKED_IN'
+		
+		ORDER BY r.checkout_date
+	</select>
+	
+	
+	
+	<!-- 체크인 -->
+	<update id="checkinReservation">	
+		UPDATE reservation
+		SET reservation_status = 'CHECKED_IN'
+		WHERE reservation_id = #{reservationId}
+	</update>
+	
+	
+		<!-- 체크아웃 -->	
+	<update id="checkoutReservation">
+		UPDATE reservation
+		SET reservation_status = 'CHECKED_OUT'
+		WHERE reservation_id = #{reservationId}
+	</update>
+	
+	
+	
+	<!-- 투숙중 조회. (체크인 버튼 누르면. )-->
+	<select id="getStayList" resultType="map">	
+		SELECT
+		    r.reservation_id,
+		    rt.room_name,
+		    r.checkin_date,
+		    r.checkout_date,
+		    r.total_price,
+		    r.reservation_status
+		FROM reservation r
+		
+		JOIN room_type rt
+		ON r.room_type_id = rt.room_type_id
+		
+		WHERE r.reservation_status = 'CHECKED_IN'
+		
+		ORDER BY r.checkin_date	
+	</select>
+	
+	
+	
+	<!-- 체크아웃 완료 목록 -->
+	<select id="getCheckoutCompleteList" resultType="map">
+		SELECT
+		    r.reservation_id,
+		    rt.room_name,
+		    r.checkin_date,
+		    r.checkout_date,
+		    r.total_price,
+		    r.reservation_status
+		FROM reservation r
+		JOIN room_type rt
+		ON r.room_type_id = rt.room_type_id
+		
+		WHERE r.reservation_status = 'CHECKED_OUT'
+		
+		ORDER BY r.checkout_date
+	</select>
+	
+	
+
+
+</mapper>

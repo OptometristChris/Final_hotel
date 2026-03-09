@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+<meta charset="UTF-8">
+<title>예약 관리</title>
+
+<style>
+
+/* 페이지 기본 */
+body{
+font-family: Arial;
+margin:40px;
+}
+
+/* 테이블 스타일 */
+table{
+border-collapse:collapse;
+width:100%;
+margin-bottom:40px;
+}
+
+/* 셀 */
+th,td{
+border:1px solid #ddd;
+padding:10px;
+text-align:center;
+}
+
+/* 헤더 */
+th{
+background:#f3f3f3;
+}
+
+/* 버튼 */
+button{
+padding:6px 12px;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>관리자 예약 관리</h2>
+
+
+<!-- ================================ -->
+<!-- 1. 오늘 체크인 -->
+<!-- ================================ -->
+
+<h3>오늘 체크인</h3>
+
+<table>
+
+<tr>
+<th>예약번호</th>
+<th>객실</th>
+<th>체크인</th>
+<th>체크아웃</th>
+<th>금액</th>
+<th>관리</th>
+</tr>
+
+<tr th:each="r : ${checkinList}">
+
+<td th:text="${r['RESERVATION_ID']}"></td>
+
+<td th:text="${r['ROOM_NAME']}"></td>
+
+<!-- 날짜 포맷 -->
+<td th:text="${#dates.format(r['CHECKIN_DATE'],'yyyy-MM-dd')}"></td>
+
+<td th:text="${#dates.format(r['CHECKOUT_DATE'],'yyyy-MM-dd')}"></td>
+
+<td th:text="${r['TOTAL_PRICE']}"></td>
+
+<td>
+
+<!-- 체크인 버튼 -->
+<form th:action="@{/admin/reservation/checkin}" method="post"
+onsubmit="return confirm('체크인 처리하시겠습니까?')">
+
+<input type="hidden"
+name="reservationId"
+th:value="${r['RESERVATION_ID']}">
+
+<button type="submit">체크인</button>
+
+</form>
+
+</td>
+
+</tr>
+
+</table>
+
+
+
+<!-- ================================ -->
+<!-- 2. 투숙중 -->
+<!-- ================================ -->
+
+<h3>투숙중</h3>
+
+<table>
+
+<tr>
+<th>예약번호</th>
+<th>객실</th>
+<th>체크인</th>
+<th>체크아웃</th>
+<th>금액</th>
+<th>관리</th>
+</tr>
+
+<tr th:each="r : ${stayList}">
+
+<td th:text="${r['RESERVATION_ID']}"></td>
+
+<td th:text="${r['ROOM_NAME']}"></td>
+
+<td th:text="${#dates.format(r['CHECKIN_DATE'],'yyyy-MM-dd')}"></td>
+
+<td th:text="${#dates.format(r['CHECKOUT_DATE'],'yyyy-MM-dd')}"></td>
+
+<td th:text="${r['TOTAL_PRICE']}"></td>
+
+<td>
+
+<!-- 체크아웃 버튼 -->
+<form th:action="@{/admin/reservation/checkout}" method="post"
+onsubmit="return confirm('체크아웃 처리하시겠습니까?')">
+
+<input type="hidden"
+name="reservationId"
+th:value="${r['RESERVATION_ID']}">
+
+<button type="submit">체크아웃</button>
+
+</form>
+
+</td>
+
+</tr>
+
+</table>
+
+
+
+<!-- ================================ -->
+<!-- 3. 오늘 체크아웃 예정 -->
+<!-- ================================ -->
+
+<h3>오늘 체크아웃 예정</h3>
+
+<table>
+
+<tr>
+<th>예약번호</th>
+<th>객실</th>
+<th>체크인</th>
+<th>체크아웃</th>
+<th>금액</th>
+<th>상태</th>
+</tr>
+
+<tr th:each="r : ${checkoutList}">
+
+<td th:text="${r['RESERVATION_ID']}"></td>
+
+<td th:text="${r['ROOM_NAME']}"></td>
+
+<td th:text="${#dates.format(r['CHECKIN_DATE'],'yyyy-MM-dd')}"></td>
+
+<td th:text="${#dates.format(r['CHECKOUT_DATE'],'yyyy-MM-dd')}"></td>
+
+<td th:text="${r['TOTAL_PRICE']}"></td>
+
+<td>체크아웃 예정</td>
+
+</tr>
+
+</table>
+
+
+
+<!-- ================================ -->
+<!-- 4. 체크아웃 완료 -->
+<!-- ================================ -->
+
+<h3>체크아웃 완료</h3>
+
+<table>
+
+<tr>
+<th>예약번호</th>
+<th>객실</th>
+<th>체크인</th>
+<th>체크아웃</th>
+<th>금액</th>
+<th>상태</th>
+</tr>
+
+<tr th:each="r : ${checkoutCompleteList}">
+
+<td th:text="${r['RESERVATION_ID']}"></td>
+
+<td th:text="${r['ROOM_NAME']}"></td>
+
+<td th:text="${#dates.format(r['CHECKIN_DATE'],'yyyy-MM-dd')}"></td>
+
+<td th:text="${#dates.format(r['CHECKOUT_DATE'],'yyyy-MM-dd')}"></td>
+
+<td th:text="${r['TOTAL_PRICE']}"></td>
+
+<td>체크아웃 완료</td>
+
+</tr>
+
+</table>
+
+
+</body>
+</html>
