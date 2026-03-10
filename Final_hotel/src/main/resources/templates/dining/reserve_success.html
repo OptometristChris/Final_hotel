@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::content})}">
+      th:replace="~{js/layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::content})}">
 <head>
     <meta charset="UTF-8">
     <title>예약 완료 - 호텔 다이닝</title>
@@ -10,7 +10,7 @@
     <style th:fragment="style">
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&display=swap');
         
-        #mycontent { background-color: #f8f9fa; padding-bottom: 100px; }
+        #mycontent { background-color: #f8f9fa; padding-bottom: 100px; padding-top: 160px !important;}
         
         .success-container { 
             max-width: 800px; margin: 60px auto; 

@@ -1,17 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      th:replace="~{layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::content})}">
-
+      th:replace="~{js/layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::content})}">
 <head>
-    <title>DINING</title>
+    <title>DINING | CIEL HOTEL</title>
 
-    <link rel="stylesheet" href="">
+    <link th:fragment="link" rel="stylesheet" href="">
 
-    <style th:fragment="css">
+    <style th:fragment="style">
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&display=swap');
-        
-        #mycontent { background-color: #fff; padding-bottom: 100px; }
+        #mycontent { background-color: #fff; padding-bottom: 100px; padding-top: 160px !important;}
         .dining-header {
             margin-top: 60px; margin-bottom: 40px; text-align: center;
         }
@@ -89,13 +86,15 @@
         }
     </style>
 
-    <script th:fragment="script">
+	<script th:fragment="script">
+        $(document).ready(function() {
+
+        });
+
         function changeHotel(hotelId) {
-            // 타임리프 변수를 자바스크립트에서 쓰기 위해 선언
-            const selectedType = [[${selectedType}]];
+            const selectedType = '[[${selectedType}]]';
             let url = "/final_hotel/dining/all?hotel_id=" + hotelId;
-            
-            if(selectedType) {
+            if(selectedType && selectedType !== 'null' && selectedType !== '') {
                 url += "&d_type=" + selectedType;
             }
             location.href = url;
@@ -104,7 +103,7 @@
 </head>
 
 <body>
-    <div th:fragment="content" class="container">
+    <div th:fragment="content" id="mycontent" class="container">
         
         <div class="dining-header">
             <h2>DINING</h2>
