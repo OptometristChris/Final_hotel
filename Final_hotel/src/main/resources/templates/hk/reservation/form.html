@@ -140,7 +140,7 @@ button:hover {
 	<p class="summary-price">
 	    총 결제 금액:
 	    <span id="currencySymbol3">₩</span>
-	    <span id="totalPrice" th:text="${base_price}"></span>
+	    <span id="totalPrice" th:text="${room_price}"></span>
 	</p>
 
 </div>
@@ -173,17 +173,21 @@ function getCurrencySymbol(){
 /* 합산금액 */
 function calculateTotal() {
 
-    const breakfastCount = parseInt(document.getElementById("breakfastCount").value);
+    const breakfastCount =
+        parseInt(document.getElementById("breakfastCount").value);
 
     let roomTotal = baseRoomPrice;
 
-    let breakfastTotal = breakfastCount * nights * BREAKFAST_PRICE;
+    let breakfastTotal =
+        breakfastCount * nights * BREAKFAST_PRICE;
 
-    let subtotal = roomTotal + breakfastTotal;
-
+    // 세금 적용
     if(includeTax){
-        subtotal *= 1.1;
+        roomTotal *= 1.1;
+        breakfastTotal *= 1.1;
     }
+
+    const subtotal = roomTotal + breakfastTotal;
 
     let rate = 1;
 
