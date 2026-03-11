@@ -3,6 +3,7 @@ package com.spring.app.jh.security.auth.service;
 import java.util.Date;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -26,12 +27,10 @@ import com.spring.app.jh.security.model.RefreshTokenDAO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
 
 /* ===== (#JWT-SERVICE-02) ===== */
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class JwtAuthService_imple implements JwtAuthService {
 
@@ -58,6 +57,23 @@ public class JwtAuthService_imple implements JwtAuthService {
     private final MemberDAO memberDAO;
     private final AdminDAO adminDAO;
 
+
+    // 생성자를 직접 작성하여 어떤 Bean 을 넣을지 명확하게 지정한다.
+    public JwtAuthService_imple(
+            @Qualifier("memberAuthProvider") DaoAuthenticationProvider memberAuthProvider,
+            @Qualifier("adminAuthProvider") DaoAuthenticationProvider adminAuthProvider,
+            JwtTokenProvider jwtTokenProvider,
+            RefreshTokenDAO refreshTokenDAO,
+            MemberDAO memberDAO,
+            AdminDAO adminDAO) {
+
+        this.memberAuthProvider = memberAuthProvider;
+        this.adminAuthProvider = adminAuthProvider;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.refreshTokenDAO = refreshTokenDAO;
+        this.memberDAO = memberDAO;
+        this.adminDAO = adminDAO;
+    }
 
     // =====================================================================
     // 1) 회원 로그인
