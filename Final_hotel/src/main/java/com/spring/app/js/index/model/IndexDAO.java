@@ -7,6 +7,7 @@ import com.spring.app.js.promotion.domain.PromotionDTO;
 
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
+import java.util.Map;
 
 @Mapper // MyBatis 매퍼 인터페이스임을 명시
 public interface IndexDAO {
@@ -22,4 +23,10 @@ public interface IndexDAO {
 
     // 진행 중인 프로모션 리스트
     List<PromotionDTO> getPromoCardList();
+
+    // 객실 검색
+	List<RoomTypeDTO> getAvailableRooms(Map<String, Object> paraMap);
+
+	// 호텔 리스트
+	List<Map<String, String>> getHotelList();
 }

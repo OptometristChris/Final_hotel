@@ -75,7 +75,7 @@
     <div th:if="${promo != null}" class="container promo-detail-container">
         <div class="promo-header">
             <div>
-                <span th:text="${promo.fk_hotel_id == 1 ? 'CIEL HOTEL SEOUL' : 'LE CIEL BUSAN'}" 
+                <span th:text="${promo.fk_hotel_id == 1 ? 'CIEL HOTEL' : 'LE CIEL'}" 
                       style="color:#d4af37; font-weight:700; font-size:0.9rem; letter-spacing:1px;">지점명</span>
                 <h2 th:text="${promo.title}">패키지 제목</h2>
             </div>
@@ -126,20 +126,60 @@
             </div>
 
             <div class="btn-area">
-                <a th:href="@{/reservation/step1(promoId=${promo.promotion_id})}" class="btn-reserve">객실 예약하기</a>
-                <a th:href="@{/promotion/list(hotelId=${promo.fk_hotel_id})}" style="display:block; margin-top:25px; color:#888; text-decoration:none;">← 목록으로 돌아가기</a>
-            </div>
-        </div>
-    </div>
-
-    <div th:unless="${promo != null}" class="container" style="padding: 200px 0; text-align: center;">
-        <h3 style="color:#666;">해당 프로모션 정보를 불러올 수 없습니다.</h3>
-        <a th:href="@{/promotion/list}" class="btn-reserve" style="margin-top:20px; padding:15px 50px;">목록으로</a>
-    </div>
+			    <div style="display: flex; justify-content: center; gap: 15px; max-width: 600px; margin: 0 auto;">
+			        <a th:href="@{/reservation/step1(promoId=${promo.promotion_id})}" 
+			           class="btn-reserve" style="flex: 2; margin-top: 0;">
+			            프로모션 예약
+			        </a>
+			        
+			        <button type="button" 
+			                th:onclick="goDelete([[${promo.promotion_id}]], [[${promo.fk_hotel_id}]])"
+			                style="flex: 1; padding: 18px 0; background: #fff; border: 1px solid #e74c3c; color: #e74c3c; font-weight: 700; cursor: pointer; transition: 0.3s;">
+			            삭제하기
+			        </button>
+			    </div>
+			    
+			    <a th:href="@{/promotion/list(hotelId=${promo.fk_hotel_id})}" 
+			       style="display:block; margin-top:25px; color:#888; text-decoration:none; font-size: 0.95rem;">
+			        ← 목록으로 돌아가기
+			    </a>
+			</div>
 
     <div class="footer-pusher"></div>
 </th:block>
 
-<th:block th:fragment="script"></th:block>
+<th:block th:fragment="script">
+    <script th:inline="javascript">
+        function goDelete(promoId, hotelId) {
+            // 1. 사용자 재확인
+            if(confirm("정말로 이 프로모션을 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.")) {
+                
+                // 2. 가상의 폼(Form) 생성
+                const form = document.createElement('form');
+                form.method = 'POST';
+                // 컨트롤러에서 설정한 @PostMapping("/delete") 경로와 일치해야 합니다.
+                form.action = /*[[@{/promotion/delete}]]*/ '/promotion/delete';
+                
+                // 3. 파라미터 추가 (프로모션 ID)
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'promotion_id';
+                idInput.value = promoId;
+                
+                // 4. 파라미터 추가 (삭제 후 돌아갈 호텔 ID)
+                const hotelInput = document.createElement('input');
+                hotelInput.type = 'hidden';
+                hotelInput.name = 'hotelId';
+                hotelInput.value = hotelId;
+                form.appendChild(idInput);
+                form.appendChild(hotelInput);
+                document.body.appendChild(form);
+                
+                // 5. 전송
+                form.submit();
+            }
+        }
+    </script>
+</th:block>
 </body>
 </html>

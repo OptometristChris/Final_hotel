@@ -68,4 +68,44 @@
 	    ORDER BY DBMS_RANDOM.VALUE
 	</select>
 
+	<select id="getAvailableRooms" parameterType="HashMap" resultType="RoomTypeDTO">
+	    SELECT 
+	        RT.room_type_id,
+	        RT.room_name,
+	        RT.room_grade,
+	        RT.bed_type,
+	        RT.view_type,
+	        RT.max_capacity,
+	        RT.base_price,
+	        (SELECT image_url FROM ROOM_IMAGE RI 
+	         WHERE RI.room_type_id = RT.room_type_id 
+	           AND RI.is_main = 'Y' 
+	           AND ROWNUM = 1) as image_url
+	    FROM ROOM_TYPE RT
+	    WHERE RT.fk_hotel_id = TO_NUMBER(#{hotelId})           
+	      AND RT.is_active = 'Y'
+	      
+	      <if test="bedType != null and bedType != ''">
+	      AND RT.bed_type = #{bedType}
+	      </if>
+	      
+	      AND RT.room_type_id IN (
+	          SELECT RS.room_type_id
+	          FROM ROOM_STOCK RS
+	          WHERE RS.stay_date &gt;= TO_DATE(#{checkIn}, 'YYYY-MM-DD')
+	            AND RS.stay_date &lt; TO_DATE(#{checkOut}, 'YYYY-MM-DD')
+	            AND RS.available_count > 0                           
+	            AND RS.is_closed = 'N'                             
+	          GROUP BY RS.room_type_id
+	          HAVING COUNT(*) = TO_DATE(#{checkOut}, 'YYYY-MM-DD') - TO_DATE(#{checkIn}, 'YYYY-MM-DD')
+	      )
+	</select>
+
+	<select id="getHotelList" resultType="HashMap">
+    SELECT hotel_id AS HOTEL_ID, 
+           hotel_name AS HOTEL_NAME
+    FROM tbl_hotel
+    ORDER BY hotel_id ASC
+</select>
+
 </mapper>

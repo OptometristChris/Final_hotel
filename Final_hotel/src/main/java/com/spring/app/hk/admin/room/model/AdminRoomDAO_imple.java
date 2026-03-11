@@ -37,37 +37,98 @@ public class AdminRoomDAO_imple implements AdminRoomDAO {
 
     }
     
+   	// 1. 객실 정보 수정
+   	@Override
+   	public void updateRoom(Map<String, String> map) {
+   	    sqlsession.update("adminRoom.updateRoom", map);
+   	}
+
+
+   	// 2. 객실 이미지 수정
+   	@Override
+   	public void updateRoomImage(Map<String, Object> imageMap) {
+   	    sqlsession.update("adminRoom.updateRoomImage", imageMap);
+   	}
+   	
+   	// 반려 후 재상신
+	@Override
+	public void resubmitRoom(int roomTypeId) {
+		sqlsession.update("adminRoom.resubmitRoom", roomTypeId);
+		
+	}
     
+    
+	
+	
     // 총관관리자
-    // 승인 대기 객실 목록
+    // 승인 대기 객실 목록 조회 (안씀)
     @Override
     public List<RoomTypeDTO> getPendingRoomList() {
         return sqlsession.selectList("adminRoom.getPendingRoomList");
     }
-
+       
+    // 전체 객실 조회
+   	@Override
+   	public List<RoomTypeDTO> getRoomApprovalList() {
+   		return sqlsession.selectList("adminRoom.getRoomApprovalList");
+   	}
+   	
     // 객실 승인
-    @Override
-    public void approveRoom(int roomTypeId, int adminId) {
+   	@Override
+   	public void approveRoom(int roomTypeId, int adminId) {
 
-        Map<String, Object> param = new HashMap<>();
-        param.put("roomTypeId", roomTypeId);
-        param.put("adminId", adminId);
+   	    Map<String, Object> param = new HashMap<>();
+   	    param.put("roomTypeId", roomTypeId);
 
-        sqlsession.update("adminRoom.approveRoom", param);
-    }
+   	    sqlsession.update("adminRoom.approveRoom", param);
+
+   	    param.put("room_type_id", roomTypeId);
+   	    param.put("status", "APPROVED");
+   	    param.put("reason", null);
+   	    param.put("admin_id", adminId);
+
+   	    sqlsession.insert("adminRoom.insertApprovalHistory", param);
+   	}
 
     // 객실 반려
-    @Override
-    public void rejectRoom(int roomTypeId, int adminId, String reason) {
+   	@Override
+   	public void rejectRoom(int roomTypeId, int adminId, String reason) {
 
-        Map<String, Object> param = new HashMap<>();
-        param.put("roomTypeId", roomTypeId);
-        param.put("adminId", adminId);
-        param.put("reason", reason);
+   	    Map<String, Object> param = new HashMap<>();
+   	    param.put("roomTypeId", roomTypeId);
 
-        sqlsession.update("adminRoom.rejectRoom", param);
-    }
+   	    sqlsession.update("adminRoom.rejectRoom", param);
 
+   	    param.put("room_type_id", roomTypeId);
+   	    param.put("status", "REJECTED");
+   	    param.put("reason", reason);
+   	    param.put("admin_id", adminId);
+
+   	    sqlsession.insert("adminRoom.insertApprovalHistory", param);
+   	}
+   
+	// 객실 승인 히스토리 조회
+	@Override
+	public List<Map<String, Object>> getRoomApprovalHistory(int roomTypeId) {
+		return sqlsession.selectList("adminRoom.getRoomApprovalHistory", roomTypeId);
+	}
+
+	// 객실 전체 승인 히스토리 조회용
+	@Override
+	public List<Map<String, Object>> getApprovalHistoryList() {
+		 return sqlsession.selectList("adminRoom.getApprovalHistoryList");
+
+	}
+
+	// 객실 전체 승인 히스토리 조회용
+	@Override
+	public List<Map<String, Object>> getBranchApprovalHistoryList(Integer adminNo) {
+		return sqlsession.selectList("adminRoom.getBranchApprovalHistoryList", adminNo);
+	}
+
+	
+
+   
 	
 
 	

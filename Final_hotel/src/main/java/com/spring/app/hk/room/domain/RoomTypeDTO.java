@@ -28,4 +28,7 @@ public class RoomTypeDTO {
     // ====== admin ====== 
     private int total_count;
     private String hotel_name;
+
+    // ===== branch ======
+    private String approve_status;
 }

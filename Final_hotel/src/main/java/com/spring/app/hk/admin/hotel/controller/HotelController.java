@@ -116,6 +116,8 @@ public class HotelController {
     public Map<String, Object> register(
             @RequestParam Map<String, String> map,
             @RequestParam("mainImage") MultipartFile mainImage,
+            @RequestParam("latitude") Double latitude,
+            @RequestParam("longitude") Double longitude,
             Authentication authentication
     ) {
 

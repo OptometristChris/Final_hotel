@@ -69,11 +69,18 @@
 				    <div sec:authorize="isAuthenticated()">
 				        <input type="text" name="writer_name" id="writer_name" 
 				               class="form-control w-100" 
-				               th:value="${#authentication.getPrincipal().getUsername()}" readonly>
-				        <p class="info-text"><i class="fas fa-info-circle"></i> 로그인 계정 정보로 작성됩니다.</p>
+				               th:value="${#authentication.principal.username}" readonly>
+				        <p class="info-text"><i class="bi bi-info-circle"></i> 회원 계정 정보로 작성됩니다.</p>
 				    </div>
 				
-				    <div sec:authorize="isAnonymous()">
+				    <div sec:authorize="isAnonymous()" th:if="${session.Session_GuestDTO != null}">
+				        <input type="text" name="writer_name" id="writer_name" 
+				               class="form-control w-100" 
+				               th:value="${session.Session_GuestDTO.guestName}" readonly>
+				        <p class="info-text"><i class="bi bi-info-circle"></i> 비회원 예약 정보(성함)로 작성됩니다.</p>
+				    </div>
+				
+				    <div sec:authorize="isAnonymous()" th:if="${session.Session_GuestDTO == null}">
 				        <input type="text" name="writer_name" id="writer_name" 
 				               class="form-control w-100" 
 				               placeholder="성함을 입력해주세요." required>
@@ -86,11 +93,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="secret-wrap">
-                        <input type="checkbox" name="is_secret" value="1">
-                        <span>비밀글로 문의하기 (작성자 본인만 확인 가능)</span>
-                    </label>
-                </div>
+				    <label>
+				        <input type="checkbox" name="is_secret" value="1"> 비밀글로 문의하기
+				    </label>
+				</div>
 
                 <div class="btn-group">
                     <a th:href="@{/cs/list(hotelId=${hotelId})}" class="btn-custom btn-cancel">취소</a>

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" 
-      xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{js/layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::content})}">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{js/layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::content})}">
 <head>
 <meta charset="UTF-8">
 <title>객실 목록</title>
@@ -9,434 +8,436 @@
 
 <style>
 body {
-    font-family: 'Pretendard', sans-serif;
-    background: #fff;
-    color: #111;
-    
+	font-family: 'Pretendard', sans-serif;
+	background: #fff;
+	color: #111;
 }
 
 #roomListArea {
-    max-width: 1100px;
-    margin: 0 auto;
+	max-width: 1100px;
+	margin: 0 auto;
 }
 
 h1 {
-    text-align: center;
-    font-size: 36px;
-    font-weight: 600;
-    margin-bottom: 50px;
+	text-align: center;
+	font-size: 36px;
+	font-weight: 600;
+	margin-bottom: 50px;
 }
 
 /* 카드 크기 줄임 */
 .room-card {
-    display: flex;
-    gap: 40px;
-    padding: 50px 0;
-    border-bottom: 1px solid #eee;
-    align-items: center;
+	display: flex;
+	gap: 40px;
+	padding: 50px 0;
+	border-bottom: 1px solid #eee;
+	align-items: center;
 }
 
 /* 이미지 줄임 */
 .room-image {
-    width: 420px;
-    height: 260px;
-    overflow: hidden;
-    border-radius: 4px;
+	width: 420px;
+	height: 260px;
+	overflow: hidden;
+	border-radius: 4px;
 }
 
 .room-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 }
 
 /* 정보 */
 .room-info {
-    flex: 1;
+	flex: 1;
 }
 
 .room-name a {
-    font-size: 24px;
-    font-weight: 600;
-    color: #111;
-    text-decoration: none;
+	font-size: 24px;
+	font-weight: 600;
+	color: #111;
+	text-decoration: none;
 }
 
 .room-name a:hover {
-    text-decoration: underline;
+	text-decoration: underline;
 }
 
 .room-meta {
-    margin-top: 18px;
-    font-size: 14px;
-    color: #666;
-    line-height: 1.9;
+	margin-top: 18px;
+	font-size: 14px;
+	color: #666;
+	line-height: 1.9;
 }
 
 .price {
-    font-size: 20px;
-    font-weight: 600;
-    margin-top: 22px;
+	font-size: 20px;
+	font-weight: 600;
+	margin-top: 22px;
 }
 
 /* 버튼 */
 .button-group {
-    margin-top: 25px;
-    display: flex;
-    gap: 12px;
+	margin-top: 25px;
+	display: flex;
+	gap: 12px;
 }
 
 .btn-reserve {
-    background: #111;
-    color: white;
-    border: none;
-    padding: 10px 30px;
-    font-size: 14px;
-    cursor: pointer;
+	background: #111;
+	color: white;
+	border: none;
+	padding: 10px 30px;
+	font-size: 14px;
+	cursor: pointer;
 }
 
 .btn-reserve:hover {
-    background: #c9a76b;
-    color: #111;
+	background: #c9a76b;
+	color: #111;
 }
 
 .btn-compare {
-    background: transparent;
-    border: 1px solid #ccc;
-    padding: 10px 20px;
-    font-size: 14px;
-    cursor: pointer;
+	background: transparent;
+	border: 1px solid #ccc;
+	padding: 10px 20px;
+	font-size: 14px;
+	cursor: pointer;
 }
 
 .btn-compare:hover {
-    border-color: #111;
+	border-color: #111;
 }
 
 .filter-wrapper {
-    max-width: 1100px;
-    width: 100%;      /* 추가 */
-    margin: 0 auto 40px auto;
-    padding: 25px 30px;
-    background: #fafafa;
-    border: 1px solid #eee;
-    border-radius: 6px;
+	max-width: 1100px;
+	width: 100%; /* 추가 */
+	margin: 0 auto 40px auto;
+	padding: 25px 30px;
+	background: #fafafa;
+	border: 1px solid #eee;
+	border-radius: 6px;
 }
 
 .filter-row {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+	display: flex;
+	align-items: center;
+	gap: 20px;
 }
 
 .sort-group {
-    margin-left: auto;
+	margin-left: auto;
 }
 
 .filter-group {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    flex-wrap: wrap;
+	display: flex;
+	gap: 15px;
+	align-items: center;
+	flex-wrap: wrap;
 }
 
 .filter-group select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    font-size: 14px;
-    min-width: 130px;
-    background: white;
+	padding: 8px 12px;
+	border: 1px solid #ddd;
+	font-size: 14px;
+	min-width: 130px;
+	background: white;
 }
 
 .filter-group select:focus {
-    outline: none;
-    border-color: #111;
+	outline: none;
+	border-color: #111;
 }
 
 .filter-search-btn {
-    background: #111;
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    font-size: 14px;
-    cursor: pointer;
+	background: #111;
+	color: white;
+	border: none;
+	padding: 8px 20px;
+	font-size: 14px;
+	cursor: pointer;
 }
 
 .filter-search-btn:hover {
-    background: #c9a76b;
-    color: #111;
+	background: #c9a76b;
+	color: #111;
 }
 
 .sort-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
 
 .sort-group select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
+	padding: 8px 12px;
+	border: 1px solid #ddd;
 }
 
 .title-row {
-    max-width: 1100px;
-    margin: 0 auto 40px auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+	max-width: 1100px;
+	margin: 0 auto 40px auto;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .title-row h1 {
-    margin: 0;
+	margin: 0;
 }
 
 #currencySelect {
-    padding: 6px 10px;
+	padding: 6px 10px;
 }
 
 .filter-date {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    background: #fff;
-    border-radius: 4px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 8px 12px;
+	border: 1px solid #ddd;
+	background: #fff;
+	border-radius: 4px;
 }
 
 .filter-date input {
-    border: none;
-    outline: none;
+	border: none;
+	outline: none;
 }
 
-#compareBar{
-    position: fixed;
-    bottom: 80px;   /* footer 높이 만큼 */
+#compareBar {
+	position: fixed;
+	bottom: 80px; /* footer 높이 만큼 */
 }
 </style>
 
 <!-- FullCalendar CSS -->
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+<link
+	href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
+	rel="stylesheet">
 
 </head>
 <body>
-<div th:fragment="content" style="margin-top:140px;">
+	<div th:fragment="content" style="margin-top: 140px;">
 
-<div class="title-row">
-	<h1>객실</h1>
-	<select id="currencySelect" style="margin-bottom:20px;">
-	    <option value="KRW">KRW</option>
-	    <option value="USD">USD</option>
-	    <option value="JPY">JPY</option>
-	    <option value="EUR">EUR</option>
-	</select>
-</div>
+		<div class="title-row">
+			<h1>객실</h1>
+			<select id="currencySelect" style="margin-bottom: 20px;">
+				<option value="KRW">KRW</option>
+				<option value="USD">USD</option>
+				<option value="JPY">JPY</option>
+				<option value="EUR">EUR</option>
+			</select>
+		</div>
 
-<!-- 체크박스 -->
-<div style="max-width:1100px; margin:0 auto 20px auto; text-align:right;">
-    <label>
-        <input type="checkbox" id="extraFeeCheck">
-        세금 · 봉사료 포함 (10%)
-    </label>
-</div>
+		<!-- 체크박스 -->
+		<div
+			style="max-width: 1100px; margin: 0 auto 20px auto; text-align: right;">
+			<label> <input type="checkbox" id="extraFeeCheck"> 세금
+				· 봉사료 포함 (10%)
+			</label>
+		</div>
 
-<!-- 사용자가 선택한 체크인/체크아웃 날짜 표시 영역 -->
-<div id="selectedDateBox" style="margin:20px 0; font-weight:bold;">
-   
-</div>
-
-<!-- 예약 페이지로 넘길 값 저장용 hidden input -->
-<input type="hidden" id="checkInInput" name="check_in">
-<input type="hidden" id="checkOutInput" name="check_out">
-
-<!-- ===============================
-      필터 (AJAX)
-     =============================== -->
-<div style="display:flex; justify-content:center; margin-bottom:20px;">
-
-	<!-- 좌측 필터 -->
-	<div class="filter-wrapper">
-    
-    <!-- 1줄 -->
-    <div class="filter-row">
-        <form id="filterForm" class="filter-group">
-
-            <select name="hotel">
-                <option value="">호텔 전체</option>
-                
-               <option th:each="hotel : ${hotelList}"
-				        th:value="${hotel.HOTEL_ID}"
-				        th:text="${hotel.HOTEL_NAME}">
-				</option>
-            </select>
-
-            <select name="room_grade">
-                <option value="">객실등급 전체</option>
-                <option value="DELUXE">DELUXE</option>
-                <option value="PREMIER">PREMIER</option>
-                <option value="SUITE">SUITE</option>
-                <option value="STANDARD">STANDARD</option>
-            </select>
-
-            <select name="bed_type">
-                <option value="">침대타입 전체</option>
-                <option value="DOUBLE">DOUBLE</option>
-                <option value="TWIN">TWIN</option>
-                <option value="KING">KING</option>
-            </select>
-
-            <select name="view_type">
-                <option value="">전망 전체</option>
-                <option value="CITY">CITY</option>
-                <option value="RIVER">RIVER</option>
-            </select>           
-
-        </form>
-
-        <div class="sort-group">
-            <span>정렬</span>
-            <select id="sortSelect">
-                <option value="">기본순</option>
-                <option value="priceAsc">가격 낮은순</option>
-                <option value="priceDesc">가격 높은순</option>
-            </select>
-        </div>
-
-    </div>
-    
- 		<!-- 2줄 (날짜 + 검색) -->
-		<div class="filter-row" style="margin-top:15px;">
-            <div class="filter-date">
-	           	<input type="date" id="filterCheckIn" name="filter_check_in">
-				<span>~</span>
-				<input type="date" id="filterCheckOut" name="filter_check_out">
-			</div>
-			
-			<button type="submit" form="filterForm" class="filter-search-btn">
-                검색
-            </button>
+		<!-- 사용자가 선택한 체크인/체크아웃 날짜 표시 영역 -->
+		<div id="selectedDateBox" style="margin: 20px 0; font-weight: bold;">
 
 		</div>
-	</div>
-</div>
 
-<hr>
+		<!-- 예약 페이지로 넘길 값 저장용 hidden input -->
+		<input type="hidden" id="checkInInput" name="check_in"> <input
+			type="hidden" id="checkOutInput" name="check_out">
 
-<!-- ===============================
+		<!-- ===============================
+      필터 (AJAX)
+     =============================== -->
+		<div
+			style="display: flex; justify-content: center; margin-bottom: 20px;">
+
+			<!-- 좌측 필터 -->
+			<div class="filter-wrapper">
+			    
+			    <!-- 1줄 -->
+			    <div class="filter-row">
+			        <form id="filterForm" class="filter-group">
+			
+			            <select name="hotel">
+			                <option value="">호텔 전체</option>
+			                
+			               <option th:each="hotel : ${hotelList}"
+			                    th:value="${hotel.HOTEL_ID}"
+			                    th:text="${hotel.HOTEL_NAME}"
+			                    th:selected="${searchParams != null and #strings.equals(hotel.HOTEL_ID, searchParams.hotelId)}">
+			            </option>
+			            </select>
+			
+			            <select name="room_grade">
+			                <option value="">객실등급 전체</option>
+			                <option value="DELUXE">DELUXE</option>
+			                <option value="PREMIER">PREMIER</option>
+			                <option value="SUITE">SUITE</option>
+			                <option value="STANDARD">STANDARD</option>
+			            </select>
+			
+			            <select name="bed_type" id="bedTypeSelect">
+			             <option value="">침대타입 전체</option>
+			             <option value="DOUBLE" th:selected="${searchParams?.bedType == 'DOUBLE'}">DOUBLE</option>
+			             <option value="TWIN" th:selected="${searchParams?.bedType == 'TWIN'}">TWIN</option>
+			             <option value="KING" th:selected="${searchParams?.bedType == 'KING'}">KING</option>
+			         </select>
+			
+			            <select name="view_type">
+			                <option value="">전망 전체</option>
+			                <option value="CITY">CITY</option>
+			                <option value="RIVER">RIVER</option>
+			            </select>           
+			
+			        </form>
+			
+			        <div class="sort-group">
+			            <span>정렬</span>
+			            <select id="sortSelect">
+			                <option value="">기본순</option>
+			                <option value="priceAsc">가격 낮은순</option>
+			                <option value="priceDesc">가격 높은순</option>
+			            </select>
+			        </div>
+			
+			    </div>
+			    
+			       <!-- 2줄 (날짜 + 검색) -->
+			      <div class="filter-row" style="margin-top:15px;">
+			            <div class="filter-date">
+			                 <input type="date" id="filterCheckIn" name="filter_check_in"
+			                 th:value="${searchParams?.checkIn}">
+			            <span>~</span>
+			            <input type="date" id="filterCheckOut" name="filter_check_out"
+			            th:value="${searchParams?.checkOut}">
+			         </div>
+			         
+			         <button type="submit" form="filterForm" class="filter-search-btn">
+			                검색
+			            </button>
+			
+			      </div>
+			   </div>
+		</div>
+
+		<hr>
+
+		<!-- ===============================
      객실 목록 영역
      =============================== -->
-<div id="roomListArea">
+		<div id="roomListArea">
 
-    <div th:each="room : ${roomList}" class="room-card">
+			<div th:each="room : ${roomList}" class="room-card">
 
-        <div class="room-image">
-            <img th:src="@{${room.image_url}}"
-                 style="width:100%; height:100%; object-fit:cover;">
-        </div>
+				<div class="room-image">
+					<img th:src="@{${room.image_url}}"
+						style="width: 100%; height: 100%; object-fit: cover;">
+				</div>
 
-        <div class="room-info">
-            <div class="room-name">
-                <a th:href="@{/room/detail(room_id=${room.room_type_id})}"
-                   th:text="${room.room_name}"
-                   style="text-decoration:none; color:black;"></a>
-            </div>
+				<div class="room-info">
+					<div class="room-name">
+						<a th:href="@{/room/detail(room_id=${room.room_type_id})}"
+							th:text="${room.room_name}"
+							style="text-decoration: none; color: black;"></a>
+					</div>
 
-            <div>등급: <span th:text="${room.room_grade}"></span></div>
-            <div>침대: <span th:text="${room.bed_type}"></span></div>
-            <div>전망: <span th:text="${room.view_type}"></span></div>
+					<div>
+						등급: <span th:text="${room.room_grade}"></span>
+					</div>
+					<div>
+						침대: <span th:text="${room.bed_type}"></span>
+					</div>
+					<div>
+						전망: <span th:text="${room.view_type}"></span>
+					</div>
 
-            <div class="price">
-			    <span class="price-value"
-			          data-base-price="${room.base_price}">
-			        ₩ ${room.base_price}
-			    </span>
+					<div class="price">
+						<span class="price-value" data-base-price="${room.base_price}">
+							₩ ${room.base_price} </span>
+					</div>
+
+					<div style="margin-top: 20px;">
+						<button id="reserveBtn"
+							th:onclick="'handleReserveClick(' + ${room.room_type_id} + ')'">
+							예약하기</button>
+
+						<button th:onclick="'addToCompare(' + ${room.room_type_id} + ')'">
+							비교하기</button>
+					</div>
+				</div>
 			</div>
-            
-            <div style="margin-top:20px;">
-			    <button id="reserveBtn" th:onclick="'handleReserveClick(' + ${room.room_type_id} + ')'">
-				    예약하기
-				</button>
-				
-				<button th:onclick="'addToCompare(' + ${room.room_type_id} + ')'">
-				    비교하기
-				</button>
-			</div>
-        </div>
-    </div>	
-</div>
+		</div>
 
 
-<!-- =======================
+		<!-- =======================
 	 예약 모달
 	======================= -->
-<div id="calendarModal"
-     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+		<div id="calendarModal"
+			style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5);">
 
-    <div style="background:white; width:900px; margin:80px auto; padding:30px; position:relative;">
-        <button onclick="closeModal()" style="position:absolute; right:10px; top:10px;">X</button>
+			<div
+				style="background: white; width: 900px; margin: 80px auto; padding: 30px; position: relative;">
+				<button onclick="closeModal()"
+					style="position: absolute; right: 10px; top: 10px;">X</button>
 
-        <h2>날짜 선택</h2>
+				<h2>날짜 선택</h2>
 
-        <!-- 실제 달력 -->
-        <div id="calendar"></div>
-    </div>
-</div>
-
-
-<!-- 비교(푸터) -->
-<div id="compareBar" style="
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #111;
-    color: white;
-    padding: 15px;
-    display: none;
-    z-index: 9999;
-">
-
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div id="compareItems">
-            <!-- 선택된 객실 표시 -->
-        </div>
-
-        <button onclick="openCompareModal()"
-                style="background:#c9a76b; border:none; padding:10px 20px;">
-            비교하기
-        </button>
-    </div>
-</div>
+				<!-- 실제 달력 -->
+				<div id="calendar"></div>
+			</div>
+		</div>
 
 
-<!-- =======================
+		<!-- 비교(푸터) -->
+		<div id="compareBar"
+			style="position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: white; padding: 15px; display: none; z-index: 9999;">
+
+			<div
+				style="display: flex; justify-content: space-between; align-items: center;">
+				<div id="compareItems">
+					<!-- 선택된 객실 표시 -->
+				</div>
+
+				<button onclick="openCompareModal()"
+					style="background: #c9a76b; border: none; padding: 10px 20px;">
+					비교하기</button>
+			</div>
+		</div>
+
+
+		<!-- =======================
      비교 모달
 	======================= -->
-<div id="compareModal"
-     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-            background:rgba(0,0,0,0.6); z-index:10000;">
+		<div id="compareModal"
+			style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 10000;">
 
-    <div style="background:white; width:1000px; margin:60px auto; padding:30px; position:relative;">
+			<div
+				style="background: white; width: 1000px; margin: 60px auto; padding: 30px; position: relative;">
 
-        <button onclick="closeCompareModal()"
-                style="position:absolute; right:15px; top:15px;">X</button>
+				<button onclick="closeCompareModal()"
+					style="position: absolute; right: 15px; top: 15px;">X</button>
 
-        <h2>상품 비교 상세</h2>
+				<h2>상품 비교 상세</h2>
 
-        <div id="compareModalBody" style="margin-top:30px;">
-            <!-- JS로 채워짐 -->
-        </div>
+				<div id="compareModalBody" style="margin-top: 30px;">
+					<!-- JS로 채워짐 -->
+				</div>
 
-    </div>
-</div>
+			</div>
+		</div>
 
-<!-- ===============================
+		<!-- ===============================
      AJAX 스크립트
      =============================== -->
 
-<!-- FullCalendar JS -->
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+		<!-- FullCalendar JS -->
+		<script
+			src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 
-<script>
+		<script>
 
 // 환율
 let exchangeRates = { KRW: 1 };
@@ -1043,6 +1044,6 @@ document.getElementById("extraFeeCheck")
 
 </script>
 
-</div>
+	</div>
 </body>
 </html>

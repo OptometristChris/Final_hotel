@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.app.hk.admin.room.model.AdminRoomDAO;
 import com.spring.app.hk.room.domain.RoomTypeDTO;
@@ -53,10 +54,65 @@ public class AdminRoomService_imple implements AdminRoomService {
     }
 
     
+ // 객실 반려 후 수정 (이미지 교체 처리)
+ 	@Override
+ 	public void updateRoom(Map<String, String> map, MultipartFile roomImage) {
+
+ 	    // 1️. 객실 기본 정보 수정
+ 	    adminRoomDAO.updateRoom(map);
+
+ 	    // 객실 ID
+ 	    int roomTypeId = Integer.parseInt(map.get("roomTypeId"));
+
+ 	    // 2️. 이미지 교체 요청이 있을 경우
+ 	    if(roomImage != null && !roomImage.isEmpty()){
+
+ 	        try {
+
+ 	            String fileName = roomImage.getOriginalFilename();
+
+ 	            // 파일 저장 경로
+ 	            String uploadPath = "C:/upload/room/";
+
+ 	            java.io.File saveFile =
+ 	                    new java.io.File(uploadPath + fileName);
+
+ 	            roomImage.transferTo(saveFile);
+
+ 	            // 이미지 URL
+ 	            String imageUrl = "/file_images/room/" + fileName;
+
+ 	            Map<String,Object> imageMap = new java.util.HashMap<>();
+
+ 	            imageMap.put("roomTypeId", roomTypeId);
+ 	            imageMap.put("image_url", imageUrl);
+
+ 	            // 이미지 UPDATE
+ 	            adminRoomDAO.updateRoomImage(imageMap);
+
+ 	        } catch(Exception e){
+ 	            e.printStackTrace();
+ 	        }
+
+ 	    }
+
+ 	}
+ 	
+ 	
+ 	// 반려 후 재상신
+ 	@Override
+ 	public void resubmitRoom(int roomTypeId) {
+ 		adminRoomDAO.resubmitRoom(roomTypeId);
+ 		
+ 	}
     
-    
-    
-    
+ 	
+ 	// 승인 히스토리 조회
+	@Override
+	public List<Map<String, Object>> getBranchApprovalHistoryList(Integer adminNo) {
+		return adminRoomDAO.getBranchApprovalHistoryList(adminNo);
+	}
+
     
     
     
@@ -80,7 +136,28 @@ public class AdminRoomService_imple implements AdminRoomService {
     }
 
 
+    // 전체 객실 목록 조회
+	@Override
+	public List<RoomTypeDTO> getRoomApprovalList() {
+		 return adminRoomDAO.getRoomApprovalList();
+	}
+
+
+	// 객실 승인 히스토리 조회
+	@Override
+	public List<Map<String, Object>> getRoomApprovalHistory(int roomTypeId) {
+		 return adminRoomDAO.getRoomApprovalHistory(roomTypeId);
+	}
+
 	
+	// 객실 전체 승인 히스토리 조회용
+	@Override
+	public List<Map<String, Object>> getApprovalHistoryList() {
+	    return adminRoomDAO.getApprovalHistoryList();
+
+	}
+
+
 
 	
 		

@@ -57,18 +57,39 @@ public class AdminRoomController {
     	
     	Integer adminNo = loginAdmin.getAdmin_no();
     	
+    	// 히스토리 조회
+    	List<Map<String,Object>> historyList = roomService.getBranchApprovalHistoryList(adminNo);
+    	
     	// 지점 객실 조회
-        List<RoomTypeDTO> roomList = roomService.getRoomListByManager(adminNo);
+    	// 전체 객실 조회
+    	List<RoomTypeDTO> roomList =
+                roomService.getRoomListByManager(adminNo);
 
-        model.addAttribute("roomList", roomList);
-        
+        // 상태별 분리
+        List<RoomTypeDTO> approvedList = roomList.stream()
+                .filter(r -> "APPROVED".equals(r.getApprove_status()))
+                .toList();
+
+        List<RoomTypeDTO> pendingList = roomList.stream()
+                .filter(r -> "PENDING".equals(r.getApprove_status()))
+                .toList();
+
+        List<RoomTypeDTO> rejectedList = roomList.stream()
+                .filter(r -> "REJECTED".equals(r.getApprove_status()))
+                .toList();
+
+        model.addAttribute("approvedList", approvedList);
+        model.addAttribute("pendingList", pendingList);
+        model.addAttribute("rejectedList", rejectedList);
+        model.addAttribute("historyList", historyList);
+
         if(!roomList.isEmpty()){
-            model.addAttribute("hotelName", roomList.get(0).getHotel_name());
+            model.addAttribute("hotelName",
+                    roomList.get(0).getHotel_name());
         }
 
         return "hk/branch/room/roomlist";
     }
-    
 
 	 // 객실 등록 페이지 진입
 	 @PreAuthorize("hasRole('ADMIN_BRANCH')")
@@ -134,26 +155,77 @@ public class AdminRoomController {
 	     return "redirect:/admin/room/branch/list";
 	 
 	 }
+	 
+	 
+	 // 객실 반려 후 수정 (이미지 교체 처리)
+	 @PreAuthorize("hasRole('ADMIN_BRANCH')")
+	 @PostMapping("/update")
+	 public String updateRoom(
+	 @RequestParam Map<String,String> map,
+	 @RequestParam(value="roomImage", required=false) MultipartFile roomImage){
+
+	 roomService.updateRoom(map, roomImage);
+
+	 return "redirect:/admin/room/branch/list";
+	 }
+	 
+	 
+	 // 반려 후 재상신
+	    @PostMapping("/resubmit")
+	    @PreAuthorize("hasRole('ADMIN_BRANCH')")
+	    public String resubmitRoom(@RequestParam("roomTypeId") int roomTypeId){
+
+	        roomService.resubmitRoom(roomTypeId);
+
+	        return "redirect:/admin/room/branch/list";
+	    }
     
+	    
     // ==========================
     // 총괄 관리자 객실 관리 페이지 (승인/반려)
     // ==========================   
     // 승인요청 (지점관리자) 목록 조회
     @PreAuthorize("hasRole('ADMIN_HQ')")
     @GetMapping("/pending")
-    public String pendingRoomList(Model model) {
+    public String roomApprovalPage(Model model){
 
-        List<RoomTypeDTO> roomList = roomService.getPendingRoomList();
+        List<RoomTypeDTO> roomList = roomService.getRoomApprovalList();
 
-        model.addAttribute("roomList", roomList);
+        List<RoomTypeDTO> pendingList = roomList.stream()
+                .filter(r -> "PENDING".equals(r.getApprove_status()))
+                .toList();
 
+        List<RoomTypeDTO> approvedList = roomList.stream()
+                .filter(r -> "APPROVED".equals(r.getApprove_status()))
+                .toList();
+        
+        List<RoomTypeDTO> rejectedList = roomList.stream()
+                .filter(r -> "REJECTED".equals(r.getApprove_status()))
+                .toList();
+
+        // 전체 승인 히스토리 조회용
+        List<Map<String,Object>> historyList = roomService.getApprovalHistoryList();
+        
+        // 승인대기
+        model.addAttribute("pendingList", pendingList);
+        
+        // 승인완료
+        model.addAttribute("approvedList", approvedList);
+
+        // 반려
+        model.addAttribute("rejectedList", rejectedList);
+        
+        model.addAttribute("historyList", historyList);
+        
         return "hk/admin/room/pendingRoomList";
     }
     
     
     // 객실 승인 처리
+    @PreAuthorize("hasRole('ADMIN_HQ')")
     @PostMapping("/approve")
-    public String approveRoom(@RequestParam int roomTypeId, HttpSession session) {
+    public String approveRoom(@RequestParam("roomTypeId") int roomTypeId,
+                              HttpSession session) {
 
     	// 로그인 사용자 가져오기
         Session_AdminDTO loginAdmin = (Session_AdminDTO) session.getAttribute("sessionAdminDTO");
@@ -167,8 +239,11 @@ public class AdminRoomController {
     }
     
     // 객실 반려 처리
+    @PreAuthorize("hasRole('ADMIN_HQ')")
     @PostMapping("/reject")
-    public String rejectRoom(@RequestParam int roomTypeId, String reason, HttpSession session) {
+    public String rejectRoom(@RequestParam("roomTypeId") int roomTypeId,
+                             @RequestParam("reason") String reason,
+                             HttpSession session) {
 
     	// 로그인 사용자 가져오기
         Session_AdminDTO loginAdmin =  (Session_AdminDTO) session.getAttribute("sessionAdminDTO");
@@ -181,7 +256,16 @@ public class AdminRoomController {
         return "redirect:/admin/room/pending";
     }
     
-    
+ 
+    // 객실 승인 히스토리 조회
+    @PreAuthorize("hasRole('ADMIN_HQ')")
+    @GetMapping("/history")
+    @ResponseBody
+    public List<Map<String,Object>> getHistory(@RequestParam("roomTypeId") int roomTypeId){
+
+        return roomService.getRoomApprovalHistory(roomTypeId);
+
+    }
     
     
     
