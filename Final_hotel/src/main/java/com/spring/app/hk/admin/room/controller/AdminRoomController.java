@@ -48,6 +48,9 @@ public class AdminRoomController {
     @GetMapping("/branch/list")
     public String roomList(Model model, HttpSession session) {
     	
+    	System.out.println("컨트롤러 세션 ID = " + session.getId());
+        System.out.println("sessionAdminDTO = " + session.getAttribute("sessionAdminDTO"));
+    	
     	// 로그인 사용자 가져오기
     	Session_AdminDTO loginAdmin = (Session_AdminDTO) session.getAttribute("sessionAdminDTO");
 

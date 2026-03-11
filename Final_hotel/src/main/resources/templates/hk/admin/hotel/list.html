@@ -128,7 +128,7 @@ onclick="filterHotel('REJECTED')">반려</button> -->
 <!-- 운영중 호텔 반복 -->
 <div class="col-md-4 hotel-card-item"
      th:each="hotel : ${activeHotelList}"
-     th:attr="data-status=${hotel.APPROVE_STATUS}">
+     data-status="APPROVED">
 
 <div class="hotel-card">
 
@@ -178,7 +178,7 @@ onclick="filterHotel('REJECTED')">반려</button> -->
 
 <div class="col-md-4 hotel-card-item"
      th:each="hotel : ${disabledHotelList}"
-     th:attr="data-status=${hotel.APPROVE_STATUS}">
+     data-status="INACTIVE">
 
 <div class="hotel-card">
 
