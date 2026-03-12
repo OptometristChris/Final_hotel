@@ -984,9 +984,15 @@ function openCompareModal(){
 
     const ids = compareList.map(r => r.id);
 
+    const token = document.querySelector("meta[name='_csrf']").content;
+    const header = document.querySelector("meta[name='_csrf_header']").content;
+    
     fetch("/final_hotel/room/compare", { 
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            [header]: token
+        },
         body: JSON.stringify(ids)
     })
     .then(res => res.json())
