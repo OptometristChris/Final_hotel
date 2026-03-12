@@ -158,7 +158,7 @@
     
     <!-- 2. 호텔 승인관리 -->
 	<!-- 지점관리자 호텔 조회 -->
-	<select id="selectHotelListByManager" parameterType="int" resultType="map">
+	<!-- <select id="selectHotelListByManager" parameterType="int" resultType="map">
 
 		SELECT
 		    h.hotel_id,
@@ -177,5 +177,5 @@
 		
 		ORDER BY h.hotel_id DESC
 		
-		</select>
+		</select> -->
 </mapper>
