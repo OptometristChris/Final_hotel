@@ -54,6 +54,7 @@
 		    fk_hotel_id,
 		    room_name,
 		    room_grade,
+		    room_size,
 		    bed_type,
 		    view_type,
 		    base_price,
@@ -71,6 +72,7 @@
 		     
 		    #{room_name},
 		    #{room_grade},
+		    #{room_size},
 		    #{bed_type},
 		    #{view_type},
 		    #{base_price},
