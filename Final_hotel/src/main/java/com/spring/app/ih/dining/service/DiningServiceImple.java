@@ -67,12 +67,23 @@ public class DiningServiceImple implements DiningService {
         return 0;
     }
 
+    // 다이닝 매장 이름
 	@Override
-	public String getDiningName(Long diningId) {
-		return diningMapper.getDiningName(diningId);
+	public String getDiningName(int dining_id) {
+		return diningMapper.getDiningName(dining_id);
 	}
 
+	// 비회원 예약 조회
+	@Override
+	public List<DiningReservationDTO> findNonMemberReservations(String name, String email, String password) {
+        return diningMapper.searchNonMemberRes(name, email, password);
+    }
 
+	// 예약 취소
+    @Transactional
+    public void cancelReservation(Long id) {
+    	diningMapper.updateStatus(id, "CANCELLED");
+    }
 
     
 }
