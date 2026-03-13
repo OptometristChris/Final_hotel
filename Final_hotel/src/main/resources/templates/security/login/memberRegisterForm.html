@@ -706,6 +706,9 @@ span#emailCheckResult{
          	 */ 
          	 // 첫번째 방법
          	 
+         	     const token  = $("meta[name='_csrf']").attr("content");
+    			const header = $("meta[name='_csrf_header']").attr("content");
+         	 
          	 $.ajax({
          		 url:/*[[@{/security/member_id_check}]]*/ "",
          		 data:{"memberid":$("input#memberid").val()}, // data 는 /myspringboot/member/member_id_check 으로 전송해야할 데이터를 말한다.
@@ -715,6 +718,9 @@ span#emailCheckResult{
          		                  // 만약에 dataType:"json" 으로 해주면 /myspring/security/member/member_id_check 로 부터 받아오는 결과물은 json 형식이어야 한다.
          		 async:true,      // async:true 가 비동기 방식을 말한다. async 을 생략하면 기본값이 비동기 방식인 async:true 이다.
          		                  // async:false 가 동기 방식이다. 지도를 할때는 반드시 동기방식인 async:false 을 사용해야만 지도가 올바르게 나온다.  
+	         		beforeSend: function(xhr){
+	                    xhr.setRequestHeader(header, token);
+	                },
          		 success:function(json){ // json ==> {"isExists":true} 또는 {"isExists":false} 이다.  
          			 if(json.isExists) {
          				 // 입력한 memberid 가 이미 사용중이라면 
@@ -756,6 +762,9 @@ span#emailCheckResult{
 		b_flag_emailDuplicate_click = true;
 		// 가입하기 버튼을 클릭시 "이메일중복확인" 을 클릭했는지 클릭안했는지 알아보기위한 용도임.
 		
+		const token  = $("meta[name='_csrf']").attr("content");
+    	const header = $("meta[name='_csrf_header']").attr("content");
+		
 		$.ajax({
 			url:/*[[@{/security/emailDuplicateCheck}]]*/ "",
 			data:{"email":$("input#email").val()}, // data 는 /myspringboot/security/emailDuplicateCheck 로 전송해야할 데이터를 말한다. 
@@ -763,6 +772,9 @@ span#emailCheckResult{
 			dataType:"json",
         //	async:true,   // async:true 가 비동기 방식을 말한다. async 을 생략하면 기본값이 비동기 방식인 async:true 이다.
                           // async:false 가 동기 방식이다. 지도를 할때는 반드시 동기방식인 async:false 을 사용해야만 지도가 올바르게 나온다. 
+			beforeSend: function(xhr){
+                xhr.setRequestHeader(header, token);
+            },
             success:function(json){
             	
             	if(json.isExists) {
@@ -887,6 +899,9 @@ span#emailCheckResult{
 	<div class="row" id="divRegisterFrm">
 	  <div class="col-md-12" align="center">
 		<form name="registerFrm">
+		 <input type="hidden"
+           th:name="${_csrf.parameterName}"
+           th:value="${_csrf.token}" />
 		
 		<table id="tblMemberRegister">
 			<thead>
