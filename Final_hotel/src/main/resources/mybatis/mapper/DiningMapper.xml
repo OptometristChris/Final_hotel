@@ -75,15 +75,12 @@
 	        D.NAME AS diningName  FROM dining_reservations R
 	    JOIN tbl_dining D ON R.dining_id = D.dining_id  WHERE R.dining_reservation_id = #{diningReservationId}
 	</select>
-	
 		
     <select id="getDiningName" parameterType="long" resultType="string">
 	    SELECT name 
 	    FROM tbl_dining 
 	    WHERE dining_id = #{diningId}
-	</select>
-	
-	    
+	</select>	    
     
 	<insert id="insertReservation" parameterType="DiningReservationDTO">
 	    <selectKey keyProperty="diningReservationId" resultType="long" order="BEFORE">
@@ -142,5 +139,29 @@
 	        SYSTIMESTAMP
 	    )
 	</insert>
+	
+	<select id="searchNonMemberRes" resultType="DiningReservationDTO">
+	    SELECT 
+	        R.DINING_RESERVATION_ID as diningReservationId,
+	        (SELECT D.NAME FROM tbl_dining D WHERE D.DINING_ID = R.DINING_ID) as diningName,
+	        R.RES_DATE as resDate,
+	        R.RES_TIME as resTime,
+	        R.ADULT_COUNT as adultCount,
+	        R.CHILD_COUNT as childCount,
+	        R.INFANT_COUNT as infantCount,
+	        R.STATUS as status
+	    FROM DINING_RESERVATIONS R
+	    WHERE R.GUEST_NAME = #{name}
+	      AND R.GUEST_EMAIL = #{email}
+	      AND R.RES_PASSWORD = #{password}
+	      AND R.FK_MEMBER_NO IS NULL  ORDER BY R.RES_DATE DESC, R.RES_TIME DESC
+	</select>
+
+    <update id="updateStatus">
+        UPDATE DINING_RESERVATIONS
+	    SET STATUS = #{status},
+	        UPDATED_AT = CURRENT_TIMESTAMP
+	    WHERE DINING_RESERVATION_ID = #{id}
+    </update>
 	
 </mapper>

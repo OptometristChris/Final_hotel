@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.spring.app.jh.security.domain.MemberDTO;
 import com.spring.app.jh.security.domain.Session_MemberDTO;
 import com.spring.app.jh.security.service.MemberService;
+import com.spring.app.jh.security.auth.service.JwtAuthService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping(value="/security/")
 public class MemberController {
 	
+	private final JwtAuthService jwtAuthService;
 	private final MemberService memberService;	
 	// private final PasswordEncoder passwordEncoder; 	// ★ 제거
 	
@@ -357,6 +360,62 @@ public class MemberController {
         model.addAttribute("result", result);
 
         return "security/member/profileEditResult";
+    }
+    
+    
+    // 회원탈퇴 form
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("member/withdraw")
+    public String withdrawForm(HttpSession session, Model model) {
+
+        Session_MemberDTO sm = (Session_MemberDTO) session.getAttribute("sessionMemberDTO");
+        if (sm == null) {
+            return "redirect:/security/login";
+        }
+
+        MemberDTO memberDto = memberService.findByMemberid(sm.getMemberid());
+        model.addAttribute("memberDto", memberDto);
+
+        return "security/member/withdrawForm";
+    }
+
+
+    // 회원탈퇴 처리
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("api/auth/member/withdraw")
+    @ResponseBody
+    public Map<String, Object> withdrawMember(HttpSession session,
+                                              HttpServletRequest request,
+                                              HttpServletResponse response) {
+
+        Map<String, Object> resultMap = new HashMap<>();
+
+        Session_MemberDTO sm = (Session_MemberDTO) session.getAttribute("sessionMemberDTO");
+
+        if (sm == null || sm.getMemberNo() == null) {
+            resultMap.put("success", false);
+            resultMap.put("message", "로그인 정보가 없습니다.");
+            return resultMap;
+        }
+
+        Integer memberNo = sm.getMemberNo();
+
+        int n = memberService.disable_member(memberNo);
+
+        if (n == 1) {
+
+            // refresh token 삭제 + security context 정리 + session 무효화
+            jwtAuthService.logout("MEMBER", Long.valueOf(memberNo), request, response);
+
+            resultMap.put("success", true);
+            resultMap.put("message", "회원탈퇴가 정상 처리되었습니다.");
+        }
+        else {
+            resultMap.put("success", false);
+            resultMap.put("message", "회원탈퇴 처리에 실패했습니다.");
+        }
+
+        return resultMap;
     }
     
     

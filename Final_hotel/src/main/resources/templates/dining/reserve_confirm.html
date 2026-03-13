@@ -11,12 +11,11 @@
             :root { 
                 --hotel-gold: #9d815d; 
                 --hotel-dark: #222222; 
-                --header-height: 120px; /* 헤더 높이에 맞게 조절하세요 */
+                --header-height: 120px;
             }
             
             body { background-color: #f8f9fa; font-family: 'Noto Serif KR', serif; }
             
-            /* 헤더와 겹치지 않도록 padding-top 수정 */
             #mycontent { 
                 background-color: #f8f9fa; 
                 padding-top: var(--header-height) !important; 
@@ -48,9 +47,9 @@
                 background: var(--hotel-dark); color: white !important; border: none;
                 padding: 20px; width: 100%; font-size: 1.1rem; font-weight: bold;
                 letter-spacing: 2px; margin-top: 30px; transition: 0.3s;
-                cursor: pointer;
+                cursor: pointer; display: block; text-align: center;
             }
-            .btn-pay:hover { background: #000; transform: translateY(-2px); }
+            .btn-pay:hover { background: #000; transform: translateY(-2px); text-decoration: none; }
             
             .hr-gold { width: 40px; border-top: 2px solid var(--hotel-gold); margin: 20px auto; }
         </style>
@@ -72,13 +71,12 @@
                     pay_method: "card",
                     merchant_uid: "ORD_" + new Date().getTime(),
                     name: "다이닝 예약금 결제 - " + (resData.diningName || "호텔 다이닝"),
-                    amount: 100, // 실제 결제 시 totalAmount로 변경
+                    amount: 100, // 테스트용 100원 (실 운영 시 totalAmount로 변경)
                     buyer_email: resData.guestEmail || "",
                     buyer_name: resData.guestName || "고객",
                     buyer_tel: resData.guestPhone || ""
                 }, function (rsp) {
                     if (rsp.success) {
-                        // 결제 성공 시 이동
                         location.href = "complete?imp_uid=" + rsp.imp_uid + "&diningId=" + currentDiningId;
                     } else {
                         alert("결제 실패: " + rsp.error_msg);
@@ -90,60 +88,49 @@
 </head>
 
 <body>
-    <th:block th:fragment="content">
-        <div class="confirm-container">
-            <div class="text-center mb-5">
-                <span style="color: var(--hotel-gold); letter-spacing: 3px; font-size: 0.9rem;">CONFIRMATION</span>
-                <h2 class="mt-2">예약 정보 확인</h2>
-                <div class="hr-gold"></div>
-                <p class="text-muted small">입력하신 정보가 맞는지 다시 한번 확인해 주세요.</p>
-            </div>
+    <div th:fragment="content">
+        <div id="mycontent">
+            <div class="confirm-container shadow">
+                <div class="text-center mb-5">
+                    <span style="color: var(--hotel-gold); letter-spacing: 3px; font-size: 0.9rem;">CONFIRMATION</span>
+                    <h2 class="mt-2">예약 정보 확인</h2>
+                    <div class="hr-gold"></div>
+                    <p class="text-muted small">입력하신 정보가 맞는지 다시 한번 확인해 주세요.</p>
+                </div>
 
-            <div class="info-section">
-                <div class="info-row">
-                    <span class="info-label">예약 업장</span>
-                    <span class="info-value" th:text="${res.diningName ?: 'DINING'}">업장명</span>
+                <div class="info-section">
+                    <div class="info-row">
+                        <span class="info-label">예약 업장</span>
+                        <span class="info-value" th:text="${res.diningName ?: 'DINING'}">업장명</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">예약 일시</span>
+                        <span class="info-value">[[${res.resDate}]] / [[${res.resTime}]]</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">예약 인원</span>
+                        <span class="info-value">성인 [[${res.adultCount}]] / 어린이 [[${res.childCount}]] / 유아 [[${res.infantCount}]]</span>
+                    </div>
+                    <div class="info-row" th:if="${res.specialRequests != null && res.specialRequests != ''}">
+                        <span class="info-label">요청 사항</span>
+                        <span class="info-value" th:text="${res.specialRequests}">요청 사항 내용</span>
+                    </div>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">예약 일시</span>
-                    <span class="info-value">[[${res.resDate}]] / [[${res.resTime}]]</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">예약 인원</span>
-                    <span class="info-value">성인 [[${res.adultCount}]] / 어린이 [[${res.childCount}]] / 유아 [[${res.infantCount}]]</span>
-                </div>
-                <div class="info-row" th:if="${res.specialRequests != null && res.specialRequests != ''}">
-                    <span class="info-label">요청 사항</span>
-                    <span class="info-value" th:text="${res.specialRequests}">요청 사항 내용</span>
-                </div>
-            </div>
 
-            <div class="price-box">
-                <p class="mb-1 small text-muted">최종 결제 금액 (예약금)</p>
-                <div class="total-price">
-                    <span th:text="${#numbers.formatInteger(totalAmount, 0, 'COMMA')}">0</span>원
+                <div class="price-box">
+                    <p class="mb-1 small text-muted">최종 결제 금액 (예약금)</p>
+                    <div class="total-price">
+                        <span th:text="${#numbers.formatInteger(totalAmount, 0, 'COMMA')}">0</span>원
+                    </div>
+                    <p class="mt-2 small text-danger" style="font-size: 0.85rem;">* 예약금은 방문 시 전체 금액에서 차감됩니다.</p>
                 </div>
-                <p class="mt-2 small text-danger" style="font-size: 0.85rem;">* 예약금은 방문 시 전체 금액에서 차감됩니다.</p>
-            </div>
-        </div>
 
-            <button type="button" class="btn-pay" onclick="requestPay()">
-                결제 및 예약 확정하기
-            </button>
-            
-            <div class="text-center mt-4">
-                <a href="javascript:history.back()" class="text-secondary small" style="text-decoration: underline;">정보 수정하기</a>
-            </div>
-            <p class="mt-2 small text-danger">* 예약금은 방문 시 전체 금액에서 차감됩니다.</p>
-        </div>
-
-        <button type="button" class="btn-pay shadow" onclick="requestPay()">
-            결제 및 예약 확정하기
-        </button>
-        
-        <div class="text-center mt-4">
-            <a href="javascript:history.back()" class="text-secondary small" style="text-decoration: underline;">정보 수정하기</a>
-        </div>
-    </div>
-</body>
+                <button type="button" class="btn-pay" onclick="requestPay()">
+                    결제 및 예약 확정하기
+                </button>
+                
+                <div class="text-center mt-4">
+                    <a href="javascript:history.back()" class="text-secondary small" style="text-decoration: underline;">정보 수정하기</a>
+                </div>
+            </div> </div> </div> </body>
 </html>

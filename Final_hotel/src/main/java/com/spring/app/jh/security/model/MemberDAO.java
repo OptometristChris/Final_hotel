@@ -51,6 +51,8 @@ public interface MemberDAO {
 	int updatePasswordForTemp(Map<String, String> paraMap);
 	
 	String findEmailByMemberid(String memberid);
+	
+	int disable_member(@Param("memberNo") Integer memberNo);
 	// ===== MemberController 에서 사용하는 메서드 ===== //
 
 

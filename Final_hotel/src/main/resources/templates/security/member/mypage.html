@@ -620,7 +620,7 @@ function switchReserveTab(type) {
 
       <div class="side-section">
         <h3>예약</h3>
-        <a th:href="@{/member/reservations/room}">객실예약내역 <span>→</span></a>
+        <a th:href="@{/reservation/mypage}">객실예약내역 <span>→</span></a>
         <a th:href="@{/member/reservations/dining}">다이닝예약내역 <span>→</span></a>
         <a th:href="@{/member/reservations/shuttle}">셔틀예약내역 <span>→</span></a>
       </div>
@@ -634,8 +634,7 @@ function switchReserveTab(type) {
       <div class="side-section">
         <h3>나의정보관리</h3>
         <a th:href="@{/security/member/profileEdit}">회원정보수정 <span>→</span></a>
-        <a th:href="@{/member/sns-link}">SNS연동 <span>→</span></a>
-        <a th:href="@{/member/withdraw}">회원탈퇴 <span>→</span></a>
+        <a th:href="@{/security/member/withdraw}">회원탈퇴 <span>→</span></a>
       </div>
     </aside>
 

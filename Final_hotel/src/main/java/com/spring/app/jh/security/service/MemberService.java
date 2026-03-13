@@ -34,6 +34,9 @@ public interface MemberService {
 	
 	// 비밀번호 찾기 시 임시비밀번호 이메일 발송 및 DB 업데이트(성공 시 임시 비번 리턴, 실패 시 null 리턴)
 	boolean issueTempPasswordAndSendEmail(Map<String, String> paraMap);
+	
+	// 회원탈퇴(soft delete)
+	int disable_member(Integer memberNo);
 	// ===== MemberController 에서 사용하는 메서드들 ==== //
 	
 	

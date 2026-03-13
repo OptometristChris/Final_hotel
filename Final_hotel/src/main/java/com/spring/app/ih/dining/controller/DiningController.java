@@ -166,4 +166,31 @@ public class DiningController {
         return "dining/reserve_success";
     }
     
+    // 예약 조회 페이지
+    @GetMapping("/reservation_search")
+    public String searchPage() {
+        return "dining/reservation_search";
+    }
+
+    // 예약 내역 조회 
+    @PostMapping("/my_reservations")
+    public String getMyReservations(
+    		@RequestParam("guestName") String guestName,
+            @RequestParam("guestEmail") String guestEmail,
+            @RequestParam("resPassword") String resPassword, 
+            Model model) {
+        
+        List<DiningReservationDTO> reservations = diningService.findNonMemberReservations(guestName, guestEmail, resPassword);
+        
+        model.addAttribute("reservations", reservations);
+        return "dining/my_reservations";
+    }
+
+    // 예약 취소 처리 
+    @GetMapping("/cancel")
+    public String cancelReservation(@RequestParam("id") Long id) {
+    	diningService.cancelReservation(id);
+        return "redirect:/dining/reservation_search"; // 취소 후 조회 페이지로 리다이렉트
+    }
+    
 }

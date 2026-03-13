@@ -396,5 +396,38 @@
     FROM tbl_member_security
     WHERE member_no = #{memberNo}
   </select>
+  
+  	<!-- =============================================================== -->
+	<!-- confirm view용: 오늘 기준 유효한 객실예약 목록                   -->
+	<!-- checkout_date 가 오늘 이상인 CONFIRMED 예약만 조회               -->
+	<!-- =============================================================== -->
+	<select id="selectActiveReservationsForShuttle"
+	        parameterType="int"
+	        resultType="ReservationForShuttleDTO">
+	  SELECT
+	      r.reservation_id        AS reservationId,
+	      r.member_no             AS memberNo,
+	      r.room_type_id          AS roomTypeId,
+	      rt.fk_hotel_id          AS hotelId,
+	      h.hotel_name            AS hotelName,
+	      rt.room_name            AS roomName,
+	      ri.image_url            AS roomImageUrl,
+	      r.guest_count           AS guestCount,
+	      r.checkin_date          AS checkinDate,
+	      r.checkout_date         AS checkoutDate,
+	      r.reservation_status    AS reservationStatus
+	  FROM reservation r
+	  JOIN room_type rt
+	    ON rt.room_type_id = r.room_type_id
+	  JOIN tbl_hotel h
+	    ON h.hotel_id = rt.fk_hotel_id
+	  LEFT JOIN room_image ri
+	    ON ri.room_type_id = rt.room_type_id
+	   AND ri.is_main = 'Y'
+	  WHERE r.member_no = #{memberNo}
+	    AND r.reservation_status = 'CONFIRMED'
+	    AND TRUNC(r.checkout_date) >= TRUNC(SYSDATE)
+	  ORDER BY r.checkin_date DESC, r.reservation_id DESC
+	</select>
 
 </mapper>

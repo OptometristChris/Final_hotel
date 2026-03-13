@@ -75,4 +75,6 @@ public interface ShuttleOpsDAO {
     List<ShuttleLegDTO> selectBookedLegsByBooking(@Param("bookingId") long bookingId);
 
     String selectMemberName(@Param("memberNo") int memberNo);
+    
+    List<ReservationForShuttleDTO> selectActiveReservationsForShuttle(@Param("memberNo") int memberNo);
 }

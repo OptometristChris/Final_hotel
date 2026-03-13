@@ -343,6 +343,12 @@ public class MemberService_imple implements MemberService {
 		return n;
 	}
 	
+	@Transactional
+	@Override
+	public int disable_member(Integer memberNo) {
+	    return memberDao.disable_member(memberNo);
+	}
+	
 	
 	// =========================================================
 	// private 공통 로직

@@ -15,5 +15,9 @@ public interface DiningService {
 
 	int registerReservation(DiningReservationDTO reservationDTO, String impUid, Session_MemberDTO member);
 
-	String getDiningName(Long outletId);
+	String getDiningName(int dining_id);
+
+	List<DiningReservationDTO> findNonMemberReservations(String name, String email, String password);
+
+	void cancelReservation(Long id);
 }

@@ -24,5 +24,10 @@ public interface DiningMapper {
 
 	int insertPayment(Map<String, Object> payMap);
 
-	String getDiningName(Long diningId);
+	String getDiningName(int dining_id);
+
+    List<DiningReservationDTO> searchNonMemberRes(
+        @Param("name") String name, @Param("email") String email,  @Param("password") String password);
+
+    void updateStatus(@Param("id") Long id, @Param("status") String status);
 }

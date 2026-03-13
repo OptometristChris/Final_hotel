@@ -6,26 +6,29 @@
     <!-- domain(DTO) package -->
 	<typeAliases>
 	
-		<typeAlias type="com.spring.app.jh.security.domain.MemberDTO" alias="MemberDTO"/>
-		<typeAlias type="com.spring.app.jh.security.domain.AdminDTO" alias="AdminDTO"/>
 		<typeAlias type="com.spring.app.hk.room.domain.RoomTypeDTO" alias="RoomTypeDTO"/>
+		
 		<typeAlias type="com.spring.app.js.notice.domain.NoticeDTO" alias="NoticeDTO"/>
 		<typeAlias type="com.spring.app.js.banner.domain.BannerDTO" alias="BannerDTO"/>
 		<typeAlias type="com.spring.app.js.promotion.domain.PromotionDTO" alias="PromotionDTO"/>
 		<typeAlias type="com.spring.app.js.cs.domain.CsDTO" alias="CsDTO"/>
+		
         <typeAlias type="com.spring.app.ih.dining.model.DiningDTO" alias="DiningDTO"/>
+        <typeAlias type="com.spring.app.ih.dining.model.DiningReservationDTO" alias="DiningReservationDTO"/>
+        
         <typeAlias type="com.spring.app.jh.ops.user.domain.ShuttleLegDTO" alias="ShuttleLegDTO"/>
         <typeAlias type="com.spring.app.jh.ops.user.domain.SlotStockDTO" alias="SlotStockDTO"/>
         <typeAlias type="com.spring.app.jh.ops.user.domain.ShuttleTimetableDTO" alias="ShuttleTimetableDTO"/>
         <typeAlias type="com.spring.app.jh.ops.user.domain.ReservationForShuttleDTO" alias="ReservationForShuttleDTO"/>
         <typeAlias type="com.spring.app.jh.ops.user.domain.ShuttleConfirmCardDTO" alias="ShuttleConfirmCardDTO"/>
-        <typeAlias type="com.spring.app.ih.dining.model.DiningReservationDTO" alias="DiningReservationDTO"/>
-        
         <typeAlias type="com.spring.app.jh.ops.admin.common.domain.HotelSimpleDTO" alias="HotelSimpleDTO"/>
+        <typeAlias type="com.spring.app.jh.ops.admin.common.domain.ShuttlePlaceDTO" alias="ShuttlePlaceDTO"/>
         <typeAlias type="com.spring.app.jh.ops.admin.common.domain.ShuttleRouteDTO" alias="ShuttleRouteDTO"/>
         <typeAlias type="com.spring.app.jh.ops.admin.common.domain.ShuttleAdminTimetableDTO" alias="ShuttleAdminTimetableDTO"/>
         <typeAlias type="com.spring.app.jh.ops.admin.common.domain.ShuttleBlockDTO" alias="ShuttleBlockDTO"/>
-        <typeAlias type="com.spring.app.jh.ops.admin.common.domain.ShuttlePlaceDTO" alias="ShuttlePlaceDTO"/>
+     	<typeAlias type="com.spring.app.jh.security.domain.MemberDTO" alias="MemberDTO"/>
+		<typeAlias type="com.spring.app.jh.security.domain.AdminDTO" alias="AdminDTO"/>
+        
 	
 	</typeAliases>
 
