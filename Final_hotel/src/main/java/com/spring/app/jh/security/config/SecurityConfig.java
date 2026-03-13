@@ -198,7 +198,9 @@ public class SecurityConfig {
             "/room/**",
             "/js_images/**",
             "/notice/**",
-            "/cs/**"
+            "/cs/**",
+            
+            "/dining/**"
         };
 
         httpSecurity
