@@ -146,8 +146,14 @@
         </div>
     </div>
 
+	<!-- 수정필요함 -->
     <div class="btn-group">
-        <a th:href="@{/mypage/reservations}" class="btn btn-primary">
+    	<a th:href="@{/shuttle/reserve(reservationId=31)}"
+		   class="btn btn-primary">
+		    셔틀 예약하기
+		</a>
+    
+        <a th:href="@{/security/member/mypage}" class="btn btn-primary">
             마이페이지 이동
         </a>
 
