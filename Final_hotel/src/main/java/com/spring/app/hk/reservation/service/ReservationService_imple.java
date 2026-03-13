@@ -130,4 +130,18 @@ public class ReservationService_imple implements ReservationService {
 	public List<Map<String, Object>> selectMyReservationList(int memberNo) {
 		return reservationDAO.selectMyReservationList(memberNo);
 	}
+
+
+	// 예약 취소
+	@Override
+	public int cancelReservation(long reservationId) {
+	    return reservationDAO.cancelReservation(reservationId);
+	}
+
+
+	// 예약 취소 내역 조회
+	@Override
+	public List<Map<String, Object>> selectMyCancelReservationList(int memberNo) {
+		return reservationDAO.selectMyCancelReservationList(memberNo);
+	}
 }

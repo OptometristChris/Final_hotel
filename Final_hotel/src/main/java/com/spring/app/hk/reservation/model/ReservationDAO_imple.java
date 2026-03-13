@@ -42,4 +42,16 @@ public class ReservationDAO_imple implements ReservationDAO {
 	public List<Map<String, Object>> selectMyReservationList(int memberNo) {
 		 return sqlsession.selectList("reservation.selectMyReservationList", memberNo);
 	}
+
+	// 예약 취소
+	@Override
+	public int cancelReservation(long reservationId) {
+		 return sqlsession.update("reservation.cancelReservation", reservationId);
+	}
+
+	// 예약 취소 내역 조회
+	@Override
+	public List<Map<String, Object>> selectMyCancelReservationList(int memberNo) {
+		return sqlsession.selectList("reservation.selectMyCancelReservationList", memberNo);
+	}
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.spring.app.hk.reservation.service.ReservationService;
 import com.spring.app.jh.security.domain.CustomUserDetails;
@@ -138,6 +139,37 @@ public class ReservationController {
 	
 	     return "hk/reservation/reservationList";
 	 }
+	 
+	// ======================================
+	// 예약 취소
+	// ======================================
+	@PostMapping("/cancel")
+	@ResponseBody
+	public String cancelReservation(@RequestParam("reservation_id") long reservationId){
+
+	    int result = reservationService.cancelReservation(reservationId);
+
+	    if(result == 1){
+	        return "success";
+	    }
+
+	    return "fail";
+	}
+	
+	
+	// 예약 취소 내역 조회하기
+	@GetMapping("/mypage/cancel")
+	@ResponseBody
+	public List<Map<String,Object>> myCancelReservationList(Authentication auth){
+
+	    // 로그인 사용자 정보
+	    CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+	    int memberNo = userDetails.getMemberDto().getMemberNo();
+
+	    // 취소 내역 조회
+	    return reservationService.selectMyCancelReservationList(memberNo);
+
+	}
 	    
     
 }

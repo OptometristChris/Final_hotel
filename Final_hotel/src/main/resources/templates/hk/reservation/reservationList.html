@@ -3,6 +3,8 @@
 	th:replace="~{js/layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::content})}">
 <head>
 <meta charset="UTF-8">
+<meta name="_csrf" th:content="${_csrf.token}">
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
 <title>마이페이지 - 예약 조회</title>
 
 <link rel="stylesheet"
@@ -88,6 +90,12 @@ body{
 
 <span th:if="${r['RESERVATION_STATUS'] == 'CONFIRMED'}"
       class="status-confirmed">예약완료</span>
+      
+<span th:if="${r['RESERVATION_STATUS'] == 'CHECKED_IN'}"
+      style="color:blue;font-weight:bold;">체크인</span>
+
+<span th:if="${r['RESERVATION_STATUS'] == 'CHECKED_OUT'}"
+      style="color:gray;font-weight:bold;">체크아웃</span>
 
 <span th:if="${r['RESERVATION_STATUS'] == 'CANCELLED'}"
       class="status-cancelled">예약취소</span>
@@ -125,10 +133,14 @@ function cancelReservation(btn){
         return;
     }
 
+    const token = document.querySelector("meta[name='_csrf']").content;
+    const header = document.querySelector("meta[name='_csrf_header']").content;
+
     fetch("/reservation/cancel",{
         method:"POST",
         headers:{
-            "Content-Type":"application/x-www-form-urlencoded"
+            "Content-Type":"application/x-www-form-urlencoded",
+            [header]: token
         },
         body:"reservation_id="+reservationId
     })
