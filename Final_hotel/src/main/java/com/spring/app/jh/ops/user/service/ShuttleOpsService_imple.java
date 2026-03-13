@@ -330,61 +330,72 @@ public class ShuttleOpsService_imple implements ShuttleOpsService {
 
     @Override
     public ShuttleConfirmPageDTO getConfirmPage(int memberNo) {
-        List<ShuttleConfirmCardDTO> skeleton = shuttleDao.selectActiveShuttleBookings(memberNo);
-        if (skeleton == null) skeleton = List.of();
+
+        List<ReservationForShuttleDTO> reservations =
+                shuttleDao.selectActiveReservationsForShuttle(memberNo);
+
+        if (reservations == null) reservations = List.of();
 
         LocalDate today = LocalDate.now(KST);
         List<ShuttleConfirmCardDTO> cards = new ArrayList<>();
 
-        for (ShuttleConfirmCardDTO card : skeleton) {
-            if (card == null || card.getReservationId() == null || card.getShuttleBookingId() == null) continue;
+        for (ReservationForShuttleDTO res : reservations) {
 
-            long reservationId = card.getReservationId();
-            long bookingId = card.getShuttleBookingId();
+            if (res == null || res.getReservationId() == null) continue;
 
-            ReservationForShuttleDTO res = shuttleDao.selectReservationForCard(reservationId);
-            if (res == null) continue;
+            LocalDate checkin = toLocalDate(res.getCheckinDate());
+            LocalDate checkout = toLocalDate(res.getCheckoutDate());
 
+            // checkout 지난 예약은 아예 제외
+            if (checkout == null || checkout.isBefore(today)) {
+                continue;
+            }
+
+            ShuttleConfirmCardDTO card = new ShuttleConfirmCardDTO();
+
+            card.setReservationId(res.getReservationId());
             card.setHotelName(res.getHotelName());
             card.setRoomName(res.getRoomName());
             card.setRoomImageUrl(res.getRoomImageUrl());
             card.setReservationStatus(res.getReservationStatus());
             card.setGuestCount(res.getGuestCount() == null ? 0 : res.getGuestCount());
 
-            LocalDate checkout = toLocalDate(res.getCheckoutDate());
-            LocalDate checkin = toLocalDate(res.getCheckinDate());
-
-            boolean showTo = (checkout != null && !checkout.isBefore(today));
-            boolean showFrom = (checkout != null && !checkout.isBefore(today)) && (checkout.equals(today) || checkout.isAfter(today));
-            if (checkout != null && checkout.isBefore(today)) showFrom = false;
-
-            card.setShowTo(showTo);
-            card.setShowFrom(showFrom);
-
-            if (!showTo && !showFrom) {
-                continue;
-            }
-
             card.setCheckinText(fmtDate(checkin));
             card.setCheckoutText(fmtDate(checkout));
             card.setToRideDateText(fmtDate(checkin));
             card.setFromRideDateText(fmtDate(checkout));
 
-            List<ShuttleLegDTO> legs = shuttleDao.selectBookedLegsByBooking(bookingId);
-            if (legs == null) legs = List.of();
+            Long bookingId = shuttleDao.selectBookingIdByReservation(res.getReservationId());
+            card.setShuttleBookingId(bookingId);
 
-            List<ShuttleConfirmLegItemDTO> toLegs = legs.stream()
-                    .filter(l -> l != null && "TO_HOTEL".equals(l.getLegType()))
-                    .sorted(Comparator.comparing(ShuttleLegDTO::getDepartTime, Comparator.nullsLast(String::compareTo)))
-                    .map(this::toLegItem)
-                    .collect(Collectors.toList());
+            List<ShuttleConfirmLegItemDTO> toLegs = new ArrayList<>();
+            List<ShuttleConfirmLegItemDTO> fromLegs = new ArrayList<>();
 
-            List<ShuttleConfirmLegItemDTO> fromLegs = legs.stream()
-                    .filter(l -> l != null && "FROM_HOTEL".equals(l.getLegType()))
-                    .sorted(Comparator.comparing(ShuttleLegDTO::getDepartTime, Comparator.nullsLast(String::compareTo)))
-                    .map(this::toLegItem)
-                    .collect(Collectors.toList());
+            if (bookingId != null) {
+                List<ShuttleLegDTO> legs = shuttleDao.selectBookedLegsByBooking(bookingId);
+                if (legs == null) legs = List.of();
 
+                toLegs = legs.stream()
+                        .filter(l -> l != null && "TO_HOTEL".equals(l.getLegType()))
+                        .sorted(Comparator.comparing(ShuttleLegDTO::getDepartTime, Comparator.nullsLast(String::compareTo)))
+                        .map(this::toLegItem)
+                        .collect(Collectors.toList());
+
+                fromLegs = legs.stream()
+                        .filter(l -> l != null && "FROM_HOTEL".equals(l.getLegType()))
+                        .sorted(Comparator.comparing(ShuttleLegDTO::getDepartTime, Comparator.nullsLast(String::compareTo)))
+                        .map(this::toLegItem)
+                        .collect(Collectors.toList());
+            }
+
+            // 호텔행: 체크아웃이 지나지 않았으면 표시 가능
+            boolean showTo = !checkout.isBefore(today);
+
+            // 행선지행: 체크아웃일이 오늘 이상이면 표시 가능
+            boolean showFrom = !checkout.isBefore(today);
+
+            card.setShowTo(showTo);
+            card.setShowFrom(showFrom);
             card.setToLegs(toLegs);
             card.setFromLegs(fromLegs);
 
@@ -394,14 +405,7 @@ public class ShuttleOpsService_imple implements ShuttleOpsService {
         ShuttleConfirmPageDTO page = new ShuttleConfirmPageDTO();
         page.setCards(cards);
         page.setValidCount(cards.size());
-
-        try {
-            String memberName = shuttleDao.selectMemberName(memberNo);
-            page.setMemberName(memberName);
-        }
-        catch (Exception ignore) {
-            page.setMemberName(null);
-        }
+        page.setMemberName(shuttleDao.selectMemberName(memberNo));
 
         return page;
     }
