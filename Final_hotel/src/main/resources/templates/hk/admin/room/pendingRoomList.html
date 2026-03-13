@@ -3,6 +3,9 @@
 
 <head>
 <meta charset="UTF-8">
+
+<meta name="_csrf" th:content="${_csrf.token}">
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
 <title>객실 승인 관리(총괄관리자)</title>
 
 <!-- Bootstrap -->
@@ -323,6 +326,9 @@ if(reason == null || reason.trim() === ""){
 return;
 }
 
+/* csrf 값 가져오기 */
+let csrfToken = document.querySelector("meta[name='_csrf']").content;
+
 let form = document.createElement("form");
 
 form.method = "post";
@@ -340,9 +346,16 @@ reasonInput.type = "hidden";
 reasonInput.name = "reason";
 reasonInput.value = reason;
 
+/* csrf hidden */
+let csrfInput = document.createElement("input");
+csrfInput.type = "hidden";
+csrfInput.name = "_csrf";
+csrfInput.value = csrfToken;
+
 
 form.appendChild(idInput);
 form.appendChild(reasonInput);
+form.appendChild(csrfInput);
 
 document.body.appendChild(form);
 
