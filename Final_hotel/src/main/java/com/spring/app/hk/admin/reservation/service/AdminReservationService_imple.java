@@ -45,4 +45,9 @@ public class AdminReservationService_imple implements AdminReservationService {
 		return reservationDAO.getCheckoutCompleteList();
 	}
 
+	@Override
+	public List<Map<String, Object>> selectAdminReservationList() {
+		return reservationDAO.selectAdminReservationList();
+	}
+
 }

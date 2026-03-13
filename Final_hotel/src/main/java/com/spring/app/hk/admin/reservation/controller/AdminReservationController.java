@@ -17,56 +17,70 @@ import com.spring.app.hk.admin.reservation.service.AdminReservationService;
 @RequestMapping("/admin/reservation")
 public class AdminReservationController {
 
-    private final AdminReservationService reservationService;
+	private final AdminReservationService reservationService;
 
-    // 예약 캘린더 (객실 배정)
-    @PreAuthorize("hasRole('ADMIN_BRANCH')")
-    @GetMapping("/calendar")
-    public String reservationCalendar() {
+	// ======= 지점 관리자 ========= //
+	// 예약 캘린더 (객실 배정)
+	@PreAuthorize("hasRole('ADMIN_BRANCH')")
+	@GetMapping("/calendar")
+	public String reservationCalendar() {
 
-        return "hk/admin/reservation/calendar";
-    }
+		return "hk/admin/reservation/calendar";
+	}
 
-    // 예약 관리 페이지
-    @PreAuthorize("hasRole('ADMIN_BRANCH')")
-    @GetMapping("/manage")
-    public String reservationManage(Model model){
+	// 예약 관리 페이지
+	@PreAuthorize("hasRole('ADMIN_BRANCH')")
+	@GetMapping("/manage")
+	public String reservationManage(Model model) {
 
-        List<Map<String,Object>> checkinList = reservationService.getTodayCheckinList();
-        List<Map<String,Object>> checkoutList = reservationService.getTodayCheckoutList();
-        List<Map<String,Object>> stayList = reservationService.getStayList();
-        List<Map<String,Object>> checkoutCompleteList =
-                reservationService.getCheckoutCompleteList();
+		List<Map<String, Object>> checkinList = reservationService.getTodayCheckinList();
+		List<Map<String, Object>> checkoutList = reservationService.getTodayCheckoutList();
+		List<Map<String, Object>> stayList = reservationService.getStayList();
+		List<Map<String, Object>> checkoutCompleteList = reservationService.getCheckoutCompleteList();
 
-        System.out.println("checkinList = " + checkinList);
-        System.out.println("checkoutList = " + checkoutList);
-        
-        model.addAttribute("checkinList", checkinList);
-        model.addAttribute("checkoutList", checkoutList);
-        model.addAttribute("stayList", stayList);
-        model.addAttribute("checkoutCompleteList", checkoutCompleteList);
+		System.out.println("checkinList = " + checkinList);
+		System.out.println("checkoutList = " + checkoutList);
 
-        return "hk/admin/reservation/reservationManage";
-    }
+		model.addAttribute("checkinList", checkinList);
+		model.addAttribute("checkoutList", checkoutList);
+		model.addAttribute("stayList", stayList);
+		model.addAttribute("checkoutCompleteList", checkoutCompleteList);
 
-    // 체크인 처리
-    @PreAuthorize("hasRole('ADMIN_BRANCH')")
-    @PostMapping("/checkin")
-    public String checkin(@RequestParam("reservationId") int reservationId){
+		return "hk/admin/reservation/reservationManage";
+	}
 
-        reservationService.checkinReservation(reservationId);
+	// 체크인 처리
+	@PreAuthorize("hasRole('ADMIN_BRANCH')")
+	@PostMapping("/checkin")
+	public String checkin(@RequestParam("reservationId") int reservationId) {
 
-        return "redirect:/admin/reservation/manage";
-    }
+		reservationService.checkinReservation(reservationId);
 
-    // 체크아웃 처리
-    @PreAuthorize("hasRole('ADMIN_BRANCH')")
-    @PostMapping("/checkout")
-    public String checkout(@RequestParam("reservationId") int reservationId){
+		return "redirect:/admin/reservation/manage";
+	}
 
-        reservationService.checkoutReservation(reservationId);
+	// 체크아웃 처리
+	@PreAuthorize("hasRole('ADMIN_BRANCH')")
+	@PostMapping("/checkout")
+	public String checkout(@RequestParam("reservationId") int reservationId) {
 
-        return "redirect:/admin/reservation/manage";
-    }
+		reservationService.checkoutReservation(reservationId);
+
+		return "redirect:/admin/reservation/manage";
+	}
+
+	// ======= 총괄 관리자 ========= //
+	// 전체 객실 예약 리스트 조회
+	@PreAuthorize("hasRole('ADMIN_HQ')")
+	@GetMapping("/list")
+	public String adminReservationList(Model model) {
+
+	    List<Map<String,Object>> reservationList =
+	            reservationService.selectAdminReservationList();
+
+	    model.addAttribute("reservationList", reservationList);
+
+	    return "hk/admin/reservation/reservationList";
+	}
 
 }

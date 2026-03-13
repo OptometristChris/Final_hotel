@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<title>관리자 예약 관리</title>
+
+<style>
+
+body{
+    font-family: Pretendard, sans-serif;
+    background:#f8f9fa;
+    margin:0;
+}
+
+.container{
+    width:1200px;
+    margin:40px auto;
+}
+
+h2{
+    margin-bottom:20px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+}
+
+th,td{
+    padding:10px;
+    border:1px solid #ddd;
+    text-align:center;
+}
+
+th{
+    background:#f1f3f5;
+}
+
+tbody tr:hover{
+    background:#f8f9fa;
+}
+
+.top-bar{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:15px;
+}
+
+button{
+    padding:6px 12px;
+    border:none;
+    background:#343a40;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#495057;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>전체 예약 관리</h2>
+
+<div class="top-bar">
+
+<div>
+총 예약 수 :
+<span th:text="${#lists.size(reservationList)}"></span>
+</div>
+
+<div>
+<button onclick="downloadExcel()">엑셀 다운로드</button>
+</div>
+
+</div>
+
+<table>
+
+<thead>
+<tr>
+<th>예약번호</th>
+<th>회원</th>
+<th>호텔</th>
+<th>객실타입</th>
+<th>체크인</th>
+<th>체크아웃</th>
+<th>가격</th>
+<th>결제상태</th>
+<th>예약상태</th>
+<th>예약일</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr th:each="r : ${reservationList}">
+
+<td th:text="${r.RESERVATION_ID}"></td>
+
+<td th:text="${r.NAME}"></td>
+
+<td th:text="${r.HOTEL_NAME}"></td>
+
+<td th:text="${r.ROOM_TYPE_ID}"></td>
+
+<td th:text="${#dates.format(r.CHECKIN_DATE,'yyyy-MM-dd')}"></td>
+
+<td th:text="${#dates.format(r.CHECKOUT_DATE,'yyyy-MM-dd')}"></td>
+
+<td th:text="${#numbers.formatInteger(r.TOTAL_PRICE,0,'COMMA')}"></td>
+
+<td th:text="${r.PAYMENT_STATUS}"></td>
+
+<td th:text="${r.RESERVATION_STATUS}"></td>
+
+<td th:text="${#dates.format(r.CREATED_AT,'yyyy-MM-dd')}"></td>
+
+</tr>
+
+<tr th:if="${#lists.isEmpty(reservationList)}">
+<td colspan="10">예약 데이터가 없습니다.</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+<script>
+
+function downloadExcel(){
+
+alert("엑셀 다운로드 기능은 아직 구현되지 않았습니다.");
+
+}
+
+</script>
+
+</body>
+
+</html>

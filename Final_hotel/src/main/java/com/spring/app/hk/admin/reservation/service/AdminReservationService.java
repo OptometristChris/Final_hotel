@@ -5,7 +5,8 @@ import java.util.Map;
 
 public interface AdminReservationService {
 
-    // 오늘 체크인 리스트
+	// ----- 지점관리자 ----- 
+	// 오늘 체크인 리스트
     List<Map<String,Object>> getTodayCheckinList();
 
     // 오늘 체크아웃 리스트
@@ -22,5 +23,10 @@ public interface AdminReservationService {
 
 	// 체크아웃 완료 목록 조회
 	List<Map<String, Object>> getCheckoutCompleteList();
+	
+	
+	// ----- 총괄관리자 ----- 
+	// 전체 객실 예약 리스트 조회
+	List<Map<String,Object>> selectAdminReservationList();
 
 }
