@@ -24,5 +24,5 @@ public interface DiningMapper {
 
 	int insertPayment(Map<String, Object> payMap);
 
-	String getDiningName(Long outletId);
+	String getDiningName(Long diningId);
 }
