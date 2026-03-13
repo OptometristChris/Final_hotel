@@ -73,7 +73,7 @@
 	    SELECT 
 	        R.*, 
 	        D.NAME AS diningName  FROM dining_reservations R
-	    JOIN tbl_dining D ON R.dining_id = D.dining_id  WHERE R.dining_id = #{diningId}
+	    JOIN tbl_dining D ON R.dining_id = D.dining_id  WHERE R.dining_reservation_id = #{diningReservationId}
 	</select>
 	
 		
@@ -86,15 +86,19 @@
 	    
     
 	<insert id="insertReservation" parameterType="DiningReservationDTO">
-		<selectKey keyProperty="diningReservationId" resultType="long" order="BEFORE">
+	    <selectKey keyProperty="diningReservationId" resultType="long" order="BEFORE">
 	        SELECT seq_dining_reservation.nextval FROM dual
 	    </selectKey>
-    
+	
 	    INSERT INTO dining_reservations (
-	        dining_reservation_id,  fk_hotel_id,            dining_id,
+	        dining_reservation_id,  
+	        fk_hotel_id,            
+	        dining_id,
+	        fk_member_no,           
 	        guest_name,
 	        guest_phone,
-	        guest_email,
+	        guest_email,            
+	        res_password,           
 	        adult_count,
 	        child_count,
 	        infant_count,
@@ -104,17 +108,15 @@
 	        status,
 	        created_at
 	    ) VALUES (
-	        SEQ_DINING_RESERVATIONS.nextval, 1,                               #{diningId},
-	        #{guestName},
+	        #{diningReservationId}, 
+	        #{fkHotelId},           
+	        #{diningId},
+	        #{fkMemberNo, jdbcType=NUMERIC},     #{guestName},
 	        #{guestPhone},
-	        #{guestEmail},
-	        #{adultCount},
-	        #{childCount},
-	        #{infantCount},
-	        #{resDate},
+	        #{guestEmail, jdbcType=VARCHAR},     #{resPassword, jdbcType=VARCHAR},    #{adultCount},
+	        #{childCount, jdbcType=NUMERIC},     #{infantCount, jdbcType=NUMERIC},    #{resDate},
 	        #{resTime},
-	        #{specialRequests},
-	        'CONFIRMED',
+	        #{specialRequests, jdbcType=VARCHAR}, 'CONFIRMED',
 	        SYSTIMESTAMP
 	    )
 	</insert>
