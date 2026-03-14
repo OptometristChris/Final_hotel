@@ -3,6 +3,9 @@
 
 <head>
 <meta charset="UTF-8">
+
+<meta name="_csrf" th:content="${_csrf.token}">
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
 <title>숙소 상세</title>
 
 <link rel="stylesheet"
@@ -187,13 +190,17 @@ function deleteHotel(){
 	
 	let hotel_id = [[${hotel.HOTEL_ID}]];
 	
+	const token = document.querySelector('meta[name="_csrf"]').content;
+	const header = document.querySelector('meta[name="_csrf_header"]').content;	
+	
 	fetch("[[@{/admin/hotel/delete}]]",{
 	
 	method:"POST",
 	
 	headers:{
-	"Content-Type":"application/json"
-	},
+		"Content-Type":"application/json",
+		[header]: token
+		},
 	
 	body:JSON.stringify({
 	hotel_id:hotel_id
@@ -223,13 +230,17 @@ function updateHotel(){
 	let contact = document.getElementById("contact").value;
 	let hotel_desc = document.getElementById("hotel_desc").value;
 
+	const token = document.querySelector('meta[name="_csrf"]').content;
+	const header = document.querySelector('meta[name="_csrf_header"]').content;	
+	
 	fetch("[[@{/admin/hotel/update}]]",{
 
 	method:"POST",
 
 	headers:{
-	"Content-Type":"application/json"
-	},
+		"Content-Type":"application/json",
+		[header]: token
+		},
 
 	body:JSON.stringify({
 	hotel_id:hotel_id,

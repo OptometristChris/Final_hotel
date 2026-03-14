@@ -103,6 +103,23 @@ public class HotelController {
     }
       
     
+    // 호텔 활성화시키기
+    @PreAuthorize("hasRole('ADMIN_HQ')")
+    @PostMapping("restore")
+    @ResponseBody
+    public Map<String,Object> restoreHotel(@RequestBody Map<String,Object> param){
+
+        int hotel_id = Integer.parseInt(param.get("hotel_id").toString());
+
+        int result = hotelService.restoreHotel(hotel_id);
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("result", result);
+
+        return map;
+    }
+    
+    
     // 등록 페이지 이동
 	@PreAuthorize("hasRole('ADMIN_HQ')")
     @GetMapping("register")

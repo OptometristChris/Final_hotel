@@ -59,6 +59,13 @@
 		WHERE H.ACTIVE_YN = 'N'
 		ORDER BY H.HOTEL_ID DESC
 	</select>
+	
+	<!-- 호텔 다시 활성화시키기 -->
+	<update id="restoreHotel">
+	    UPDATE tbl_hotel
+	    SET active_yn = 'Y'
+	    WHERE hotel_id = #{hotel_id}
+	</update>
 
 	
 	<!-- 호텔 상세페이지 이동 -->

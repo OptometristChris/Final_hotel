@@ -95,7 +95,11 @@ public class HotelService_imple implements HotelService {
 		  return hotelDAO.deleteHotel(hotel_id);
 	}
 	
-
+	// 호텔 활성화시키기
+	@Override
+	public int restoreHotel(int hotel_id) {
+	    return hotelDAO.restoreHotel(hotel_id);
+	}
 
 
 	
