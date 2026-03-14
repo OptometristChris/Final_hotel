@@ -20,7 +20,7 @@
 		AND i.is_main='Y'
 		
 		WHERE h.active_yn='Y'
-		AND h.approve_status='APPROVED'
+		
 		
 		ORDER BY h.hotel_id
 	</select>

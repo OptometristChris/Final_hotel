@@ -198,7 +198,7 @@ onclick="filterHotel('REJECTED')">반려</button> -->
 비활성
 </span>
 
-<button class="btn btn-sm btn-success"
+<button class="btn btn-sm btn-light"
         th:onclick="'restoreHotel(' + ${hotel.HOTEL_ID} + ')'">
 원복
 </button>
@@ -361,6 +361,10 @@ card.style.display="none";
 /* 호텔 다시 활성화시키기 */
 function restoreHotel(hotelId){
 
+	if(!confirm("정말 다시 원복하시겠습니까?")){
+		return;
+		}
+	
 	const token = document.querySelector('meta[name="_csrf"]').content;
 	const header = document.querySelector('meta[name="_csrf_header"]').content;	
 	
