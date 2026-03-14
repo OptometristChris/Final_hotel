@@ -20,7 +20,5 @@ public interface ReservationService {
 	// 예약 취소
 	int cancelReservation(long reservationId);
 
-	// 예약 취소 내역 조회
-	List<Map<String, Object>> selectMyCancelReservationList(int memberNo);
 
 }

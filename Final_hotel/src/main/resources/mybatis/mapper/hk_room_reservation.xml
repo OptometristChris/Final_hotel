@@ -158,33 +158,11 @@
 	    UPDATE RESERVATION
 	    SET RESERVATION_STATUS = 'CANCELLED'
 	    WHERE RESERVATION_ID = #{reservation_id}
+	    AND SYSDATE &lt;= CANCEL_DEADLINE
 	</update>
 	
 	
-	<!-- 예약 취소 내역 조회 -->
-	<select id="selectMyCancelReservationList" resultType="map">
 
-		SELECT
-		    r.RESERVATION_CODE,
-		    h.HOTEL_NAME,
-		    rt.ROOM_NAME,
-		    r.CHECKIN_DATE,
-		    r.CHECKOUT_DATE,
-		    r.REFUND_AMOUNT,
-		    r.CREATED_AT
-		
-		FROM RESERVATION r
-		JOIN ROOM_TYPE rt
-		  ON r.ROOM_TYPE_ID = rt.ROOM_TYPE_ID
-		JOIN TBL_HOTEL h
-		  ON rt.FK_HOTEL_ID = h.HOTEL_ID
-		
-		WHERE r.MEMBER_NO = #{memberNo}
-		AND r.RESERVATION_STATUS = 'CANCELLED'
-		
-		ORDER BY r.CREATED_AT DESC
-		
-	</select>
 	  
 
 </mapper>

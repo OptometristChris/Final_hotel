@@ -136,29 +136,16 @@ public class ReservationController {
 	// ======================================
 	@PostMapping("/cancel")
 	@ResponseBody
-	public String cancelReservation(@RequestParam("reservation_id") long reservationId) {
+	public String cancelReservation(@RequestParam("reservation_id") Long reservationId){
 
-		int result = reservationService.cancelReservation(reservationId);
+	    int n = reservationService.cancelReservation(reservationId);
 
-		if (result == 1) {
-			return "success";
-		}
+	    if(n == 1){
+	        return "success";
+	    }
 
-		return "fail";
+	    return "deadline";
 	}
 
-	// 예약 취소 내역 조회하기
-	@GetMapping("/mypage/cancel")
-	@ResponseBody
-	public List<Map<String, Object>> myCancelReservationList(Authentication auth) {
-
-		// 로그인 사용자 정보
-		CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-		int memberNo = userDetails.getMemberDto().getMemberNo();
-
-		// 취소 내역 조회
-		return reservationService.selectMyCancelReservationList(memberNo);
-
-	}
 
 }

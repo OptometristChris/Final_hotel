@@ -151,6 +151,9 @@ function cancelReservation(btn){
             alert("예약이 취소되었습니다.");
             location.reload();
         }
+        else if(data === "deadline"){
+            alert("취소 가능 시간이 지났습니다.");
+        }
         else{
             alert("취소 실패");
         }

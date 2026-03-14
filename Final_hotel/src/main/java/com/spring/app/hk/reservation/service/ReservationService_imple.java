@@ -139,9 +139,4 @@ public class ReservationService_imple implements ReservationService {
 	}
 
 
-	// 예약 취소 내역 조회
-	@Override
-	public List<Map<String, Object>> selectMyCancelReservationList(int memberNo) {
-		return reservationDAO.selectMyCancelReservationList(memberNo);
-	}
 }
