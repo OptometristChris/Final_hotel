@@ -51,10 +51,18 @@ public class AdminReservationController {
 	        occupancyRate = (int)(((double) stayCount / totalRoomCount) * 100);
 	    }
 	    
+	    // 바
+	    int checkinProgress = 0;
+
+	    if(todayCheckinCount > 0){
+	        checkinProgress = (int)(((double) stayCount / todayCheckinCount) * 100);
+	    }
+
+	    
 		//System.out.println("checkinList = " + checkinList);
 		//System.out.println("checkoutList = " + checkoutList);
 
-	 // ===== 리스트 =====
+	    // ===== 리스트 =====
 	    model.addAttribute("checkinList", checkinList);
 	    model.addAttribute("checkoutList", checkoutList);
 	    model.addAttribute("stayList", stayList);
@@ -65,6 +73,9 @@ public class AdminReservationController {
 	    model.addAttribute("todayCheckoutCount", todayCheckoutCount);
 	    model.addAttribute("stayCount", stayCount);
 	    model.addAttribute("occupancyRate", occupancyRate);
+	    
+	    // === 바 ===
+	    model.addAttribute("checkinProgress", checkinProgress);
 
 		return "hk/admin/reservation/reservationManage";
 	}

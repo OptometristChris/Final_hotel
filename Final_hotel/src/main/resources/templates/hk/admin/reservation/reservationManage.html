@@ -72,6 +72,23 @@ padding:6px 12px;
 cursor:pointer;
 }
 
+/* 체크인 진행률 */
+.progress-container{
+margin-bottom:40px;
+}
+
+.progress-bar-bg{
+width:100%;
+background:#eee;
+border-radius:10px;
+overflow:hidden;
+height:20px;
+}
+
+.progress-bar-fill{
+background:#4CAF50;
+height:100%;
+}
 </style>
 
 </head>
@@ -113,6 +130,27 @@ cursor:pointer;
 
 </div>
 
+<!-- ================================ -->
+<!-- 체크인 진행률 -->
+<!-- ================================ -->
+
+<div class="progress-container">
+
+<h3>오늘 체크인 진행률</h3>
+
+<div class="progress-bar-bg">
+
+<div class="progress-bar-fill"
+     th:style="'width:' + ${checkinProgress} + '%'">
+</div>
+
+</div>
+
+<div style="margin-top:8px;font-weight:bold;"
+     th:text="${checkinProgress} + '%'">
+</div>
+
+</div>
 
 <!-- ================================ -->
 <!-- 1. 오늘 체크인 -->
