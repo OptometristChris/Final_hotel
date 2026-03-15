@@ -68,8 +68,9 @@
 	</update>
 
 	
-	<!-- 호텔 상세페이지 이동 -->
+	<!-- 호텔 상세페이지 -->
 	<select id="selectHotelDetail" resultType="map">
+	
 		SELECT
 		    H.HOTEL_ID,
 		    H.HOTEL_NAME,
@@ -77,6 +78,8 @@
 		    H.CONTACT,
 		    H.HOTEL_DESC,
 		    H.APPROVE_STATUS,
+		    H.LATITUDE,
+		    H.LONGITUDE,
 		    I.IMAGE_URL
 		
 		FROM TBL_HOTEL H
@@ -87,6 +90,7 @@
 		
 		WHERE H.HOTEL_ID = #{hotelId}
 		AND H.ACTIVE_YN = 'Y'
+	
 	</select>
 		
 		

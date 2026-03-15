@@ -150,6 +150,9 @@ public class HotelController {
 
 			Map<String,Object> paraMap = new HashMap<>(map);
 
+			paraMap.put("latitude", latitude);
+			paraMap.put("longitude", longitude);
+			
 			// 관리자 번호
 			paraMap.put("admin_no", adminNo);
 
@@ -180,6 +183,8 @@ public class HotelController {
 
             // 서비스 호출 (Reservation 구조 동일)
             hotelService.saveHotel(paraMap);
+            
+            
 
         } catch(Exception e) {
             e.printStackTrace();
@@ -189,6 +194,5 @@ public class HotelController {
         return Map.of("result", 1);
     }
     
-    
-    
+       
 }
