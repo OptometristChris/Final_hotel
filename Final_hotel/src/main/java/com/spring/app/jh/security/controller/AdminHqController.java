@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.spring.app.jh.ops.admin.common.domain.AdminDashboardKpiDTO;
+import com.spring.app.jh.ops.admin.common.domain.MonthlyReservationSummaryDTO;
+import com.spring.app.jh.ops.admin.service.AdminDashboardService;
 import com.spring.app.jh.security.domain.AdminDTO;
 import com.spring.app.jh.security.domain.MemberDTO;
 import com.spring.app.jh.security.domain.Session_AdminDTO;
@@ -30,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminHqController {
 
 	private final AdminService adminService;
+	private final AdminDashboardService adminDashboardService;
 
 	/*
 	   HQ 전용 기능
@@ -53,11 +57,21 @@ public class AdminHqController {
 	// ============================================================
 
 	@GetMapping("dashboard")
-	public String dashboard() {
+	public String dashboard(Model model) {
 
-		return "admin/hq/hq_dashboard";
-		// src/main/resources/templates/admin/hq/hq_dashboard.html
-	}
+        AdminDashboardKpiDTO kpi = adminDashboardService.getHqDashboardKpi();
+        MonthlyReservationSummaryDTO monthlySummary = adminDashboardService.getHqMonthlyReservationSummary();
+        
+        model.addAttribute("kpi_occupancy", kpi.getOccupancyRate());
+        model.addAttribute("kpi_sales", kpi.getMonthlySales());
+        model.addAttribute("kpi_cancelRate", kpi.getCancelRate());
+        model.addAttribute("kpi_revpar", kpi.getRevpar());
+        
+        model.addAttribute("monthlySummary", monthlySummary);
+        model.addAttribute("reservationSummary", monthlySummary);
+
+        return "admin/hq/hq_dashboard";
+    }
 	
 	
 	// ============================================================

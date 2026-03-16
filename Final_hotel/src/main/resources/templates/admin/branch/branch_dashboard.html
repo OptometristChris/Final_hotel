@@ -32,7 +32,7 @@
     button{font-family:inherit}
 
     .container{
-      padding-top: 120px; /* layout_main 헤더 높이에 맞춰 조절 */
+      padding-top: 120px;
     }
 
     /* ===== Layout ===== */
@@ -172,7 +172,6 @@
       cursor:pointer;
     }
 
-    /* 히어로 바디는 “포인트 영역”이므로 아주 약한 그라데이션만 */
     .heroBody{
       padding:14px 16px 16px;
       background:
@@ -204,6 +203,7 @@
       gap:10px;
       flex-wrap:wrap;
       justify-content:flex-end;
+      align-items:flex-start;
     }
     .kpiBadges .pill{
       background:rgba(255,255,255,.12);
@@ -219,7 +219,7 @@
       border-radius: 16px;
       padding:12px;
       display:grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap:10px;
       backdrop-filter: blur(6px);
     }
@@ -348,6 +348,7 @@
     @media (max-width: 980px){
       .row2{grid-template-columns:1fr}
       .heroStats{grid-template-columns:1fr}
+      .kpiBadges{justify-content:flex-start}
       .quickActions{grid-template-columns:1fr 1fr}
     }
     @media (max-width: 520px){
@@ -365,29 +366,38 @@
 <body>
 <div class="container"
      th:with="
-        a=${session.sessionAdminDTO},
-        adminType=(${a} != null and ${a.admin_type} != null ? ${a.admin_type} : 'BRANCH'),
-        adminName=(${a} != null and ${a.name} != null ? ${a.name} : '지점관리자 홍길동'),
-        hotelId=(${a} != null and ${a.fk_hotel_id} != null ? ${a.fk_hotel_id} : 1),
-
-        hotelName=(${hotelName} != null ? ${hotelName} : '호텔 시엘(잠실)'),
-        periodLabel=(${periodLabel} != null ? ${periodLabel} : '오늘'),
-        alertCount=(${alertCount} != null ? ${alertCount} : 3),
-
-        occupancyRate=(${occupancyRate} != null ? ${occupancyRate} : 72),
-        kpiBefore=(${kpiBefore} != null ? ${kpiBefore} : 42),
-        kpiHold=(${kpiHold} != null ? ${kpiHold} : 8),
-        kpiDone=(${kpiDone} != null ? ${kpiDone} : 55),
-
-        checkinCount=(${checkinCount} != null ? ${checkinCount} : 12),
-        checkoutCount=(${checkoutCount} != null ? ${checkoutCount} : 9),
-        qnaUnansweredCount=(${qnaUnansweredCount} != null ? ${qnaUnansweredCount} : 5),
-        payWaitCount=(${payWaitCount} != null ? ${payWaitCount} : 3)
-     ">
+	   a=${session.sessionAdminDTO},
+	   adminType=(${a} != null and ${a.admin_type} != null ? ${a.admin_type} : 'BRANCH'),
+	   adminName=(${a} != null and ${a.name} != null ? ${a.name} : '지점관리자 홍길동'),
+	   hotelId=(${a} != null and ${a.fk_hotel_id} != null ? ${a.fk_hotel_id} : 1),
+	
+	   hotelName=(${hotelName} != null ? ${hotelName} : '호텔 시엘(잠실)'),
+	   periodLabel=(${periodLabel} != null ? ${periodLabel} : '오늘'),
+	   alertCount=(${alertCount} != null ? ${alertCount} : 0),
+	
+	   occupancyRate=(${kpi_occupancy} != null ? ${kpi_occupancy} : 0),
+	   kpiBefore=(${kpiBefore} != null ? ${kpiBefore} : 0),
+	   kpiHold=(${kpiHold} != null ? ${kpiHold} : 0),
+	   kpiDone=(${kpiDone} != null ? ${kpiDone} : 0),
+	
+	   todayReservationCount=(${todayReservationCount} != null ? ${todayReservationCount} : 0),
+	   todayCancelCount=(${todayCancelCount} != null ? ${todayCancelCount} : 0),
+	
+	   paidCount=(${monthlySummary} != null and ${monthlySummary.paidCount} != null ? ${monthlySummary.paidCount} : 0),
+	   prevPaidCount=(${monthlySummary} != null and ${monthlySummary.prevPaidCount} != null ? ${monthlySummary.prevPaidCount} : 0),
+	   paidDiffCount=(${monthlySummary} != null and ${monthlySummary.paidDiffCount} != null ? ${monthlySummary.paidDiffCount} : 0),
+	   paidDiffRate=(${monthlySummary} != null and ${monthlySummary.paidDiffRate} != null ? ${monthlySummary.paidDiffRate} : '0'),
+	
+	   cancelCount=(${monthlySummary} != null and ${monthlySummary.cancelCount} != null ? ${monthlySummary.cancelCount} : 0),
+	   prevCancelCount=(${monthlySummary} != null and ${monthlySummary.prevCancelCount} != null ? ${monthlySummary.prevCancelCount} : 0),
+	   cancelDiffCount=(${monthlySummary} != null and ${monthlySummary.cancelDiffCount} != null ? ${monthlySummary.cancelDiffCount} : 0),
+	   cancelDiffRate=(${monthlySummary} != null and ${monthlySummary.cancelDiffRate} != null ? ${monthlySummary.cancelDiffRate} : '0'),
+	
+	   netCount=(${monthlySummary} != null and ${monthlySummary.netCount} != null ? ${monthlySummary.netCount} : 0)
+	">
 
   <div class="dash-wrap">
 
-    <!-- TOPBAR -->
     <div class="topbar">
       <h1>지점관리자 대시보드</h1>
 
@@ -402,21 +412,19 @@
         <a href="#" onclick="document.getElementById('logout-form').submit(); return false;">로그아웃</a>
       </div>
     </div>
-<form id="logout-form" th:action="@{/security/logout}" method="post" style="display:none;">
-</form>
-    <!-- 세션/식별 정보 -->
+
+    <form id="logout-form" th:action="@{/security/logout}" method="post" style="display:none;"></form>
+
     <div style="display:flex; gap:8px; flex-wrap:wrap; margin: 0 0 14px;">
       <span class="chip" th:text="${adminType}">BRANCH</span>
       <span class="chip muted" th:text="|호텔ID: ${hotelId}|">호텔ID: 1</span>
     </div>
 
-    <!-- HERO -->
     <section class="card hero">
       <div class="heroTop">
         <div class="filters">
           <div class="pill">
             🏨 지점
-            <!-- 실데이터: hotelOptions(List<String>)가 내려오면 select 채우고 selected 처리 -->
             <select>
               <option th:text="${hotelName}">호텔 시엘(잠실)</option>
               <option th:if="${hotelOptions != null}" th:each="h : ${hotelOptions}" th:text="${h}">르시엘(잠실)</option>
@@ -433,45 +441,42 @@
           </div>
         </div>
 
-        <div class="pill">🔔 알림 <b style="margin-left:6px" th:text="${alertCount}">3</b></div>
+        <div class="pill">🔔 알림 <b style="margin-left:6px" th:text="${alertCount}">0</b></div>
       </div>
 
       <div class="heroBody">
         <div class="heroStats">
           <div class="occupancy">
             <div class="big">
-              <span th:text="|${occupancyRate}%|">72%</span>
+              <span th:text="|${occupancyRate}%|">0%</span>
               <span style="font-size:16px;font-weight:900;opacity:.92">객실 가동률</span>
             </div>
 
             <div class="miniKpis">
-              <div class="k"><b th:text="${kpiBefore}">42</b><span>예약전</span></div>
-              <div class="k"><b th:text="${kpiHold}">8</b><span>예약중(홀드)</span></div>
-              <div class="k"><b th:text="${kpiDone}">55</b><span>예약완료</span></div>
+              <div class="k"><b th:text="${kpiBefore}">0</b><span>예약전</span></div>
+              <div class="k"><b th:text="${kpiHold}">0</b><span>예약중(홀드)</span></div>
+              <div class="k"><b th:text="${kpiDone}">0</b><span>예약완료</span></div>
             </div>
           </div>
 
           <div class="kpiBadges">
-            <div class="pill">✅ 오늘 체크인 <b style="margin-left:6px" th:text="${checkinCount}">12</b></div>
-            <div class="pill">🚪 체크아웃 <b style="margin-left:6px" th:text="${checkoutCount}">9</b></div>
-            <div class="pill">💬 미답변 QnA <b style="margin-left:6px" th:text="${qnaUnansweredCount}">5</b></div>
-            <div class="pill">💳 결제대기 <b style="margin-left:6px" th:text="${payWaitCount}">3</b></div>
-          </div>
+			  <div class="pill">💰 월간매출 <b style="margin-left:6px" th:text="${kpi_sales != null ? #numbers.formatInteger(kpi_sales, 3, 'COMMA') : '0'}">0</b></div>
+			  <div class="pill">📉 월간 취소율 <b style="margin-left:6px" th:text="|${kpi_cancelRate != null ? kpi_cancelRate : 0}%|">0%</b></div>
+			  <div class="pill">📊 RevPAR <b style="margin-left:6px" th:text="${kpi_revpar != null ? #numbers.formatInteger(kpi_revpar, 3, 'COMMA') : '0'}">0</b></div>
+			
+			  <div class="pill">📅 오늘 예약 <b style="margin-left:6px" th:text="${todayReservationCount}">0</b></div>
+			  <div class="pill">📉 오늘 취소 <b style="margin-left:6px" th:text="${todayCancelCount}">0</b></div>
+			  <div class="pill">✅ 이번달 결제완료 <b style="margin-left:6px" th:text="${paidCount}">0</b></div>
+			  <div class="pill">❌ 이번달 취소 <b style="margin-left:6px" th:text="${cancelCount}">0</b></div>
+			  <div class="pill">📊 이번달 순예약 <b style="margin-left:6px" th:text="${netCount}">0</b></div>
+			  <div class="pill">📈 결제 전월대비 <b style="margin-left:6px" th:text="|${paidDiffRate}%|">0%</b></div>
+			</div>
         </div>
 
-        <!-- Quick Actions (기본 5개) -->
         <div class="quickActions">
           <button class="qaBtn" type="button" onclick="location.href='/admin/branch/room/status'">
             <div class="dot">🛏️</div>
             <div class="txt"><b>객실 상태 변경</b></div>
-          </button>
-          <button class="qaBtn" type="button" onclick="location.href='/admin/branch/shuttle'">
-            <div class="dot">🚌</div>
-            <div class="txt"><b>셔틀 관리</b></div>
-          </button>
-          <button class="qaBtn" type="button" onclick="location.href='/admin/branch/facilities'">
-            <div class="dot">🍽️</div>
-            <div class="txt"><b>부대시설 관리</b></div>
           </button>
           <button class="qaBtn" type="button" onclick="location.href='/admin/branch/notice/write'">
             <div class="dot">📢</div>
@@ -485,68 +490,56 @@
       </div>
     </section>
 
-    <!-- 2분할: 결제대기 / 미답변QnA -->
     <div class="row2">
 
-      <!-- 결제대기 -->
-      <section class="card">
-        <div class="cardHeader">
-          <h3>결제 대기 목록</h3>
-          <a th:href="@{/admin/branch/payments/wait}">전체보기</a>
-        </div>
+		<section class="card">
+		  <div class="cardHeader">
+		    <h3>이번달 예약 현황 요약</h3>
+		    <a th:href="@{/admin/branch/dashboard}">새로고침</a>
+		  </div>
+		
+		  <div class="list">
+		    <div class="item">
+		      <div class="who">
+		        <div class="p">결</div>
+		        <div class="t">
+		          <b>이번달 결제완료</b>
+		          <span th:text="|전월 ${prevPaidCount}건 대비 ${paidDiffRate}%|">전월 대비 0%</span>
+		        </div>
+		      </div>
+		      <span class="btnSmall" th:text="${paidCount} + '건'">0건</span>
+		    </div>
+		
+		    <div class="item">
+		      <div class="who">
+		        <div class="p">취</div>
+		        <div class="t">
+		          <b>이번달 취소예약</b>
+		          <span th:text="|전월 ${prevCancelCount}건 대비 ${cancelDiffRate}%|">전월 대비 0%</span>
+		        </div>
+		      </div>
+		      <span class="btnSmall" th:text="${cancelCount} + '건'">0건</span>
+		    </div>
+		
+		    <div class="item">
+		      <div class="who">
+		        <div class="p">순</div>
+		        <div class="t">
+		          <b>이번달 순예약</b>
+		          <span>결제완료 - 취소</span>
+		        </div>
+		      </div>
+		      <span class="btnSmall primary" th:text="${netCount} + '건'">0건</span>
+		    </div>
+		  </div>
+		</section>
 
-        <!-- 실데이터 -->
-        <div class="list" th:if="${payWaitList != null and !#lists.isEmpty(payWaitList)}">
-          <div class="item" th:each="p : ${payWaitList}">
-            <div class="who">
-              <div class="p" th:text="${p.initials != null ? p.initials : 'P'}">이지</div>
-              <div class="t">
-                <b th:text="${p.memberName}">이지림</b>
-                <span th:text="|₩ ${p.amount} · ${p.reservationNo}|">₩ 650,000 · A10246</span>
-              </div>
-            </div>
-            <button class="btnSmall primary"
-                    type="button"
-                    th:onclick="|location.href='@{/admin/branch/payments/confirm(reservationNo=${p.reservationNo})}'|">
-              결제확인
-            </button>
-          </div>
-        </div>
-
-        <!-- 더미데이터 -->
-        <div class="list" th:unless="${payWaitList != null and !#lists.isEmpty(payWaitList)}">
-          <div class="item">
-            <div class="who">
-              <div class="p">이지</div>
-              <div class="t"><b>이지림</b><span>₩ 650,000 · A10246</span></div>
-            </div>
-            <button class="btnSmall primary" type="button">결제확인</button>
-          </div>
-          <div class="item">
-            <div class="who">
-              <div class="p">신</div>
-              <div class="t"><b>신선우</b><span>₩ 370,000 · A10671</span></div>
-            </div>
-            <button class="btnSmall" type="button">결제확인</button>
-          </div>
-          <div class="item">
-            <div class="who">
-              <div class="p">오</div>
-              <div class="t"><b>오혜석</b><span>₩ 920,000 · A10523</span></div>
-            </div>
-            <button class="btnSmall" type="button">결제확인</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- 미답변 QnA -->
       <section class="card">
         <div class="cardHeader">
           <h3>미답변 Q&amp;A</h3>
           <a th:href="@{/admin/branch/board/qna}">전체보기</a>
         </div>
 
-        <!-- 실데이터 -->
         <div class="list" th:if="${qnaList != null and !#lists.isEmpty(qnaList)}">
           <div class="item" th:each="q : ${qnaList}">
             <div class="who">
@@ -556,134 +549,137 @@
                 <span th:text="|${q.dateText} · ${q.refText}|">2026.02.11 · 예약 A10246</span>
               </div>
             </div>
-            <button class="btnSmall primary"
+            <button class="btnSmall"
                     type="button"
-                    th:onclick="|location.href='@{/admin/branch/board/qna/detail(qnaId=${q.qnaId})}'|">
-              답변하기
+                    onclick="alert('관리자 QnA 답변 기능은 아직 연결 전입니다.');">
+              준비중
             </button>
           </div>
         </div>
 
-        <!-- 더미데이터 -->
         <div class="list" th:unless="${qnaList != null and !#lists.isEmpty(qnaList)}">
           <div class="item">
             <div class="who">
               <div class="p">Q</div>
               <div class="t"><b>체크인 시간 변경 문의</b><span>2026.02.11 · 예약 A10246</span></div>
             </div>
-            <button class="btnSmall primary" type="button">답변하기</button>
+            <button class="btnSmall" type="button" onclick="alert('관리자 QnA 답변 기능은 아직 연결 전입니다.');">준비중</button>
           </div>
           <div class="item">
             <div class="who">
               <div class="p">Q</div>
               <div class="t"><b>조식 포함 패키지 안내 요청</b><span>2026.02.11 · 패키지 문의</span></div>
             </div>
-            <button class="btnSmall" type="button">답변하기</button>
+            <button class="btnSmall" type="button" onclick="alert('관리자 QnA 답변 기능은 아직 연결 전입니다.');">준비중</button>
           </div>
           <div class="item">
             <div class="who">
               <div class="p">Q</div>
               <div class="t"><b>셔틀 예약 조건(결제완료) 확인</b><span>2026.02.10 · 셔틀/결제</span></div>
             </div>
-            <button class="btnSmall" type="button">답변하기</button>
+            <button class="btnSmall" type="button" onclick="alert('관리자 QnA 답변 기능은 아직 연결 전입니다.');">준비중</button>
           </div>
         </div>
       </section>
 
     </div>
 
-    <!-- 예약 테이블 -->
     <section class="card tableWrap">
-      <div class="cardHeader" style="display:flex; align-items:center; justify-content:space-between;">
-        <h3 style="margin:0;">오늘의 예약 현황</h3>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <a th:href="@{/admin/branch/reservations}">전체보기</a>
-          <a th:href="@{/admin/branch/reservations(filter='today')}">필터</a>
-        </div>
-      </div>
-
-      <!-- 실데이터 -->
-      <div th:if="${reservationList != null and !#lists.isEmpty(reservationList)}" style="padding:0 0 6px">
-        <table>
-          <thead>
-          <tr>
-            <th style="width:110px">예약번호</th>
-            <th style="width:110px">회원</th>
-            <th style="width:130px">객실타입</th>
-            <th style="width:130px">객실등급</th>
-            <th>기간</th>
-            <th style="width:140px">금액</th>
-            <th style="width:150px">상태</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr th:each="r : ${reservationList}">
-            <td th:text="${r.reservationNo}">A10246</td>
-            <td th:text="${r.memberName}">김민수</td>
-            <td th:text="${r.roomTypeName}">Deluxe Twin</td>
-            <td th:text="${r.roomGradeName}">Junior Suite</td>
-            <td th:text="${r.stayText}">2026.02.11 ~ 2026.02.12</td>
-            <td th:text="|₩ ${r.totalPrice}|">₩ 650,000</td>
-            <td>
-              <span th:switch="${r.statusCode}">
-                <span th:case="'PAYWAIT'" class="status paywait"><span class="sDot"></span>결제대기</span>
-                <span th:case="'HOLD'" class="status hold"><span class="sDot"></span>예약중</span>
-                <span th:case="'DONE'" class="status done"><span class="sDot"></span>예약완료</span>
-                <span th:case="*" class="status"><span class="sDot"></span><span th:text="${r.statusText}">상태</span></span>
-              </span>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- 더미데이터 -->
-      <div th:unless="${reservationList != null and !#lists.isEmpty(reservationList)}" style="padding:0 0 6px">
-        <table>
-          <thead>
-          <tr>
-            <th style="width:110px">예약번호</th>
-            <th style="width:110px">회원</th>
-            <th style="width:130px">객실타입</th>
-            <th style="width:130px">객실등급</th>
-            <th>기간</th>
-            <th style="width:140px">금액</th>
-            <th style="width:150px">상태</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            <td>A10246</td>
-            <td>김민수</td>
-            <td>Deluxe Twin</td>
-            <td>Junior Suite</td>
-            <td>2026.02.11 ~ 2026.02.12</td>
-            <td>₩ 650,000</td>
-            <td><span class="status paywait"><span class="sDot"></span>결제대기</span></td>
-          </tr>
-          <tr>
-            <td>A10671</td>
-            <td>김소영</td>
-            <td>Deluxe Twin</td>
-            <td>Deluxe Double</td>
-            <td>2026.02.11 ~ 2026.02.13</td>
-            <td>₩ 370,000</td>
-            <td><span class="status hold"><span class="sDot"></span>예약중</span></td>
-          </tr>
-          <tr>
-            <td>A10523</td>
-            <td>장혜민</td>
-            <td>Junior Suite</td>
-            <td>Junior Suite</td>
-            <td>2026.02.11 ~ 2026.02.14</td>
-            <td>₩ 920,000</td>
-            <td><span class="status done"><span class="sDot"></span>예약완료</span></td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-
-    </section>
+	  <div class="cardHeader" style="display:flex; align-items:center; justify-content:space-between;">
+	    <h3 style="margin:0;">오늘 운영 예약 현황</h3>
+	    <div style="display:flex; align-items:center; gap:8px;">
+	      <a th:href="@{/admin/branch/reservations}">전체보기</a>
+	      <a th:href="@{/admin/branch/reservations(filter='todayOps')}">필터</a>
+	    </div>
+	  </div>
+	
+	  <div th:if="${reservationList != null and !#lists.isEmpty(reservationList)}" style="padding:0 0 6px">
+	    <table>
+	      <thead>
+	      <tr>
+	        <th style="width:110px">예약번호</th>
+	        <th style="width:110px">회원</th>
+	        <th style="width:150px">객실</th>
+	        <th style="width:120px">체크인</th>
+	        <th style="width:120px">체크아웃</th>
+	        <th style="width:90px">인원</th>
+	        <th style="width:140px">금액</th>
+	        <th style="width:150px">상태</th>
+	      </tr>
+	      </thead>
+	      <tbody>
+	      <tr th:each="r : ${reservationList}">
+	        <td th:text="${r.reservationNo}">A10246</td>
+	        <td th:text="${r.memberName}">김민수</td>
+	        <td th:text="${r.roomTypeName}">Deluxe Twin</td>
+	        <td th:text="${r.checkinDate}">2026.03.15</td>
+	        <td th:text="${r.checkoutDate}">2026.03.16</td>
+	        <td th:text="${r.guestCount}">2</td>
+	        <td th:text="|₩ ${r.totalPrice}|">₩ 650,000</td>
+	        <td>
+	          <span th:switch="${r.statusCode}">
+	            <span th:case="'CHECKIN_TODAY'" class="status done"><span class="sDot"></span>오늘 체크인</span>
+	            <span th:case="'CHECKOUT_TODAY'" class="status"><span class="sDot"></span>오늘 체크아웃</span>
+	            <span th:case="'STAYING'" class="status"><span class="sDot"></span>투숙중</span>
+	            <span th:case="'CONFIRMED'" class="status done"><span class="sDot"></span>예약확정</span>
+	            <span th:case="'CANCELLED'" class="status hold"><span class="sDot"></span>취소</span>
+	            <span th:case="*" class="status"><span class="sDot"></span><span th:text="${r.statusText}">상태</span></span>
+	          </span>
+	        </td>
+	      </tr>
+	      </tbody>
+	    </table>
+	  </div>
+	
+	  <div th:unless="${reservationList != null and !#lists.isEmpty(reservationList)}" style="padding:0 0 6px">
+	    <table>
+	      <thead>
+	      <tr>
+	        <th style="width:110px">예약번호</th>
+	        <th style="width:110px">회원</th>
+	        <th style="width:150px">객실</th>
+	        <th style="width:120px">체크인</th>
+	        <th style="width:120px">체크아웃</th>
+	        <th style="width:90px">인원</th>
+	        <th style="width:140px">금액</th>
+	        <th style="width:150px">상태</th>
+	      </tr>
+	      </thead>
+	      <tbody>
+	      <tr>
+	        <td>A10246</td>
+	        <td>김민수</td>
+	        <td>Deluxe Twin</td>
+	        <td>2026.03.15</td>
+	        <td>2026.03.16</td>
+	        <td>2</td>
+	        <td>₩ 650,000</td>
+	        <td><span class="status done"><span class="sDot"></span>오늘 체크인</span></td>
+	      </tr>
+	      <tr>
+	        <td>A10671</td>
+	        <td>김소영</td>
+	        <td>Deluxe Double</td>
+	        <td>2026.03.14</td>
+	        <td>2026.03.15</td>
+	        <td>2</td>
+	        <td>₩ 370,000</td>
+	        <td><span class="status"><span class="sDot"></span>오늘 체크아웃</span></td>
+	      </tr>
+	      <tr>
+	        <td>A10523</td>
+	        <td>장혜민</td>
+	        <td>Junior Suite</td>
+	        <td>2026.03.14</td>
+	        <td>2026.03.17</td>
+	        <td>3</td>
+	        <td>₩ 920,000</td>
+	        <td><span class="status"><span class="sDot"></span>투숙중</span></td>
+	      </tr>
+	      </tbody>
+	    </table>
+	  </div>
+	</section>
 
   </div>
 </div>

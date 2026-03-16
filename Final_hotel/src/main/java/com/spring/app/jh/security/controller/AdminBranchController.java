@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.spring.app.jh.ops.admin.common.domain.AdminDashboardKpiDTO;
+import com.spring.app.jh.ops.admin.common.domain.MonthlyReservationSummaryDTO;
+import com.spring.app.jh.ops.admin.service.AdminDashboardService;
 import com.spring.app.jh.security.domain.AdminDTO;
 import com.spring.app.jh.security.domain.Session_AdminDTO;
 import com.spring.app.jh.security.service.AdminService;
@@ -22,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminBranchController {
 
 	private final AdminService adminService;
+	private final AdminDashboardService adminDashboardService;
 
 	/*
 	   BRANCH 전용 기능
@@ -40,11 +44,31 @@ public class AdminBranchController {
 	// ============================================================
 
 	@GetMapping("dashboard")
-	public String dashboard() {
+	public String dashboard(HttpSession session, Model model) {
 
-		return "admin/branch/branch_dashboard";
-		// src/main/resources/templates/admin/branch/branch_dashboard.html
-	}
+        Session_AdminDTO sad = (Session_AdminDTO) session.getAttribute("sessionAdminDTO");
+
+        if (sad == null || sad.getFk_hotel_id() == null) {
+            return "redirect:/admin/login";
+        }
+
+        int hotelId = sad.getFk_hotel_id();
+
+        AdminDashboardKpiDTO kpi = adminDashboardService.getBranchDashboardKpi(hotelId);
+        MonthlyReservationSummaryDTO monthlySummary = adminDashboardService.getBranchMonthlyReservationSummary(hotelId);
+
+
+        model.addAttribute("kpi_occupancy", kpi.getOccupancyRate());
+        model.addAttribute("kpi_sales", kpi.getMonthlySales());
+        model.addAttribute("kpi_cancelRate", kpi.getCancelRate());
+        model.addAttribute("kpi_revpar", kpi.getRevpar());
+        
+        model.addAttribute("monthlySummary", monthlySummary);
+        model.addAttribute("todayReservationCount", adminDashboardService.getBranchTodayReservationCount(hotelId));
+        model.addAttribute("todayCancelCount", adminDashboardService.getBranchTodayCancelCount(hotelId));
+
+        return "admin/branch/branch_dashboard";
+    }
 
 
 	

@@ -199,6 +199,7 @@ public class SecurityConfig {
             "/js_images/**",
             "/notice/**",
             "/cs/**",
+            "/hotel/location",
             
             "/dining/**"
         };
