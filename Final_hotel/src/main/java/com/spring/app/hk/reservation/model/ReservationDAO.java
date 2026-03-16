@@ -26,5 +26,8 @@ public interface ReservationDAO {
 	// 비회원 예약 조회
 	List<Map<String, Object>> findGuestReservation(Map<String, Object> paraMap);
 
+	// 비회원 예약 취소
+	int cancelGuestReservation(String reservationCode);
+
 
 }

@@ -25,8 +25,8 @@ public interface ReservationService {
 	// 비회원 에약 조회
 	List<Map<String, Object>> findGuestReservation(String name, String phone);
 
-	
-	
+	// 비회원 예약 취소
+	int cancelGuestReservation(String reservationCode);
 
 
 }

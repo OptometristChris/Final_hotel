@@ -181,4 +181,11 @@ public class ReservationService_imple implements ReservationService {
 	}
 
 
+	// 비회원 예약 취소
+	@Override
+	public int cancelGuestReservation(String reservationCode) {
+		return reservationDAO.cancelGuestReservation(reservationCode);
+	}
+
+
 }

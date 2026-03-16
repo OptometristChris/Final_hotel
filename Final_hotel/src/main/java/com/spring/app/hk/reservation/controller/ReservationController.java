@@ -214,4 +214,24 @@ public class ReservationController {
 	    return "hk/reservation/guestReservationList";
 	}
 	
+	// ======================================
+	// 비회원 예약 취소
+	// ======================================
+	@PostMapping("/guestCancel")
+	@ResponseBody
+	public String cancelGuestReservation(@RequestParam("reservation_code") String reservationCode){
+
+		  System.out.println("받은 예약코드 = " + reservationCode);
+		
+	    int n = reservationService.cancelGuestReservation(reservationCode);
+
+	    System.out.println("update 결과 = " + n);
+	    
+	    if(n == 1){
+	        return "success";
+	    }
+
+	    return "deadline";
+	}
+	
 }

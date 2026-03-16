@@ -6,8 +6,7 @@
 <mapper namespace="reservation">
 
 	<!-- 예약 페이지 내 객실 기본 정보 조회 -->
-	<select id="getRoomInfo" parameterType="int" resultType="map">
-	
+	<select id="getRoomInfo" parameterType="int" resultType="map">	
 	    SELECT
 	        h.HOTEL_NAME,
 	        r.ROOM_NAME,
@@ -16,8 +15,7 @@
 	    FROM ROOM_TYPE r
 	    JOIN TBL_HOTEL h
 	      ON r.FK_HOTEL_ID = h.HOTEL_ID
-	    WHERE r.ROOM_TYPE_ID = #{value}
-	
+	    WHERE r.ROOM_TYPE_ID = #{value}	
 	</select>
 
 	<!-- payment 테이블에 insert -->
@@ -166,36 +164,43 @@
 	<!-- 비회원 예약 조회 -->
 	<!-- ========================================= -->
 	<select id="findGuestReservation" parameterType="map" resultType="map">
-
-SELECT
-    r.RESERVATION_CODE,
-    r.CHECKIN_DATE,
-    r.CHECKOUT_DATE,
-    r.TOTAL_PRICE,
-    r.RESERVATION_STATUS,
-    rt.ROOM_NAME,
-    h.HOTEL_NAME
-
-FROM RESERVATION r
-
-JOIN TBL_MEMBER_SECURITY m
-ON r.MEMBER_NO = m.MEMBER_NO
-
-JOIN ROOM_TYPE rt
-ON r.ROOM_TYPE_ID = rt.ROOM_TYPE_ID
-
-JOIN TBL_HOTEL h
-ON rt.FK_HOTEL_ID = h.HOTEL_ID
-
-WHERE m.NAME = #{name}
-AND m.MEMBER_TYPE = 'GUEST'
-
-ORDER BY r.CREATED_AT DESC
-
-</select>
+		SELECT
+		    m.NAME,
+		    r.RESERVATION_CODE,
+		    r.CHECKIN_DATE,
+		    r.CHECKOUT_DATE,
+		    r.TOTAL_PRICE,
+		    r.RESERVATION_STATUS,
+		    rt.ROOM_NAME,
+		    h.HOTEL_NAME
+		
+		FROM RESERVATION r
+		
+		JOIN TBL_MEMBER_SECURITY m
+		ON r.MEMBER_NO = m.MEMBER_NO
+		
+		JOIN ROOM_TYPE rt
+		ON r.ROOM_TYPE_ID = rt.ROOM_TYPE_ID
+		
+		JOIN TBL_HOTEL h
+		ON rt.FK_HOTEL_ID = h.HOTEL_ID
+		
+		WHERE m.NAME = #{name}
+		AND m.MEMBER_TYPE = 'GUEST'
+		
+		ORDER BY r.CREATED_AT DESC
+	</select>
 	
 	
-
+	<!-- ========================================= -->
+	<!-- 비회원 예약 취소 -->
+	<!-- ========================================= -->
+	<update id="cancelGuestReservation">
+	    UPDATE RESERVATION
+	    SET RESERVATION_STATUS = 'CANCELLED'
+	    WHERE RESERVATION_CODE = #{reservation_code}
+	    AND TRUNC(SYSDATE) &lt;= TRUNC(CANCEL_DEADLINE)
+	</update>
 	  
 
 </mapper>
