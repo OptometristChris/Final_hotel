@@ -70,6 +70,33 @@ public class AdminHqShuttleOpsService_imple implements AdminHqShuttleOpsService 
             throw new IllegalArgumentException("출발지와 도착지는 같을 수 없습니다.");
         }
 
+        // 화면에서 "선택 호텔" 은 HOTEL_{hotelId} 코드로 넘어오도록 맞춘 상태
+        String hotelPlaceCode = "HOTEL_" + hotelId;
+
+        if ("TO_HOTEL".equals(routeType)) {
+
+            // TO_HOTEL : 외부 장소 -> 선택 호텔
+            if (!hotelPlaceCode.equals(endPlaceCode)) {
+                throw new IllegalArgumentException("TO_HOTEL 노선의 도착지는 선택 호텔이어야 합니다.");
+            }
+
+            if (hotelPlaceCode.equals(startPlaceCode)) {
+                throw new IllegalArgumentException("TO_HOTEL 노선의 출발지는 외부 장소여야 합니다.");
+            }
+        }
+
+        if ("FROM_HOTEL".equals(routeType)) {
+
+            // FROM_HOTEL : 선택 호텔 -> 외부 장소
+            if (!hotelPlaceCode.equals(startPlaceCode)) {
+                throw new IllegalArgumentException("FROM_HOTEL 노선의 출발지는 선택 호텔이어야 합니다.");
+            }
+
+            if (hotelPlaceCode.equals(endPlaceCode)) {
+                throw new IllegalArgumentException("FROM_HOTEL 노선의 도착지는 외부 장소여야 합니다.");
+            }
+        }
+
         if (routeName == null || routeName.trim().isEmpty()) {
             throw new IllegalArgumentException("노선명은 필수입니다.");
         }
@@ -113,27 +140,6 @@ public class AdminHqShuttleOpsService_imple implements AdminHqShuttleOpsService 
     @Transactional
     public int deactivateBlock(int hotelId, long blockId) {
         return shuttleDao.deactivateBlock(hotelId, blockId);
-    }
-
-    @Override
-    @Transactional
-    public int extendSlotStock(int hotelId, LocalDate endDate) {
-
-        if (hotelId <= 0) {
-            throw new IllegalArgumentException("호텔 번호가 올바르지 않습니다.");
-        }
-
-        if (endDate == null) {
-            throw new IllegalArgumentException("연장 종료일은 필수입니다.");
-        }
-
-        LocalDate startDate = LocalDate.now();
-
-        if (endDate.isBefore(startDate)) {
-            throw new IllegalArgumentException("연장 종료일이 오늘보다 빠를 수 없습니다.");
-        }
-
-        return shuttleDao.extendSlotStock(hotelId, startDate, endDate);
     }
 
     @Override

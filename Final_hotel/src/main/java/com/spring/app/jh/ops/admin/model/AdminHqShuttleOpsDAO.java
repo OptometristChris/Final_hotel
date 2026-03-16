@@ -48,10 +48,6 @@ public interface AdminHqShuttleOpsDAO {
     int deactivateBlock(@Param("hotelId") int hotelId,
                         @Param("blockId") long blockId);
 
-    int extendSlotStock(@Param("hotelId") int hotelId,
-                        @Param("startDate") LocalDate startDate,
-                        @Param("endDate") LocalDate endDate);
-
     int deleteOldBooking(@Param("hotelId") int hotelId,
                          @Param("cutoffDate") LocalDate cutoffDate);
 
