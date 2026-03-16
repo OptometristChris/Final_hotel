@@ -1,5 +1,6 @@
 package com.spring.app.hk.admin.reservation.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -103,15 +104,24 @@ public class AdminReservationController {
 	}
 
 	// ======= 총괄 관리자 ========= //
-	// 전체 객실 예약 리스트 조회
+	// 전체 객실 예약 리스트 조회 + 검색
 	@PreAuthorize("hasRole('ADMIN_HQ')")
 	@GetMapping("/list")
-	public String adminReservationList(Model model) {
+	public String adminReservationList(
+	        @RequestParam(value="name", required=false) String name,
+	        @RequestParam(value="status", required=false) String status,
+	        Model model) {
+
+	    Map<String,Object> param = new HashMap<>();
+	    param.put("name", name);
+	    param.put("status", status);
 
 	    List<Map<String,Object>> reservationList =
-	            reservationService.selectAdminReservationList();
+	            reservationService.selectAdminReservationList(param);
 
 	    model.addAttribute("reservationList", reservationList);
+	    model.addAttribute("name", name);
+	    model.addAttribute("status", status);
 
 	    return "hk/admin/reservation/reservationList";
 	}

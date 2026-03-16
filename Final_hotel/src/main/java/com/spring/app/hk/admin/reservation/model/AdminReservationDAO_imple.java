@@ -54,9 +54,9 @@ public class AdminReservationDAO_imple implements AdminReservationDAO {
 	
 	// 전체 객실 예약 리스트 조회
 	@Override
-    public List<Map<String, Object>> selectAdminReservationList() {
+    public List<Map<String, Object>> selectAdminReservationList(Map<String,Object> param) {
 
-        return sqlsession.selectList("adminReservation.selectAdminReservationList");
+		return sqlsession.selectList("adminReservation.selectAdminReservationList", param);
     }
 	
 

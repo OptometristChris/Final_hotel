@@ -27,6 +27,6 @@ public interface AdminReservationDAO {
 	
 	// ----- 총괄관리자 ----- 
 	// 전체 객실 예약 리스트 조회
-	List<Map<String,Object>> selectAdminReservationList();
+	List<Map<String, Object>> selectAdminReservationList(Map<String, Object> param);
 
 }

@@ -86,7 +86,8 @@ button:hover{
 
 <div class="container">
 
-<h2>전체 예약 관리</h2>
+<h1 style="color:red">HELLO TEST</h1>
+<h2>전체 예약 관리22</h2>
 
 <div class="search-box">
 
@@ -96,11 +97,28 @@ button:hover{
 	<input type="text" name="name" th:value="${name}" placeholder="회원 이름">
 	
 	예약 상태
-	<select name="status" th:value="${status}">
-	<option value="">전체</option>
-	<option value="CONFIRMED">예약완료</option>
-	<option value="CHECKED_IN">체크인</option>
-	<option value="CHECKED_OUT">체크아웃</option>
+	<select name="status">
+
+		<option value=""
+		th:selected="${status == null or status == ''}">
+		전체
+		</option>
+		
+		<option value="CONFIRMED"
+		th:selected="${status == 'CONFIRMED'}">
+		예약완료
+		</option>
+		
+		<option value="CHECKED_IN"
+		th:selected="${status == 'CHECKED_IN'}">
+		체크인
+		</option>
+		
+		<option value="CHECKED_OUT"
+		th:selected="${status == 'CHECKED_OUT'}">
+		체크아웃
+		</option>
+		
 	</select>
 	
 	<button type="submit">검색</button>
