@@ -144,6 +144,8 @@ public class RoomController {
     @ResponseBody
     public List<RoomTypeDTO> compareRooms(@RequestBody List<Long> roomIds){
 
+    	
+    	 System.out.println("roomIds = " + roomIds);
         return roomService.getRoomsByIds(roomIds);
     }
     

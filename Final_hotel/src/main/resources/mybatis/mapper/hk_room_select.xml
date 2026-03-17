@@ -238,11 +238,17 @@
 	
 	<!-- 5. 비교 모달용 (비교함에 담긴 객실 id리스트를 기준으로 객실 정보 조회하기)  푸터 -->
 	<select id="selectRoomsByIds" parameterType="list" resultType="RoomTypeDTO">
-	    SELECT *
-	    FROM room_type
-	    WHERE approve_status = 'APPROVED'
-	    AND rt.IS_ACTIVE = 'Y' 
-	    AND room_type_id IN
+	    SELECT
+	        rt.room_type_id,
+	        rt.room_name,
+	        rt.room_grade,
+	        rt.bed_type,
+	        rt.view_type,
+	        rt.base_price
+	    FROM room_type rt
+	    WHERE rt.approve_status = 'APPROVED'
+	    AND rt.IS_ACTIVE = 'Y'
+	    AND rt.room_type_id IN
 	    <foreach collection="list" item="id" open="(" close=")" separator=",">
 	        #{id}
 	    </foreach>
@@ -304,9 +310,18 @@
 	      )
 	
 	    ORDER BY rt.base_price DESC
-		)
+		) sub
 	    WHERE ROWNUM &lt;= 3
 	
 	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 </mapper>
