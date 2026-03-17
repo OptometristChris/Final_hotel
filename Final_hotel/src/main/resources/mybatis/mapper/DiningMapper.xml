@@ -118,6 +118,7 @@
 	    )
 	</insert>
 	
+	
 	<insert id="insertPayment" parameterType="map">
 	    INSERT INTO dining_payments (
 	        payment_id, 
@@ -140,7 +141,8 @@
 	    )
 	</insert>
 	
-	<select id="searchNonMemberRes" resultType="DiningReservationDTO">
+
+	<select id="findNonMemberReservations" resultType="DiningReservationDTO">
 	    SELECT 
 	        R.DINING_RESERVATION_ID as diningReservationId,
 	        (SELECT D.NAME FROM tbl_dining D WHERE D.DINING_ID = R.DINING_ID) as diningName,
@@ -148,7 +150,6 @@
 	        R.RES_TIME as resTime,
 	        R.ADULT_COUNT as adultCount,
 	        R.CHILD_COUNT as childCount,
-	        R.INFANT_COUNT as infantCount,
 	        R.STATUS as status
 	    FROM DINING_RESERVATIONS R
 	    WHERE R.GUEST_NAME = #{name}
@@ -157,11 +158,112 @@
 	      AND R.FK_MEMBER_NO IS NULL  ORDER BY R.RES_DATE DESC, R.RES_TIME DESC
 	</select>
 
+	
+	<select id="findMemberReservations" resultType="DiningReservationDTO">
+	    SELECT 
+	        R.dining_reservation_id as diningReservationId,
+	        (SELECT D.NAME FROM TBL_DINING D WHERE D.DINING_ID = R.dining_id) as diningName,
+	        R.res_date as resDate,
+	        R.res_time as resTime,
+	        R.adult_count as adultCount,
+	        R.child_count as childCount,
+	        R.infant_count as infantCount,
+	        R.status as status
+	    FROM dining_reservations R
+	    INNER JOIN TBL_MEMBER_SECURITY M ON R.fk_member_no = M.member_no  WHERE M.memberid = #{memberid}
+	    ORDER BY R.res_date DESC, R.res_time DESC
+	</select>
+
+
     <update id="updateStatus">
         UPDATE DINING_RESERVATIONS
 	    SET STATUS = #{status},
 	        UPDATED_AT = CURRENT_TIMESTAMP
 	    WHERE DINING_RESERVATION_ID = #{id}
     </update>
+    
+    <select id="findAllReservationsAdmin" parameterType="map" resultType="DiningReservationDTO">
+	    SELECT 
+	        R.dining_reservation_id as diningReservationId,
+	        (SELECT D.NAME FROM TBL_DINING D WHERE D.DINING_ID = R.dining_id) as diningName,
+	        R.guest_name as guestName,
+	        R.guest_phone as guestPhone,
+	        R.res_date as resDate,
+	        R.res_time as resTime,
+	        R.adult_count as adultCount,
+	        R.child_count as childCount,
+	        R.status as status,
+	        R.fk_member_no as fkMemberNo,
+	        R.created_at as createdAt
+	    FROM dining_reservations R
+	    <where>
+	        <if test="keyword != null and keyword != ''">
+	            AND (R.guest_name LIKE '%' || #{keyword} || '%' OR R.guest_phone LIKE '%' || #{keyword} || '%')
+	        </if>
+	        <if test="status != null and status != ''">
+	            AND R.status = #{status}
+	        </if>
+	    </where>
+	    ORDER BY R.res_date DESC, R.res_time DESC
+	</select>
 	
+	<select id="getAdminDashboardCounts" resultType="map">
+	    SELECT 
+	        COUNT(*) as TOTAL,
+	        COUNT(CASE WHEN status = 'CONFIRMED' AND res_date = TRUNC(SYSDATE) THEN 1 END) as TODAY_RESERVE,
+	        COUNT(CASE WHEN status = 'VISITED' THEN 1 END) as VISITED, COUNT(CASE WHEN status = 'NOSHOW' THEN 1 END) as NOSHOW
+	    FROM dining_reservations
+	</select>
+	
+	<update id="updateReservationStatusAdmin">
+	    UPDATE dining_reservations
+	    SET status = #{status}
+	    WHERE dining_reservation_id = #{resId}
+	</update>
+	
+	<insert id="insertManualReservation">
+	    INSERT INTO dining_reservations (
+	        dining_reservation_id, 
+	        dining_id, 
+	        fk_hotel_id,  guest_name, 
+	        guest_phone, 
+	        res_date, 
+	        res_time, 
+	        adult_count, 
+	        child_count, 
+	        infant_count, 
+	        status, 
+	        created_at
+	    ) VALUES (
+	        seq_dining_reservation.nextval, 
+	        #{diningId}, 
+	        #{fkHotelId}, #{guestName}, 
+	        #{guestPhone}, 
+	        #{resDate}, 
+	        #{resTime}, 
+	        #{adultCount}, 
+	        #{childCount}, 
+	        #{infantCount}, 
+	        'CONFIRMED', 
+	        SYSTIMESTAMP
+	    )
+	</insert>
+	
+	<select id="getReservationDetail" resultType="com.spring.app.ih.dining.model.DiningReservationDTO">
+	    SELECT 
+	        res.dining_reservation_id, 
+	        res.guest_name, 
+	        res.guest_phone, 
+	        res.res_date, 
+	        res.res_time, 
+	        res.adult_count, 
+	        res.child_count, 
+	        res.infant_count, 
+	        res.status,
+	        res.request_term,  
+	        d.name AS diningName  FROM dining_reservations res
+	    JOIN tbl_dining d ON res.dining_id = d.dining_id
+	    WHERE res.dining_reservation_id = #{resId}
+	</select>
+			
 </mapper>

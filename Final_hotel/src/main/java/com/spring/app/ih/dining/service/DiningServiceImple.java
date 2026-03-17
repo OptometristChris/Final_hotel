@@ -76,14 +76,44 @@ public class DiningServiceImple implements DiningService {
 	// 비회원 예약 조회
 	@Override
 	public List<DiningReservationDTO> findNonMemberReservations(String name, String email, String password) {
-        return diningMapper.searchNonMemberRes(name, email, password);
+        return diningMapper.findNonMemberReservations(name, email, password);
     }
 
+	// 회원 예약 조회
+	@Override
+	public List<DiningReservationDTO> findMemberReservations(String memberid) {
+		return diningMapper.findMemberReservations(memberid);
+	}
+	
 	// 예약 취소
     @Transactional
-    public void cancelReservation(Long id) {
+    public void updateStatus(Long id) {
     	diningMapper.updateStatus(id, "CANCELLED");
     }
 
+    @Override
+    public List<DiningReservationDTO> getAllReservationsAdmin(Map<String, Object> paraMap) {
+        return diningMapper.findAllReservationsAdmin(paraMap);
+    }
+
+    @Override
+    public Map<String, Object> getDashboardCounts() {
+        return diningMapper.getAdminDashboardCounts();
+    }
+
+    @Override
+    public int updateReservationStatusAdmin(Long resId, String status) {
+        return diningMapper.updateReservationStatusAdmin(resId, status);
+    }
+
+	@Override
+	public int registerManual(DiningReservationDTO dto) {
+		return diningMapper.insertManualReservation(dto);
+	}
+	
+	@Override
+	public DiningReservationDTO getReservationDetail(Long resId) {
+	    return diningMapper.getReservationDetail(resId);
+	}
     
 }

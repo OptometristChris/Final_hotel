@@ -24,7 +24,7 @@
         .intro-text { font-size: 1.15rem; line-height: 2; color: #555; word-break: keep-all; }
 
         .nav-tabs { border-bottom: 2px solid #eee; justify-content: center; }
-        .nav-tabs .nav-link { color: #999; border: none; font-size: 1.1rem; padding: 15px 30px; }
+        .nav-tabs .nav-link { color: #555; border: none; font-size: 1.1rem; padding: 15px 30px; }
         .nav-tabs .nav-link.active { color: #9d815d; border-bottom: 2px solid #9d815d; background: none; font-weight: bold; }
 
         .carousel-item img { height: 500px; object-fit: cover; }
@@ -59,14 +59,20 @@
             </div>
 
             <div class="my-5">
-                <ul class="nav nav-tabs" id="diningTab" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="store-tab" data-toggle="tab" href="#store" role="tab">매장 전경</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="food-tab" data-toggle="tab" href="#food" role="tab">음식 메뉴</a>
-                    </li>
-                </ul>
+                <ul class="nav nav-tabs" id="diningTab" role="tablist" style="border-bottom: 1px solid #eee; justify-content: center;">
+				    <li class="nav-item">
+				        <a class="nav-link active" id="store-tab" data-toggle="tab" href="#store" role="tab" 
+				           style="color: #9d815d !important; font-weight: bold; border: none; border-bottom: 2px solid #9d815d;">
+				           매장 전경
+				        </a>
+				    </li>
+				    <li class="nav-item">
+				        <a class="nav-link" id="food-tab" data-toggle="tab" href="#food" role="tab" 
+				           style="color: #555 !important; border: none;">
+				           음식 메뉴
+				        </a>
+				    </li>
+				</ul>
                 
                 <div class="tab-content mt-4" id="diningTabContent">
                     <div class="tab-pane fade show active" id="store" role="tabpanel">
