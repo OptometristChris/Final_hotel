@@ -64,4 +64,41 @@ public class AdminDiningController {
         System.out.println(">>> 가져온 데이터: " + detail);
         return detail; 
     }
+    
+    // 다이닝 예약 관리
+    
+    
+    @GetMapping("/setting")
+    public String settingPage(Model model) {
+
+        List<Map<String, Object>> blockList = diningservice.getBlockList(); 
+        List<Map<String, Object>> diningList = diningservice.getDiningList(); 
+        
+        model.addAttribute("blockList", blockList);
+        model.addAttribute("diningList", diningList);
+        
+        return "dining/admin/control_setting";
+    }
+    
+    // 차단 등록
+    @PostMapping("/block/register")
+    @ResponseBody
+    public String registerBlock(@RequestParam Map<String, Object> params) {
+        try {
+            // 여기서 필요한 추가 데이터 가공 (예: 날짜 형식 맞추기 등)
+        	diningservice.insertBlock(params);
+            return "success";
+        } catch (Exception e) {
+            return "fail";
+        }
+    }
+
+    // 차단 해제
+    @PostMapping("/block/delete")
+    @ResponseBody
+    public String deleteBlock(@RequestParam("blockId") Long blockId) {
+    	diningservice.deleteBlock(blockId);
+        return "success";
+    }
+
 }
