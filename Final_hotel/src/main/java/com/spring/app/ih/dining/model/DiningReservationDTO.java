@@ -44,4 +44,7 @@ public class DiningReservationDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String diningName;
+    
+    private String requestTerm;
+    
 }
