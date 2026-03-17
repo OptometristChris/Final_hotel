@@ -292,47 +292,47 @@ h1 {
 			    <!-- 1줄 -->
 			    <div class="filter-row">
 			        <form id="filterForm" class="filter-group">
-			
-			            <select name="hotel">
-			                <option value="">호텔 전체</option>
-			                
-			               <option th:each="hotel : ${hotelList}"
-			                    th:value="${hotel.HOTEL_ID}"
-			                    th:text="${hotel.HOTEL_NAME}"
-			                    th:selected="${searchParams != null and #strings.equals(hotel.HOTEL_ID, searchParams.hotelId)}">
-			           	   </option>
-			            </select>
-			
-			            <select name="room_grade">
-			                <option value="">객실등급 전체</option>
-			                <option value="DELUXE">DELUXE</option>
-			                <option value="PREMIER">PREMIER</option>
-			                <option value="SUITE">SUITE</option>
-			                <option value="STANDARD">STANDARD</option>
-			            </select>
-			
-			            <select name="bed_type" id="bedTypeSelect">
-			             <option value="">침대타입 전체</option>
-			             <option value="DOUBLE" th:selected="${searchParams?.bedType == 'DOUBLE'}">DOUBLE</option>
-			             <option value="TWIN" th:selected="${searchParams?.bedType == 'TWIN'}">TWIN</option>
-			             <option value="KING" th:selected="${searchParams?.bedType == 'KING'}">KING</option>
-			         </select>
-			
-			            <select name="view_type">
-			                <option value="">전망 전체</option>
-			                <option value="CITY">CITY</option>
-			                <option value="RIVER">RIVER</option>
-			            </select>        
-			               
-			            <select name="capacity">
-						    <option value="">인원 전체</option>
-						    <option value="1">1명</option>
-						    <option value="2">2명</option>
-						    <option value="3">3명</option>
-						    <option value="4">4명 이상</option>
-						</select>   
-			
-			        </form>
+         
+                     <select name="hotel">
+                         <option value="">호텔 전체</option>
+                         
+                        <option th:each="hotel : ${hotelList}"
+                             th:value="${hotel.HOTEL_ID}"
+                             th:text="${hotel.HOTEL_NAME}"
+                             th:selected="${searchParams != null and #strings.equals(hotel.HOTEL_ID, searchParams.hotelId)}">
+                          </option>
+                     </select>
+         
+                     <select name="room_grade">
+                         <option value="">객실등급 전체</option>
+                         <option value="DELUXE">DELUXE</option>
+                         <option value="PREMIER">PREMIER</option>
+                         <option value="SUITE">SUITE</option>
+                         <option value="STANDARD">STANDARD</option>
+                     </select>
+         
+                     <select name="bed_type" id="bedTypeSelect">
+                      <option value="">침대타입 전체</option>
+                      <option value="DOUBLE">DOUBLE</option>
+                      <option value="TWIN">TWIN</option>
+                      <option value="KING">KING</option>
+                  </select>
+         
+                     <select name="view_type">
+                         <option value="">전망 전체</option>
+                         <option value="CITY">CITY</option>
+                         <option value="RIVER">RIVER</option>
+                     </select>        
+                        
+                     <select name="capacity" id="guestCountSelect">
+                       <option value="">인원 전체</option>
+                       <option value="1" th:selected="${searchParams?.capacity == '1'}">1명</option>
+                       <option value="2" th:selected="${searchParams?.capacity == '2'}">2명</option>
+                       <option value="3" th:selected="${searchParams?.capacity == '3'}">3명</option>
+                       <option value="4" th:selected="${searchParams?.capacity == '4'}">4명 이상</option>
+                   </select>   
+         
+                 </form>
 			
 			        <div class="sort-group">
 			            <span>정렬</span>

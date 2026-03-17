@@ -149,13 +149,13 @@ public class AdminReservationController {
 	
 	
 	// 엑셀 다운로드
-	@PreAuthorize("hasRole('ADMIN_HQ')")
+	//@PreAuthorize("hasRole('ADMIN_HQ')")
 	@GetMapping("/excel")
 	public void downloadExcel(
 	        @RequestParam(value="name", required=false) String name,
 	        @RequestParam(value="status", required=false) String status,
 	        HttpServletResponse response) throws Exception {
-
+		
 	    Map<String,Object> param = new HashMap<>();
 	    param.put("name", name);
 	    param.put("status", status);

@@ -198,17 +198,16 @@ button:hover{
 
 </div>
 
-<script>
-
+<script th:inline="javascript">
 function downloadExcel(){
 
-	const name = document.querySelector("input[name='name']").value;
+    const name = document.querySelector("input[name='name']").value;
     const status = document.querySelector("select[name='status']").value;
 
-    location.href = "/admin/reservation/excel?name="+name+"&status="+status;
+    let url = /*[[@{/admin/reservation/excel}]]*/ "";
 
+    location.href = url + "?name=" + name + "&status=" + status;
 }
-
 </script>
 
 </body>
