@@ -26,8 +26,21 @@ public interface DiningMapper {
 
 	String getDiningName(int dining_id);
 
-    List<DiningReservationDTO> searchNonMemberRes(
+    List<DiningReservationDTO> findNonMemberReservations(
         @Param("name") String name, @Param("email") String email,  @Param("password") String password);
 
     void updateStatus(@Param("id") Long id, @Param("status") String status);
+
+	List<DiningReservationDTO> findMemberReservations(String memberid);
+
+	List<DiningReservationDTO> findAllReservationsAdmin(Map<String, Object> paraMap);
+
+	Map<String, Object> getAdminDashboardCounts();
+
+	int updateReservationStatusAdmin(@Param("resId") Long resId, @Param("status") String status);
+
+	int insertManualReservation(DiningReservationDTO dto);
+	
+	// 관리자 - 예약 상세 정보 조회
+	DiningReservationDTO getReservationDetail(Long resId);
 }

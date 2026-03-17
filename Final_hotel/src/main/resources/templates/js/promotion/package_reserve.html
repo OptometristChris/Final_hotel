@@ -151,7 +151,7 @@
 
             const roomId = selectedRadio.value;
             try {
-                const response = await fetch(`/final_hotel/room/calendar?room_id=${roomId}`);
+                const response = await fetch(`/room/calendar?room_id=${roomId}`);
                 calendarData = await response.json();
                 updateFinalDisplay(checkInVal, checkOutVal);
             } catch (error) {
@@ -227,7 +227,7 @@
                     const token = document.querySelector("meta[name='_csrf']").content;
                     const header = document.querySelector("meta[name='_csrf_header']").content;
                     
-                    fetch("/final_hotel/payment/verify", {
+                    fetch("/payment/verify", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -249,7 +249,7 @@
                     .then(res => res.text())
                     .then(code => {
                         alert("예약이 완료되었습니다.");
-                        location.href = "/final_hotel/reservation/complete?code=" + code;
+                        location.href = "/reservation/complete?code=" + code;
                     });
                 } else {
                     alert("결제 실패: " + rsp.error_msg);

@@ -14,8 +14,9 @@
             .status-badge { padding: 4px 12px; font-size: 12px; font-weight: bold; border-radius: 20px; }
             .status-reserved { background: #e3f2fd; color: #1976d2; }
             .status-cancelled { background: #ffebee; color: #d32f2f; }
-            .btn-cancel { border: 1px solid #d32f2f; color: #d32f2f; background: none; padding: 5px 15px; cursor: pointer; }
+            .btn-cancel { border: 1px solid #d32f2f; color: #d32f2f; background: none; padding: 5px 15px; cursor: pointer; transition: 0.2s; }
             .btn-cancel:hover { background: #d32f2f; color: #fff; }
+            .user-name { color: #9d815d; font-weight: bold; }
         </style>
     </th:block>
 
@@ -23,6 +24,7 @@
         <script th:inline="javascript">
             function cancelRes(resId) {
                 if(confirm("정말로 예약을 취소하시겠습니까?")) {
+                    // 취소 후 다시 조회 페이지로 리다이렉트 (컨트롤러 설정에 따라 분기 가능)
                     location.href = "/final_hotel/dining/cancel?id=" + resId;
                 }
             }
@@ -36,18 +38,22 @@
             <div class="container">
                 <div class="mb-5 text-center">
                     <h2 style="font-family: 'Noto Serif KR', serif;">My Reservations</h2>
-                    <p class="text-muted">조회하신 예약 내역입니다.</p>
+                    
+                    <p th:if="${isMember}" class="text-muted">
+                        <span class="user-name" th:text="${session.sessionMemberDTO.name}">회원</span> 님의 소중한 다이닝 예약 내역입니다.
+                    </p>
+                    <p th:unless="${isMember}" class="text-muted">비회원 전용 예약 조회 결과입니다.</p>
                 </div>
 
-                <div th:if="${#lists.isEmpty(reservations)}" class="text-center py-5">
-                    <p>조회된 예약 내역이 없습니다.</p>
-                    <a th:href="@{/dining/reservation_search}" class="btn btn-outline-dark mt-3">다시 조회하기</a>
+                <div th:if="${#lists.isEmpty(reservations)}" class="text-center py-5" style="border: 1px dashed #eee;">
+                    <p class="text-muted">조회된 예약 내역이 없습니다.</p>
+                    <a th:href="@{/dining/reservation_search}" class="btn btn-outline-dark mt-3">조회 페이지로 돌아가기</a>
                 </div>
 
                 <div th:each="res : ${reservations}" class="res-card">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <h4 th:text="${res.diningName}" style="color: #9d815d;">레스토랑 이름</h4>
+                            <h4 th:text="${res.diningName}" style="color: #9d815d; font-family: 'Noto Serif KR', serif;">레스토랑 이름</h4>
                             <p class="mb-1">
                                 <strong th:text="${res.resDate}">2026-03-13</strong> | 
                                 <span th:text="${res.resTime}">18:00</span>
@@ -68,6 +74,10 @@
                                     class="btn-cancel">예약취소</button>
                         </div>
                     </div>
+                </div>
+                
+                <div class="text-center mt-5">
+                    <a th:href="@{/dining/all}" class="btn btn-dark px-5" style="border-radius: 0;">레스토랑 더보기</a>
                 </div>
             </div>
         </div>

@@ -163,72 +163,56 @@
                class="btn-filter" th:classappend="${selectedType == 'bar'} ? 'active'">라운지 & 바</a>
         </div>
 
-<div class="container">
-    <div class="dining-header">
-        <h2>DINING</h2>
-    </div>
+	    <div class="hotel-select-wrap">
+	        <select class="custom-select-sm" onchange="location.href='/final_hotel/dining/all?hotel_id=' + this.value">
+	            <option value="">전체 호텔</option>
+	            <option value="1" th:selected="${selectedHotel == 1}">CIEL</option>
+	            <option value="2" th:selected="${selectedHotel == 2}">LE CIEL</option>
+	        </select>
+	    </div>
+	
+	    <div class="row" th:if="${not #lists.isEmpty(diningList)}">
+	        <div th:each="dining : ${diningList}" class="col-md-4">
+	            <a th:href="@{/dining/detail/{id}(id=${dining.dining_id})}" class="dining-card">
+	                
+	                <div class="img-wrapper shadow-sm">
+	                    <img th:src="@{/images/dining/{img}(img=${dining.main_img})}" 
+	                         th:alt="${dining.name}"
+	                         onerror="this.src='/final_hotel/images/dining/default_dining.jpg'">
+	                </div>
+	
+	                <div class="badge-container">
+					    <span class="badge-hotel" 
+						      th:text="${dining.fk_hotel_id == 1 ? 'CIEL' : (dining.fk_hotel_id == 2 ? 'LE CIEL' : 'LOTTE HOTEL WORLD')}">
+						    호텔명
+						</span>
+					    
+					    <span class="badge-type" 
+					          th:text="${dining.d_type == 'dining' ? '레스토랑' : (dining.d_type == 'bar' ? '라운지 & 바' : dining.d_type)}">
+					        타입
+					    </span>
+					</div>
+	
+	                <h3 class="res-name" th:text="${dining.name}">다이닝 명칭</h3>
+	                
+	                <div class="info-row">
+	                    <span class="info-label">위치</span>
+	                    <span class="info-content" th:text="${dining.floor}">층수 정보</span>
+	                </div>
+	                <div class="info-row">
+	                    <span class="info-label">문의</span>
+	                    <span class="info-content" th:text="${dining.tel}">전화번호</span>
+	                </div>
+	            </a>
+	        </div>
+	    </div>
+	
+	    <div class="no-data" th:if="${#lists.isEmpty(diningList)}">
+	        <p>선택하신 조건에 해당하는 다이닝 매장이 없습니다.</p>
+	        <a th:href="@{/dining/all}" class="btn btn-outline-dark btn-sm mt-3">전체보기</a>
+	    </div>
 
-    <div class="filter-wrap">
-	    <a th:href="@{/dining/all(hotel_id=${selectedHotel})}" 
-	       class="btn-filter" th:classappend="${selectedType == null} ? 'active'">전체</a>
-	
-	    <a th:href="@{/dining/all(hotel_id=${selectedHotel}, d_type='dining')}" 
-	       class="btn-filter" th:classappend="${selectedType == 'dining'} ? 'active'">레스토랑</a>
-	
-	    <a th:href="@{/dining/all(hotel_id=${selectedHotel}, d_type='bar')}" 
-	       class="btn-filter" th:classappend="${selectedType == 'bar'} ? 'active'">라운지 & 바</a>
 	</div>
-
-    <div class="hotel-select-wrap">
-        <select class="custom-select-sm" onchange="location.href='/final_hotel/dining/all?hotel_id=' + this.value">
-            <option value="">전체 호텔</option>
-            <option value="1" th:selected="${selectedHotel == 1}">CIEL</option>
-            <option value="2" th:selected="${selectedHotel == 2}">LE CIEL</option>
-        </select>
-    </div>
-
-    <div class="row" th:if="${not #lists.isEmpty(diningList)}">
-        <div th:each="dining : ${diningList}" class="col-md-4">
-            <a th:href="@{/dining/detail/{id}(id=${dining.dining_id})}" class="dining-card">
-                
-                <div class="img-wrapper shadow-sm">
-                    <img th:src="@{/images/dining/{img}(img=${dining.main_img})}" 
-                         th:alt="${dining.name}"
-                         onerror="this.src='/final_hotel/images/dining/default_dining.jpg'">
-                </div>
-
-                <div class="badge-container">
-				    <span class="badge-hotel" 
-					      th:text="${dining.fk_hotel_id == 1 ? 'CIEL' : (dining.fk_hotel_id == 2 ? 'LE CIEL' : 'LOTTE HOTEL WORLD')}">
-					    호텔명
-					</span>
-				    
-				    <span class="badge-type" 
-				          th:text="${dining.d_type == 'dining' ? '레스토랑' : (dining.d_type == 'bar' ? '라운지 & 바' : dining.d_type)}">
-				        타입
-				    </span>
-				</div>
-
-                <h3 class="res-name" th:text="${dining.name}">다이닝 명칭</h3>
-                
-                <div class="info-row">
-                    <span class="info-label">위치</span>
-                    <span class="info-content" th:text="${dining.floor}">층수 정보</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">문의</span>
-                    <span class="info-content" th:text="${dining.tel}">전화번호</span>
-                </div>
-            </a>
-        </div>
-    </div>
-
-    <div class="no-data" th:if="${#lists.isEmpty(diningList)}">
-        <p>선택하신 조건에 해당하는 다이닝 매장이 없습니다.</p>
-        <a th:href="@{/dining/all}" class="btn btn-outline-dark btn-sm mt-3">전체보기</a>
-    </div>
-
-</div>
 
 </body>
 </html>
