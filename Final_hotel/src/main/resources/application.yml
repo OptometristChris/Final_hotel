@@ -99,7 +99,7 @@ logging:
 server:
   port: 8001
   servlet:
-    #context-path: /final_hotel
+    context-path: /final_hotel
     encoding:
       charset: UTF-8
       enabled: true
