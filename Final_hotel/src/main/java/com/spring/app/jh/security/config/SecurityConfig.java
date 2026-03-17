@@ -23,6 +23,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import com.spring.app.jh.security.jwt.JwtAuthenticationFilter;
 import com.spring.app.jh.security.jwt.JwtTokenProvider;
+import com.spring.app.jh.security.loginsuccess.MemberAuthenticationSuccessHandler;
 import com.spring.app.jh.security.service.AdminUserDetailsService;
 import com.spring.app.jh.security.service.CustomOAuth2UserService;
 import com.spring.app.jh.security.service.MemberUserDetailsService;
@@ -50,6 +51,11 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+    
+    @Bean
+    public MemberAuthenticationSuccessHandler memberAuthenticationSuccessHandler() {
+        return new MemberAuthenticationSuccessHandler("/index");
     }
 
 
@@ -151,7 +157,8 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain memberChain(HttpSecurity httpSecurity,
-                                           CustomOAuth2UserService customOAuth2UserService) throws Exception {
+								    		CustomOAuth2UserService customOAuth2UserService,
+								            MemberAuthenticationSuccessHandler memberAuthenticationSuccessHandler) throws Exception {
 
         AuthenticationEntryPoint memberEntryPoint = (request, response, authException) -> {
             response.sendRedirect(request.getContextPath() + "/security/noAuthenticated");
@@ -227,11 +234,12 @@ public class SecurityConfig {
             )
 
             .oauth2Login(oauth2 -> oauth2
-                .loginPage("/security/login")
-                .userInfoEndpoint(userInfo -> userInfo
-                    .userService(customOAuth2UserService)
-                )
-            )
+        	    .loginPage("/security/login")
+        	    .userInfoEndpoint(userInfo -> userInfo
+        	        .userService(customOAuth2UserService)
+        	    )
+        	    .successHandler(memberAuthenticationSuccessHandler)
+        	)
 
             .exceptionHandling(exceptionConfig -> exceptionConfig
                 .authenticationEntryPoint(memberEntryPoint)

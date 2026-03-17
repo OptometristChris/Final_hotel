@@ -1,6 +1,7 @@
 package com.spring.app.jh.ops.admin.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContext;
@@ -8,10 +9,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import com.spring.app.jh.ops.admin.common.domain.HotelSimpleDTO;
 import com.spring.app.jh.ops.admin.service.AdminHqShuttleOpsService;
+import com.spring.app.jh.security.auth.domain.JwtPrincipalDTO;
 import com.spring.app.jh.security.domain.CustomAdminDetails;
 import com.spring.app.jh.security.domain.Session_AdminDTO;
-import com.spring.app.jh.security.auth.domain.JwtPrincipalDTO;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -34,11 +36,22 @@ public class AdminHqShuttleOpsController {
             return "redirect:/admin/login";
         }
 
-        model.addAttribute("hotelList", shuttleOpsService.getHotelList());
+        List<HotelSimpleDTO> hotelList = shuttleOpsService.getHotelList();
+
+        model.addAttribute("hotelList", hotelList);
         model.addAttribute("placeList", shuttleOpsService.getPlaceList());
         model.addAttribute("selectedHotelId", hotelId);
 
         if (hotelId != null) {
+
+            // 선택한 호텔명도 같이 넘겨서 화면 상단 요약카드/타이틀에 사용
+            String selectedHotelName = hotelList.stream()
+                    .filter(h -> h.getHotelId() == hotelId)
+                    .map(HotelSimpleDTO::getHotelName)
+                    .findFirst()
+                    .orElse(null);
+
+            model.addAttribute("selectedHotelName", selectedHotelName);
             model.addAttribute("routeList", shuttleOpsService.getRouteList(hotelId));
             model.addAttribute("timetableList", shuttleOpsService.getTimetableList(hotelId));
             model.addAttribute("blockList", shuttleOpsService.getBlockList(hotelId));
@@ -118,21 +131,6 @@ public class AdminHqShuttleOpsController {
         }
 
         shuttleOpsService.deactivateBlock(hotelId, blockId);
-
-        return "redirect:/admin/hq/shuttle?hotelId=" + hotelId;
-    }
-
-    @PostMapping("/extend")
-    public String extendPeriod(@RequestParam("hotelId") int hotelId,
-                               @RequestParam("endDate") LocalDate endDate,
-                               HttpSession session) {
-
-        Integer adminNo = getSessionAdminNo(session);
-        if (adminNo == null) {
-            return "redirect:/admin/login";
-        }
-
-        shuttleOpsService.extendSlotStock(hotelId, endDate);
 
         return "redirect:/admin/hq/shuttle?hotelId=" + hotelId;
     }

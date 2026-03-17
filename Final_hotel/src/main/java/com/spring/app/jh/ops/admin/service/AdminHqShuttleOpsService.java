@@ -3,11 +3,11 @@ package com.spring.app.jh.ops.admin.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.spring.app.jh.ops.admin.common.domain.HotelSimpleDTO;
 import com.spring.app.jh.ops.admin.common.domain.ShuttleAdminTimetableDTO;
 import com.spring.app.jh.ops.admin.common.domain.ShuttleBlockDTO;
 import com.spring.app.jh.ops.admin.common.domain.ShuttlePlaceDTO;
 import com.spring.app.jh.ops.admin.common.domain.ShuttleRouteDTO;
-import com.spring.app.jh.ops.admin.common.domain.HotelSimpleDTO;
 
 public interface AdminHqShuttleOpsService {
 
@@ -38,8 +38,6 @@ public interface AdminHqShuttleOpsService {
                  String reason);
 
     int deactivateBlock(int hotelId, long blockId);
-
-    int extendSlotStock(int hotelId, LocalDate endDate);
 
     int purgeOldShuttleData(int hotelId);
 }
