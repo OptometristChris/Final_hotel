@@ -248,6 +248,10 @@ function requestPay() {
             const token = document.querySelector("meta[name='_csrf']").content;
             const header = document.querySelector("meta[name='_csrf_header']").content;
             
+            //console.log("totalAmount : "+totalAmount);
+            
+            //console.log("typeof totalAmount =", typeof totalAmount);
+            
             fetch("/final_hotel/payment/verify", {
                 method: "POST",
                 headers: {
@@ -262,7 +266,7 @@ function requestPay() {
                     check_out: document.querySelector("input[name='check_out']").value,
                     guest_count: document.getElementById("guestCount").value,
                     breakfast_count: document.getElementById("breakfastCount").value,
-                    total_price: totalAmount,
+                    total_price: String(totalAmount),
                     
                     hotel_name: "[[${hotel_name}]]",
                     room_name: "[[${room_name}]]"

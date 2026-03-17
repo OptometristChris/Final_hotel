@@ -246,10 +246,24 @@
                             room_name: selectedRadio.dataset.name
                         })
                     })
-                    .then(res => res.text())
-                    .then(code => {
+                    .then(async res => {
+
+                        const text = await res.text();
+
+                        console.log("==== /payment/verify status ====", res.status);
+                        console.log("==== /payment/verify response ====", text);
+
+                        if (!res.ok) {
+                            alert("예약 저장 중 오류가 발생했습니다.\n\n" + text);
+                            return;
+                        }
+
                         alert("예약이 완료되었습니다.");
-                        location.href = "/final_hotel/reservation/complete?code=" + code;
+                        location.href = "/final_hotel/reservation/complete?code=" + encodeURIComponent(text);
+                    })
+                    .catch(err => {
+                        console.error("==== /payment/verify fetch 오류 ====", err);
+                        alert("서버 통신 중 오류가 발생했습니다.");
                     });
                 } else {
                     alert("결제 실패: " + rsp.error_msg);

@@ -35,6 +35,9 @@ public class ReservationService_imple implements ReservationService {
     @Override
     public String saveReservation(Map<String, String> map, HttpSession session) {
 
+        System.out.println("========== ReservationService.saveReservation() 시작 ==========");
+        System.out.println("▶ 전달받은 map : " + map);
+
         Map<String, Object> paraMap = new HashMap<>(map);
 
         Integer memberNo = null;
@@ -43,6 +46,7 @@ public class ReservationService_imple implements ReservationService {
 
         // 1️. Spring Security 로그인 회원
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("▶ authentication : " + authentication);
 
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
 
@@ -51,34 +55,46 @@ public class ReservationService_imple implements ReservationService {
             memberNo = userDetails.getMemberDto().getMemberNo();
             email = userDetails.getMemberDto().getEmail();
             name = userDetails.getMemberDto().getName();
+
+            System.out.println("▶ [회원 로그인] memberNo : " + memberNo);
+            System.out.println("▶ [회원 로그인] email    : " + email);
+            System.out.println("▶ [회원 로그인] name     : " + name);
         }
 
         // 2️. 비회원 로그인
         if (memberNo == null) {
 
             Session_GuestDTO guest = (Session_GuestDTO) session.getAttribute("guestSession");
+            System.out.println("▶ guestSession : " + guest);
 
             if (guest != null) {
                 memberNo = guest.getMemberNo();
                 name = guest.getGuestName();
+
+                System.out.println("▶ [비회원 로그인] memberNo : " + memberNo);
+                System.out.println("▶ [비회원 로그인] name     : " + name);
             }
         }
 
         // 로그인 안된 경우 방지
         if (memberNo == null) {
+            System.out.println("❌ memberNo 가 null 입니다. 로그인/비회원 세션이 없는 상태입니다.");
             throw new RuntimeException("로그인 또는 비회원 로그인이 필요합니다.");
         }
 
         paraMap.put("member_no", memberNo);
+        System.out.println("▶ paraMap.member_no : " + paraMap.get("member_no"));
 
         // 인원수 처리
         String guestCount = map.getOrDefault("guest_count", "1");
         paraMap.put("guest_count", guestCount);
+        System.out.println("▶ guest_count : " + guestCount);
 
         // imp_uid null 방지
         if (paraMap.get("imp_uid") == null) {
             paraMap.put("imp_uid", "");
         }
+        System.out.println("▶ imp_uid : " + paraMap.get("imp_uid"));
 
         // 가격 결정
         if (map.containsKey("applied_price") && !map.get("applied_price").isEmpty()) {
@@ -86,35 +102,81 @@ public class ReservationService_imple implements ReservationService {
         } else {
             paraMap.put("total_price", map.getOrDefault("room_price", "100"));
         }
+        System.out.println("▶ total_price : " + paraMap.get("total_price"));
 
         // 날짜 처리
+        System.out.println("▶ room_type_id 원본값 : " + map.get("room_type_id"));
+        System.out.println("▶ check_in   원본값 : " + map.get("check_in"));
+        System.out.println("▶ check_out  원본값 : " + map.get("check_out"));
+
         int roomId = Integer.parseInt(map.get("room_type_id"));
         LocalDate checkIn = LocalDate.parse(map.get("check_in"));
         LocalDate checkOut = LocalDate.parse(map.get("check_out"));
+
+        System.out.println("▶ roomId   : " + roomId);
+        System.out.println("▶ checkIn  : " + checkIn);
+        System.out.println("▶ checkOut : " + checkOut);
 
         LocalDateTime cancelDeadline = checkIn.atStartOfDay().minusDays(1);
         paraMap.put("cancel_deadline", cancelDeadline);
         paraMap.put("refund_amount", 0);
 
+        System.out.println("▶ cancel_deadline : " + cancelDeadline);
+        System.out.println("▶ refund_amount   : " + paraMap.get("refund_amount"));
+
         // 재고 차감
-        roomStockService.decreaseStockByDateRange(roomId, checkIn, checkOut);
+        try {
+            System.out.println("========== 재고 차감 시작 ==========");
+            roomStockService.decreaseStockByDateRange(roomId, checkIn, checkOut);
+            System.out.println("✅ 재고 차감 완료");
+        } catch (Exception e) {
+            System.out.println("❌ 재고 차감 중 예외 발생");
+            e.printStackTrace();
+            throw new RuntimeException("객실 재고 차감 중 오류가 발생했습니다. " + e.getMessage(), e);
+        }
 
         // PAYMENT insert
-        reservationDAO.insertPayment(paraMap);
+        try {
+            System.out.println("========== PAYMENT insert 시작 ==========");
+            reservationDAO.insertPayment(paraMap);
+            System.out.println("✅ PAYMENT insert 완료");
+            System.out.println("▶ payment_id(insert 후 paraMap) : " + paraMap.get("payment_id"));
+        } catch (Exception e) {
+            System.out.println("❌ PAYMENT insert 중 예외 발생");
+            e.printStackTrace();
+            throw new RuntimeException("결제 정보 저장 중 오류가 발생했습니다. " + e.getMessage(), e);
+        }
 
         // RESERVATION insert
-        reservationDAO.insertReservation(paraMap);
+        try {
+            System.out.println("========== RESERVATION insert 시작 ==========");
+            reservationDAO.insertReservation(paraMap);
+            System.out.println("✅ RESERVATION insert 완료");
+            System.out.println("▶ reservation_id(insert 후 paraMap) : " + paraMap.get("reservation_id"));
+        } catch (Exception e) {
+            System.out.println("❌ RESERVATION insert 중 예외 발생");
+            e.printStackTrace();
+            throw new RuntimeException("예약 정보 저장 중 오류가 발생했습니다. " + e.getMessage(), e);
+        }
 
         Long reservationId = (Long) paraMap.get("reservation_id");
+
+        if (reservationId == null) {
+            System.out.println("❌ reservation_id 가 null 입니다.");
+            throw new RuntimeException("예약번호 생성에 실패했습니다.");
+        }
 
         // 예약 코드 생성
         String reservationCode = "R"
                 + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
                 + "-" + String.format("%04d", reservationId);
 
+        System.out.println("▶ reservationCode : " + reservationCode);
+
         // 회원일 경우만 이메일 전송
         if (email != null) {
             try {
+                System.out.println("========== 예약 메일 전송 시작 ==========");
                 reservationMailService.sendReservationMail(
                         email,
                         name,
@@ -125,11 +187,14 @@ public class ReservationService_imple implements ReservationService {
                         map.get("check_out"),
                         String.valueOf(paraMap.get("total_price"))
                 );
+                System.out.println("✅ 예약 메일 전송 완료");
             } catch (Exception e) {
+                System.out.println("❌ 예약 메일 전송 중 예외 발생");
                 e.printStackTrace();
             }
         }
 
+        System.out.println("========== ReservationService.saveReservation() 종료 ==========");
         return reservationCode;
     }
 
