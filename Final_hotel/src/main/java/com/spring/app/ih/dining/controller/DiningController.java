@@ -145,7 +145,7 @@ public class DiningController {
         }
         reservationDTO.setDiningId(diningId);
         
-        Session_MemberDTO member = (Session_MemberDTO) session.getAttribute("loginUser");
+        Session_MemberDTO member = (Session_MemberDTO) session.getAttribute("sessionMemberDTO");
         
         int result = diningService.registerReservation(reservationDTO, impUid, member);
         
@@ -166,13 +166,23 @@ public class DiningController {
         return "dining/reserve_success";
     }
     
-    // 예약 조회 페이지
+    // 예약 조회 (로그인 여부에 따라 분기)
     @GetMapping("/reservation_search")
-    public String searchPage() {
+    public String searchPage(HttpSession session) {
+    	
+    	// 세션에서 로그인 정보 확인
+        Session_MemberDTO sessionUser = (Session_MemberDTO) session.getAttribute("sessionMemberDTO");
+
+        if (sessionUser != null) {
+            // 로그인 상태, 회원 전용 조회 경로로 리다이렉트
+            return "redirect:/dining/my_member_reservations";
+        }
+
+        // 로그아웃 상태, 원래대로 비회원 조회 폼 페이지 보여주기
         return "dining/reservation_search";
     }
 
-    // 예약 내역 조회 
+    // 비회원 예약 내역 조회 
     @PostMapping("/my_reservations")
     public String getMyReservations(
     		@RequestParam("guestName") String guestName,
@@ -186,10 +196,28 @@ public class DiningController {
         return "dining/my_reservations";
     }
 
+    // 회원 전용 예약 내역 조회
+    @GetMapping("/my_member_reservations")
+    public String getMemberReservations(HttpSession session, Model model) {
+        
+        Session_MemberDTO sessionUser = (Session_MemberDTO) session.getAttribute("sessionMemberDTO");
+
+        if (sessionUser == null) {
+            return "redirect:/dining/reservation_search"; 
+        }
+
+        List<DiningReservationDTO> reservations = diningService.findMemberReservations(sessionUser.getMemberid());
+        
+        model.addAttribute("reservations", reservations);
+        model.addAttribute("isMember", true); 
+        
+        return "dining/my_reservations"; 
+    }
+    
     // 예약 취소 처리 
     @GetMapping("/cancel")
     public String cancelReservation(@RequestParam("id") Long id) {
-    	diningService.cancelReservation(id);
+    	diningService.updateStatus(id);
         return "redirect:/dining/reservation_search"; // 취소 후 조회 페이지로 리다이렉트
     }
     
