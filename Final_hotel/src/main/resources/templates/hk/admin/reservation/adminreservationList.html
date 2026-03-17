@@ -118,6 +118,11 @@ button:hover{
 		체크아웃
 		</option>
 		
+		<option value="CANCELLED"
+		th:selected="${status == 'CANCELLED'}">
+		예약취소
+		</option>
+		
 	</select>
 	
 	<button type="submit">검색</button>
@@ -197,7 +202,10 @@ button:hover{
 
 function downloadExcel(){
 
-alert("엑셀 다운로드 기능은 아직 구현되지 않았습니다.");
+	const name = document.querySelector("input[name='name']").value;
+    const status = document.querySelector("select[name='status']").value;
+
+    location.href = "/admin/reservation/excel?name="+name+"&status="+status;
 
 }
 
