@@ -12,13 +12,13 @@ import com.spring.app.jh.security.domain.Session_MemberDTO;
 
 public interface DiningService {
 	
-    List<DiningDTO> getDiningList(Map<String, Object> paraMap);
+	List<Map<String, Object>> getDiningList(Map<String, Object> paraMap);
     
-    DiningDTO getDiningDetail(int dining_id);
+    DiningDTO getDiningDetail(Long dining_id);
 
 	int registerReservation(DiningReservationDTO reservationDTO, String impUid, Session_MemberDTO member);
 
-	String getDiningName(int dining_id);
+	String getDiningName(long dining_id);
 
 	List<DiningReservationDTO> findNonMemberReservations(String name, String email, String password);
 
@@ -36,5 +36,13 @@ public interface DiningService {
 
 	// 관리자용 예약 상세 조회
 	DiningReservationDTO getReservationDetail(Long resId);
+
+	void insertBlock(Map<String, Object> params);
+
+	List<Map<String, Object>> getBlockList();
+
+	void deleteBlock(Long blockId);
+	
+	List<Map<String, Object>> getDiningList();
 	
 }
