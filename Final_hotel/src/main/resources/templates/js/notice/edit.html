@@ -14,62 +14,50 @@
         .table th { width: 15%; background-color: #F8F9FA; vertical-align: middle; text-align: center; font-weight: 600; }
         .edit-title { font-size: 2rem; font-weight: 700; margin-bottom: 40px; text-align: center; letter-spacing: 1px; }
         .btn-group-wrap { margin-top: 40px; gap: 10px; }
+        .item-category .fw-bold { font-size: 1.1rem; }
     </style>
 
     <script type="text/javascript" th:src="@{/smarteditor/js/HuskyEZCreator.js}" charset="utf-8"></script>
 
     <script th:inline="javascript">
      /*<![CDATA[*/
-         const contextPath = /*[[@{/}]]*/ '';
-         
+         var obj = []; // 전역 변수로 선언
+
          $(function(){
-            var obj = [];
-            
-            // 스마트에디터 초기화 함수 정의
-            function initEditor() {
-                if (typeof nhn !== 'undefined' && nhn.husky && nhn.husky.EZCreator) {
-                    nhn.husky.EZCreator.createInIFrame({
-                        oAppRef: obj,
-                        elPlaceHolder: "content",
-                        sSkinURI: contextPath + "smarteditor/SmartEditor2Skin.html",
-                        htParams : {
-                            bUseToolbar : true,            
-                            bUseVerticalResizer : true,
-                            bUseModeChanger : true,
-                            fOnAppLoad : function(){
-                                // textarea의 값을 에디터에 주입
-                                const contentValue = $("#content").val();
-                                obj.getById["content"].exec("SET_CONTENTS", [contentValue]);
-                            }
-                        }
-                    });
-                } else {
-                    console.error("스마트에디터 라이브러리(nhn)를 찾을 수 없습니다. 경로를 확인하세요.");
+            // 1. 스마트에디터 초기화
+            nhn.husky.EZCreator.createInIFrame({
+                oAppRef: obj,
+                elPlaceHolder: "content", // textarea의 id와 일치해야 함
+                sSkinURI: contextPath + "smarteditor/SmartEditor2Skin.html",
+                htParams : {
+                    bUseToolbar : true,            
+                    bUseVerticalResizer : true,
+                    bUseModeChanger : true,
+                    fOnAppLoad : function(){
+                        // 로딩 완료 후 필요한 동작이 있다면 작성 (기본적으로 textarea 값이 자동 주입됨)
+                    }
                 }
-            }
+            });
 
-            // 초기화 호출
-            initEditor();
-
-            // 수정완료 버튼 클릭 이벤트
+            // 2. 수정완료 버튼 클릭 이벤트
             $("#btnEdit").click(function(){
-                // 에디터의 내용을 textarea에 동기화
-                if(obj.length > 0 || obj.getById["content"]) {
-                    obj.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
-                }
+                // [필수] 에디터의 내용을 textarea(id="content")에 동기화
+                obj.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
                 
                 // 제목 유효성 검사
                 const title = $('input:text[name="title"]').val().trim();
                 if(title == "") {
                     alert("제목을 입력하세요!!");
+                    $('input:text[name="title"]').focus();
                     return;
                 }
 
-                // 내용 유효성 검사 (HTML 태그를 제외한 실제 텍스트가 있는지 확인)
-                let content_val = $("textarea[name='content']").val();
+                // 내용 유효성 검사
+                let content_val = $("#content").val();
+                // HTML 태그 및 공백 제거 후 실제 텍스트 존재 여부 확인
                 let check_val = content_val.replace(/<[^>]*>?/g, '').replace(/\&nbsp;/g, '').trim();
 
-                if(check_val == "") {
+                if(check_val == "" || content_val == "<p>&nbsp;</p>") {
                     alert("내용을 입력하세요!!");
                     return;
                 }
@@ -91,16 +79,20 @@
       <h2 class="edit-title">공지사항 수정</h2>
       
       <form name="editFrm" id="editFrm">
-         <input type="hidden" name="noticeId" th:value="${notice.noticeId}" />
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <input type="hidden" name="noticeId" th:value="${notice.noticeId}" />
          
          <table class="table table-bordered">
             <tr>
-                <th>지점 선택</th>
+                <th>담당 지점</th>
                 <td>
-                    <select name="fkHotelId" class="form-select" style="width: 250px;">
-                        <option value="1" th:selected="${notice.fkHotelId == 1}">호텔 시엘 (본점)</option>
-                        <option value="2" th:selected="${notice.fkHotelId == 2}">르 시엘 (프리미엄)</option>
-                    </select>
+                    <div class="item-category">
+                        <th:block th:each="h : ${hotelList}" th:if="${#strings.equals(notice.fkHotelId, h.HOTEL_ID)}">
+                            <span class="fw-bold text-primary" th:text="${h.HOTEL_NAME}">지점명</span>
+                        </th:block>
+                        
+                        <input type="hidden" name="fkHotelId" th:value="${notice.fkHotelId}" />
+                    </div>
                 </td>
             </tr>
             <tr>

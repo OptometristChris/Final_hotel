@@ -100,38 +100,42 @@
         
         <div class="notice-list-wrap">
             <a th:each="notice : ${topNotices}" 
-               th:href="@{'/notice/detail/' + ${notice.noticeId}(hotelId=${hotelId})}" 
-               class="notice-item row-top">
-                <div class="item-left">
-                    <div class="icon-pin"><i class="bi bi-pin-angle-fill"></i></div>
-                    <div class="item-info-box">
-                        <div class="item-category">
-                            <span th:text="${notice.fkHotelId == 1 ? '호텔 시엘' : '르 시엘'}">지점</span>
-                            <span class="sep"></span>
-                            <span>고정</span>
-                        </div>
-                        <div class="item-title" th:text="${notice.title}">제목</div>
-                    </div>
-                </div>
-                <div class="item-date" th:text="${#dates.format(notice.createdAt, 'yyyy.MM.dd')}">날짜</div>
-            </a>
+			   th:href="@{'/notice/detail/' + ${notice.noticeId}(hotelId=${hotelId})}" 
+			   class="notice-item row-top">
+			    <div class="item-left">
+			        <div class="icon-pin"><i class="bi bi-pin-angle-fill"></i></div>
+			        <div class="item-info-box">
+			            <div class="item-category">
+			                <th:block th:each="h : ${hotelList}" th:if="${#strings.equals(notice.fkHotelId, h.HOTEL_ID)}">
+			                    <span th:text="${h.HOTEL_NAME}">지점명</span>
+			                </th:block>
+			                <span class="sep"></span>
+			                <span>고정</span>
+			            </div>
+			            <div class="item-title" th:text="${notice.title}">제목</div>
+			        </div>
+			    </div>
+			    <div class="item-date" th:text="${#dates.format(notice.createdAt, 'yyyy.MM.dd')}">날짜</div>
+			</a>
 
             <a th:each="notice : ${notices}" 
-               th:href="@{'/notice/detail/' + ${notice.noticeId}(hotelId=${hotelId})}" 
-               class="notice-item">
-                <div class="item-left">
-                    <div style="width:33px;"></div>
-                    <div class="item-info-box">
-                        <div class="item-category">
-                            <span th:text="${notice.fkHotelId == 1 ? '호텔 시엘' : '르 시엘'}">지점</span>
-                            <span class="sep"></span>
-                            <span>공지사항</span>
-                        </div>
-                        <div class="item-title" th:text="${notice.title}">제목</div>
-                    </div>
-                </div>
-                <div class="item-date" th:text="${#dates.format(notice.createdAt, 'yyyy.MM.dd')}">날짜</div>
-            </a>
+			   th:href="@{'/notice/detail/' + ${notice.noticeId}(hotelId=${hotelId})}" 
+			   class="notice-item">
+			    <div class="item-left">
+			        <div style="width:33px;"></div>
+			        <div class="item-info-box">
+			            <div class="item-category">
+			                <th:block th:each="h : ${hotelList}" th:if="${#strings.equals(notice.fkHotelId, h.HOTEL_ID)}">
+			                    <span th:text="${h.HOTEL_NAME}">지점명</span>
+			                </th:block>
+			                <span class="sep"></span>
+			                <span>공지사항</span>
+			            </div>
+			            <div class="item-title" th:text="${notice.title}">제목</div>
+			        </div>
+			    </div>
+			    <div class="item-date" th:text="${#dates.format(notice.createdAt, 'yyyy.MM.dd')}">날짜</div>
+			</a>
 
             <div th:if="${#lists.isEmpty(topNotices) and #lists.isEmpty(notices)}" class="text-center py-5 text-muted">
                 등록된 공지사항이 없습니다.
