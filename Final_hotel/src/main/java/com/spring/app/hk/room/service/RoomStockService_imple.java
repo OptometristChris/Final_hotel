@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 import org.springframework.stereotype.Service;
 
-import com.spring.app.hk.reservation.controller.NoStockException;
 import com.spring.app.hk.room.model.RoomStockDAO;
 
 import lombok.RequiredArgsConstructor;
@@ -28,9 +27,9 @@ public class RoomStockService_imple implements RoomStockService {
         	int stock = roomStockDAO.selectStockForUpdate(roomId, date);
         	
         	// 재고 부족 체크
-        	if(stock <= 0) {
-        	    throw new NoStockException("선택한 날짜 중 예약이 마감된 날짜가 있습니다: " + date);
-        	}
+        	 if(stock <= 0) {
+                 throw new RuntimeException("재고 부족 날짜: " + date);
+             }
         	
         	// 재고 차감
             totalUpdated += roomStockDAO.decreaseStock(roomId, date);
