@@ -15,7 +15,7 @@
           AND available_count > 0
     </update>
     
-    <!-- 재고 0일 시 예약 막기 -->
+    <!-- 재고 0일 시 예약 막기 (락)-->
     <select id="selectStockForUpdate" resultType="int">
 
 	    SELECT available_count
