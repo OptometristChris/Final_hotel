@@ -214,11 +214,11 @@ public class AdminRoomController {
 		List<RoomTypeDTO> roomList = roomService.getRoomApprovalList();
 
 		// 호텔 필터
-		 if(hotelId != null && !hotelId.equals("")) {
-		        roomList = roomList.stream()
-		                .filter(r -> hotelId.equals(String.valueOf(r.getHotel_name())))
-		                .toList();
-		    }
+		if(hotelId != null && !hotelId.equals("")) {
+		    roomList = roomList.stream()
+		    	.filter(r -> hotelId.equals(r.getHotel_name()))
+		        .toList();
+		}
 		
 		List<RoomTypeDTO> pendingList = roomList.stream().filter(r -> "PENDING".equals(r.getApprove_status())).toList();
 
@@ -244,6 +244,7 @@ public class AdminRoomController {
 
 		// 호텔 목록 
 		model.addAttribute("hotelList", roomService.selectHotelList());
+		model.addAttribute("hotelId", hotelId);
 		
 		return "hk/admin/room/pendingRoomList";
 	}

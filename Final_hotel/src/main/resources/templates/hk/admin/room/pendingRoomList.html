@@ -135,11 +135,11 @@ margin:15px 0;
 
     <option value="">전체 호텔</option>
 
-    <option th:each="h : ${hotelList}"
-            th:value="${h.HOTEL_NAME}"
-            th:text="${h.HOTEL_NAME}"
-            th:selected="${hotelId == h.HOTEL_ID.toString()}">
-    </option>
+	<option th:each="h : ${hotelList}"
+	        th:value="${h.HOTEL_NAME}"  
+	        th:text="${h.HOTEL_NAME}"
+	        th:selected="${hotelId == h.HOTEL_NAME.toString()}">
+	</option>
 
 </select>
 
