@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.spring.app.jh.security.domain.MemberDTO;
+import com.spring.app.js.promotion.domain.PromotionDTO;
 
 @Mapper
 public interface MemberDAO {
@@ -53,6 +54,8 @@ public interface MemberDAO {
 	String findEmailByMemberid(String memberid);
 	
 	int disable_member(@Param("memberNo") Integer memberNo);
+	
+	List<PromotionDTO> selectMypagePromoList();
 	// ===== MemberController 에서 사용하는 메서드 ===== //
 
 
@@ -64,6 +67,9 @@ public interface MemberDAO {
 	// memberdto: name, mobile(암호문), memberType='GUEST', lookupKey
 
 	Integer findMemberNoByLookupKey(@Param("lookupKey") String lookupKey);
+	
+	
+	
 
 
 
