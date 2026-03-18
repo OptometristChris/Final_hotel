@@ -1,6 +1,7 @@
 package com.spring.app.jh.ops.user.controller;
 
 import java.util.Enumeration;
+import java.util.List;
 
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Controller;
@@ -44,11 +45,11 @@ public class ShuttleOpsController {
 
     
     @PostMapping("/confirm")
-    public String confirm(@RequestParam long reservationId,
-                          @RequestParam(required = false) java.util.List<Long> toTimetableIds,
-                          @RequestParam(required = false) java.util.List<Integer> toQtys,
-                          @RequestParam(required = false) java.util.List<Long> fromTimetableIds,
-                          @RequestParam(required = false) java.util.List<Integer> fromQtys,
+    public String confirm(@RequestParam("reservationId") long reservationId,
+			    		  @RequestParam(value = "toTimetableIds", required = false) List<Long> toTimetableIds,
+			              @RequestParam(value = "toQtys", required = false) List<Integer> toQtys,
+			              @RequestParam(value = "fromTimetableIds", required = false) List<Long> fromTimetableIds,
+			              @RequestParam(value = "fromQtys", required = false) List<Integer> fromQtys,
                           HttpSession session) {
 
         Integer memberNo = getSessionMemberNo(session);
@@ -81,11 +82,19 @@ public class ShuttleOpsController {
 
         if (session == null) return null;
 
+        // 1. 일반 회원 세션
         Object obj = session.getAttribute("sessionMemberDTO");
         if (obj instanceof Session_MemberDTO dto) {
             return dto.getMemberNo();
         }
+        
+        // 2. 비회원 세션
+        Object guestObj = session.getAttribute("guestSession");
+        if (guestObj instanceof Session_GuestDTO guestDto) {
+            return guestDto.getMemberNo();
+        }
 
+        // 3. Spring Security 인증 주체
         SecurityContext context =
                 (SecurityContext)
                         session.getAttribute("SPRING_SECURITY_CONTEXT");
