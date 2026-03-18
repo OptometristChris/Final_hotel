@@ -30,12 +30,13 @@
         .slick-next { right: 40px; }
         .slick-arrow:before { display: none !important; }
 
-        /* 하단 프로그레스 바 */
+/*      <날씨 부분 css 날씨 추가시 추가>
+		하단 프로그레스 바
         .slider-progress-container { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); z-index: 150; display: flex; align-items: center; }
         .progress-bar-bg { width: 300px; height: 3px; background: rgba(255, 255, 255, 0.2); position: relative; overflow: hidden; border-radius: 2px; }
         .progress-bar-fill { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background: #fff; }
 
-        /* 날씨 정보 */
+        날씨 정보
         .weather-info { position: absolute; bottom: 50px; left: 50px; z-index: 100; }
         .weather-btn {
             background: rgba(0, 0, 0, 0.5); color: white; padding: 12px 35px; font-size: 1.1rem;
@@ -43,7 +44,8 @@
             cursor: pointer; display: flex; align-items: center; transition: all 0.3s ease; outline: none;
         }
         .weather-btn:hover { background: rgba(0, 0, 0, 0.8); transform: scale(1.05); border-color: #d4af37; }
-        .divider { margin: 0 15px; opacity: 0.6; }
+        .divider { margin: 0 15px; opacity: 0.6; } 
+*/
 
         /* --- 예약 플로팅 버튼 및 탭 --- */
         .fixed-reserve-btn {
@@ -173,7 +175,9 @@
                     <h5 class="text-white font-weight-bold mb-0" style="font-size: 3.5rem; line-height: 1.2; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);" th:utext="${banner.subtitle}">카피 문구</h5>
                 </div>
             </div>
-        </div> 
+        </div>
+        
+<!--    하단 날씨 부분 나중에 공공데이터 사용하여 추가      
         <div class="slider-progress-container">
             <div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
         </div>
@@ -182,6 +186,7 @@
                 2 ℃ <span class="divider">|</span> SEOUL <span class="divider">|</span> 03/05
             </button>
         </div>
+ -->        
     </div>
 
     <div class="fixed-reserve-btn" onclick="toggleReserveTab()">
