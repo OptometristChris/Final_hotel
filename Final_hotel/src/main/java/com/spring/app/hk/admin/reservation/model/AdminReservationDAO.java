@@ -34,6 +34,9 @@ public interface AdminReservationDAO {
 
 	int getTodayCheckinDoneCount();
 
+	// 호텔 조회 필터 추가
+	List<Map<String, Object>> selectHotelList();
+
 	
 
 }

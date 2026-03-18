@@ -65,6 +65,11 @@ public class AdminReservationService_imple implements AdminReservationService {
 	    return reservationDAO.getTodayCheckinDoneCount();
 	}
 
+	@Override
+	public List<Map<String, Object>> selectHotelList() {
+		return reservationDAO.selectHotelList();
+	}
+
 	
 	
 }

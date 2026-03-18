@@ -203,11 +203,23 @@
 		<if test="status != null and status != ''">
 		    AND r.reservation_status = #{status}
 		</if>
-		
+				
+		<if test="hotelId != null and hotelId != ''">
+		    AND h.hotel_id = #{hotelId}
+		</if>
 		</where>
 		
 		ORDER BY r.created_at DESC
 		
+		</select>
+		
+		
+		<!-- 호텔 목록 조회 -->
+		<select id="selectHotelList" resultType="map">
+		    SELECT hotel_id, hotel_name
+		    FROM tbl_hotel
+		    WHERE active_yn = 'Y'
+		    ORDER BY hotel_name
 		</select>
 	
 

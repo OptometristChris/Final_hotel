@@ -125,6 +125,22 @@ button:hover{
 		
 	</select>
 	
+	호텔
+	<select name="hotelId">
+	
+	    <option value=""
+	    th:selected="${hotelId == null or hotelId == ''}">
+	    전체
+	    </option>
+	
+	    <option th:each="h : ${hotelList}"
+	            th:value="${h.HOTEL_ID}"
+	            th:text="${h.HOTEL_NAME}"
+	            th:selected="${hotelId == h.HOTEL_ID.toString()}">
+	    </option>
+	
+	</select>
+	
 	<button type="submit">검색</button>
 	
 	</form>

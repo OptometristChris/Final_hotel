@@ -119,18 +119,27 @@ public class AdminReservationController {
 	public String adminReservationList(
 	        @RequestParam(value="name", required=false) String name,
 	        @RequestParam(value="status", required=false) String status,
+	        @RequestParam(value="hotelId", required=false) String hotelId,
 	        Model model) {
 
 	    Map<String,Object> param = new HashMap<>();
 	    param.put("name", name);
 	    param.put("status", status);
+	    param.put("hotelId", hotelId);
 
 	    List<Map<String,Object>> reservationList =
 	            reservationService.selectAdminReservationList(param);
 
+	    // 호텔 목록 추가
+	    List<Map<String,Object>> hotelList =
+	            reservationService.selectHotelList();
+
 	    model.addAttribute("reservationList", reservationList);
+	    model.addAttribute("hotelList", hotelList);
+
 	    model.addAttribute("name", name);
 	    model.addAttribute("status", status);
+	    model.addAttribute("hotelId", hotelId);
 
 	    return "hk/admin/reservation/adminreservationList";
 	}

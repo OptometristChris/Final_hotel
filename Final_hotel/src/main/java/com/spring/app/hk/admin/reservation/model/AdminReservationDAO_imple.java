@@ -77,6 +77,12 @@ public class AdminReservationDAO_imple implements AdminReservationDAO {
     }
 
 	
+	@Override
+	public List<Map<String, Object>> selectHotelList() {
+		return sqlsession.selectList("adminReservation.selectHotelList");
+	}
+
+	
 	
 
 }
