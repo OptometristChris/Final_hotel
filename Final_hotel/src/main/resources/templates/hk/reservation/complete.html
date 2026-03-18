@@ -148,7 +148,7 @@
 
 	<!-- 수정필요함 -->
     <div class="btn-group">
-    	<a th:href="@{/shuttle/reserve(reservationId=31)}"
+    	<a th:href="@{/shuttle/reserve(reservationId=${reservation['RESERVATION_ID']})}"
 		   class="btn btn-primary">
 		    셔틀 예약하기
 		</a>

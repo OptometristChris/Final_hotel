@@ -248,8 +248,9 @@ function requestPay() {
             const token = document.querySelector("meta[name='_csrf']").content;
             const header = document.querySelector("meta[name='_csrf_header']").content;
             
-            console.log("totalAmount : "+totalAmount);
-            console.log("typeof totalAmount =", typeof totalAmount);
+            //console.log("totalAmount : "+totalAmount);
+            
+            //console.log("typeof totalAmount =", typeof totalAmount);
             
             fetch("/final_hotel/payment/verify", {
                 method: "POST",
@@ -265,30 +266,32 @@ function requestPay() {
                     check_out: document.querySelector("input[name='check_out']").value,
                     guest_count: document.getElementById("guestCount").value,
                     breakfast_count: document.getElementById("breakfastCount").value,
-                    total_price: String(totalAmount), // 안전한 방식
-
+                    total_price: String(totalAmount),
+                    
                     hotel_name: "[[${hotel_name}]]",
                     room_name: "[[${room_name}]]"
                 })
             })
-            .then(async res => {
-
-                const text = await res.text();
-
-                console.log("==== /payment/verify status ====", res.status);
-                console.log("==== /payment/verify response ====", text);
-
+            .then(res => {
                 if (!res.ok) {
-                    alert("예약 저장 중 오류가 발생했습니다.\n\n" + text);
-                    return;
+                    return res.text().then(msg => {
+                        throw new Error(msg); //  여기 중요
+                    });
                 }
-
+                return res.text();
+            })
+            .then(code => {
                 alert("예약이 완료되었습니다.");
-                location.href = "/final_hotel/reservation/complete?code=" + encodeURIComponent(text);
+                location.href = "/final_hotel/reservation/complete?code=" + code;
             })
             .catch(err => {
-                console.error("==== /payment/verify fetch 오류 ====", err);
-                alert("서버 통신 중 오류가 발생했습니다.");
+                console.error(err);
+
+                if (err.message.includes("재고")) {
+                    alert("이미 예약된 객실입니다. 다른 날짜를 선택해주세요.");
+                } else {
+                    alert("예약 처리 중 오류가 발생했습니다.");
+                }
             });
 
         } else {

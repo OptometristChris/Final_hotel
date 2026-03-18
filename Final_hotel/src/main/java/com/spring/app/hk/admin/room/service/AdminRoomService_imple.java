@@ -1,5 +1,7 @@
 package com.spring.app.hk.admin.room.service;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,49 +36,42 @@ public class AdminRoomService_imple implements AdminRoomService {
     @Override
     public void modifyApprovedRoom(Map<String, String> map, MultipartFile roomImage) {
 
-        // 객실 기본 정보 수정
         adminRoomDAO.modifyApprovedRoom(map);
 
-        // 객실 ID
         int roomTypeId = Integer.parseInt(map.get("roomTypeId"));
 
-        // 이미지 교체 시
         if(roomImage != null && !roomImage.isEmpty()){
 
             try {
+                String fileName = System.currentTimeMillis() + "_" + roomImage.getOriginalFilename();
 
-            	String fileName = System.currentTimeMillis() + "_" + roomImage.getOriginalFilename();
+                // ✅ 절대경로로 변경
+                String uploadPath = "C:/upload/room/";
 
-                // 파일 저장 경로
-                String uploadPath = "./file_images/room/";
-
-                java.io.File dir = new java.io.File(uploadPath);
-                if(!dir.exists()){
+                File dir = new File(uploadPath);
+                if (!dir.exists()) {
                     dir.mkdirs();
                 }
 
-                java.io.File saveFile =
-                        new java.io.File(uploadPath + fileName);
+                File saveFile = new File(uploadPath + fileName);
+
+                // ✅ 부모 폴더까지 확실히 생성
+                saveFile.getParentFile().mkdirs();
 
                 roomImage.transferTo(saveFile);
 
-                // 이미지 url
                 String imageUrl = "/file_images/room/" + fileName;
 
-                Map<String,Object> imageMap = new java.util.HashMap<>();
-
+                Map<String,Object> imageMap = new HashMap<>();
                 imageMap.put("roomTypeId", roomTypeId);
                 imageMap.put("image_url", imageUrl);
 
-                // 이미지 업데이트
                 adminRoomDAO.updateRoomImage(imageMap);
 
             } catch(Exception e){
                 e.printStackTrace();
             }
-
         }
-        
     }
     
     

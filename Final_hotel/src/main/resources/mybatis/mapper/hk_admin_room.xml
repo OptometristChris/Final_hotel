@@ -229,7 +229,7 @@
 		UPDATE ROOM_IMAGE
 		SET IMAGE_URL = #{image_url}
 		WHERE ROOM_TYPE_ID = #{roomTypeId}
-
+		AND IS_MAIN = 'Y'
 	</update>
 	
 	<!-- 반려 후 재상신 -->

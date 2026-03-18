@@ -208,9 +208,8 @@ public class SecurityConfig {
             "/cs/**",
             "/hotel/location",
             
-            "/dining/**",
-            
-            "/promotion/**"
+            "/dining/**"
+           
         };
 
         httpSecurity
@@ -225,6 +224,8 @@ public class SecurityConfig {
                 .requestMatchers(excludeUri).permitAll()
                 .requestMatchers("/notice/write", "/notice/edit/**", "/notice/delete")
                     .hasAnyRole("ADMIN_HQ", "ADMIN_BRANCH")
+                .requestMatchers("/promotion/reserve").authenticated()
+                .requestMatchers("/promotion/**").permitAll()
                 .requestMatchers("/cs/qnaWrite", "/cs/qnaDelete").authenticated()
                 .requestMatchers("/reservation/**").permitAll()
                 .requestMatchers("/payment/**").permitAll()

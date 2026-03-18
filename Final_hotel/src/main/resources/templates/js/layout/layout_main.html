@@ -97,7 +97,6 @@
                         <i class="fas fa-user-circle mr-1"></i>
                         <span th:text="${session.guestSession.guestName}">게스트</span>님 환영합니다
                     </span>
-                    <a href="#">예약조회</a>
                     <a href="javascript:void(0);" onclick="logoutGuest();">로그아웃</a>
                 </th:block>
 
@@ -171,6 +170,9 @@
                         <li class="nav-item"><a class="nav-link" th:href="@{/}">다이닝예약확인</a></li>
                         <li class="nav-item"><a class="nav-link" th:href="@{/promotion/list}">프로모션</a></li>
                         <li class="nav-item"><a class="nav-link" th:href="@{/hotel/location}">호텔위치</a></li>
+                        <th:block th:if="${session.guestSession == null}" sec:authorize="hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')">
+                        	<li class="nav-item"><a class="nav-link" th:href="@{/admin/revenue}">수익관리</a>
+                        </th:block>
                     </ul>
                 </nav>
             </div>
