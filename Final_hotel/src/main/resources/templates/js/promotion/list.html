@@ -85,7 +85,7 @@
 		</div>
         
         <div class="admin-action-area" 
-		     sec:authorize="hasAnyRole('ADMIN_BRANCH', 'ROLE_ADMIN_BRANCH', 'ROLE_ADMIN', 'ADMIN')" 
+		     th:if="${canWrite}" 
 		     style="max-width: 1200px; margin: 0 auto 30px; padding: 0 20px; text-align: right;">
 		    
 		    <a th:href="@{/promotion/write(hotelId=${hotelId})}" class="btn-admin-add">
