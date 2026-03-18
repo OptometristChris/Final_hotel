@@ -78,8 +78,10 @@
     <div th:if="${promo != null}" class="container promo-detail-container">
         <div class="promo-header">
             <div>
-                <span th:text="${promo.fk_hotel_id == 1 ? 'CIEL HOTEL' : 'LE CIEL'}" 
-                      style="color:#d4af37; font-weight:700; font-size:0.9rem; letter-spacing:1px;">지점명</span>
+                <th:block th:each="h : ${hotelList}" th:if="${#strings.equals(promo.fk_hotel_id, h.HOTEL_ID)}">
+				    <span th:text="${h.HOTEL_NAME}" 
+				          style="color:#d4af37; font-weight:700; font-size:0.9rem; letter-spacing:1px;">지점명</span>
+				</th:block>
                 <h2 th:text="${promo.title}">패키지 제목</h2>
             </div>
             <div class="price-info">

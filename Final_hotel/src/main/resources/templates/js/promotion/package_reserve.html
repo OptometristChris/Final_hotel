@@ -138,8 +138,8 @@
 <th:block th:fragment="script">
     <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
     <script th:inline="javascript">
-        const dRate = [[${promo.discount_rate}]] || 0;   
-        const dAmount = [[${promo.discount_amount}]] || 0;
+	    const dRate = /*[[${promo.discount_rate}]]*/ 0;   
+	    const dAmount = /*[[${promo.discount_amount}]]*/ 0;
         let calendarData = [];
 
         async function recalculatePrice() {
@@ -218,10 +218,10 @@
                 pg: "html5_inicis",
                 pay_method: "card",
                 merchant_uid: "hotel_" + new Date().getTime(),
-                name: "프로모션: " + [[${promo.title}]],
+                name: "프로모션: " + /*[[${promo.title}]]*/ "프로모션 상품",
                 amount: 100, // 테스트 결제금액
-                buyer_name: [[${memberName}]],
-                buyer_tel: [[${memberMobile}]]
+                buyer_name: /*[[${memberName}]]*/ "구매자명",
+                buyer_tel: /*[[${memberMobile}]]*/ "010-0000-0000"
             }, function (rsp) {
                 if (rsp.success) {
                     const token = document.querySelector("meta[name='_csrf']").content;
@@ -236,7 +236,7 @@
                         body: JSON.stringify({
                             imp_uid: rsp.imp_uid,
                             merchant_uid: rsp.merchant_uid,
-                            member_no: [[${memberNo}]],
+                            member_no: /*[[${memberNo}]]*/ 0,
                             room_type_id: selectedRadio.value,
                             check_in: document.getElementById('checkIn').value,
                             check_out: document.getElementById('checkOut').value,

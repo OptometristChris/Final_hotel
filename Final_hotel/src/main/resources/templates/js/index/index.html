@@ -190,40 +190,43 @@
     </div>
 
     <div id="reserveQuickTab" class="reserve-quick-tab">
-        <form th:action="@{/search}" method="get">
-            <div class="tab-header">
-                <input type="hidden" name="reserveType" id="reserveType" value="room">
-                <button type="button" class="tab-btn active" id="tab-room-btn" onclick="switchReserveTab('room')">객실</button>
-                <button type="button" class="tab-btn" id="tab-dining-btn" onclick="switchReserveTab('dining')">다이닝</button>
-            </div>
-            <div class="tab-body">
-                <select name="hotelId" class="reserve-field" required>
-                    <option value="" disabled selected hidden>호텔 선택</option>
-                    <option value="1">CIEL HOTEL</option>
-                    <option value="2">LE CIEL</option>
-                </select>
-                <div id="room-fields">
-                    <input type="text" name="daterange" class="reserve-field" placeholder="체크인 / 체크아웃" readonly style="background-color: #fff;">
-                    <select name="bedType" class="reserve-field" >
-					    <option value="">침대타입 전체</option>
-					    <option value="DOUBLE">DOUBLE</option>
-					    <option value="TWIN">TWIN</option>
-					    <option value="KING">KING</option>
-					</select>
-                </div>
-                
-                <div id="dining-fields" style="display: none;">
-				    <select name="diningType" class="reserve-field">
-				        <option value="">다이닝 전체</option>
-				        <option value="dining">레스트랑</option>
-				        <option value="bar">라운지 & 바</option>
-				    </select>
-				</div>	
-                
-                <button type="submit" class="search-submit-btn">검색 하기</button>
-            </div>
-        </form>
-    </div>
+	    <form th:action="@{/search}" method="get">
+	        <div class="tab-header">
+	            <input type="hidden" name="reserveType" id="reserveType" value="room">
+	            <button type="button" class="tab-btn active" id="tab-room-btn" onclick="switchReserveTab('room')">객실</button>
+	            <button type="button" class="tab-btn" id="tab-dining-btn" onclick="switchReserveTab('dining')">다이닝</button>
+	        </div>
+	        <div class="tab-body">
+	            <select name="hotelId" class="reserve-field" required>
+	                <option value="" disabled selected hidden>호텔 선택</option>
+	                <th:block th:each="hotel : ${hotelList}">
+	                    <option th:value="${hotel.HOTEL_ID}" th:text="${hotel.HOTEL_NAME}"></option>
+	                </th:block>
+	            </select>
+	
+	            <div id="room-fields">
+	                <input type="text" name="daterange" class="reserve-field" placeholder="체크인 / 체크아웃" readonly style="background-color: #fff;">
+	                
+	                <select name="capacity" class="reserve-field">
+	                    <option value="1">1명</option>
+	                    <option value="2" selected>2명</option>
+	                    <option value="3">3명</option>
+	                    <option value="4">4명 이상</option>
+	                </select>
+	            </div>
+	            
+	            <div id="dining-fields" style="display: none;">
+	                <select name="diningType" class="reserve-field">
+	                    <option value="">다이닝 전체</option>
+	                    <option value="RESTAURANT">레스토랑</option>
+	                    <option value="BAR">라운지 & 바</option>
+	                </select>
+	            </div>	
+	            
+	            <button type="submit" class="search-submit-btn">검색 하기</button>
+	        </div>
+	    </form>
+	</div>
 
     <div class="container-fluid px-md-5 mt-5">
 	    <div class="row mb-5">
@@ -259,7 +262,7 @@
         <div class="row mb-5 text-center">
             <div class="col-12 d-flex justify-content-between align-items-end mb-4">
                 <h3 class="section-title mb-0 w-100 text-left">다이닝</h3>
-                <a th:href="@{/dining/list}" class="more-btn text-muted" style="white-space:nowrap;">전체보기 ></a>
+                <a th:href="@{/dining/all}" class="more-btn text-muted" style="white-space:nowrap;">전체보기 ></a>
             </div>
             <div class="col-md-4 mb-4" th:each="dining : ${diningList}">
                 <div class="dining-card overflow-hidden rounded mb-3" style="height: 250px;"

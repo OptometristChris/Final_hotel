@@ -44,12 +44,15 @@ public class PromotionController {
                              .anyMatch(a -> a.getAuthority().equals("ADMIN_BRANCH") || 
                                             a.getAuthority().equals("ROLE_ADMIN_BRANCH"));
 
+        List<Map<String, String>> hotelList = promotionService.getHotelList();
+        
         Map<String, Object> paraMap = new HashMap<>();
         paraMap.put("hotelId", hotelId);
         paraMap.put("isAdmin", isAdmin); // 쿼리로 전달
 
         List<PromotionDTO> promoList = promotionService.getPromotionList(paraMap);
         
+        mav.addObject("hotelList", hotelList);
         mav.addObject("promoList", promoList);
         mav.addObject("hotelId", hotelId);
         mav.setViewName("js/promotion/list");
@@ -67,6 +70,9 @@ public class PromotionController {
             return mav;
         }
 
+        List<Map<String, String>> hotelList = promotionService.getHotelList();
+        mav.addObject("hotelList", hotelList);
+        
         // ★ 비활성 프로모션 접근 제어 로직 추가 ★
         if (promo.getIs_active() == 0) {
             // 현재 로그인한 사용자의 권한 확인
@@ -94,6 +100,10 @@ public class PromotionController {
      */
     @GetMapping("/write")
     public ModelAndView promotionWrite(@RequestParam("hotelId") String hotelId, ModelAndView mav) {
+    	
+    	List<Map<String, String>> hotelList = promotionService.getHotelList();
+        
+        mav.addObject("hotelList", hotelList);
         mav.addObject("hotelId", hotelId);
         mav.setViewName("js/promotion/write"); 
         return mav;
@@ -200,7 +210,9 @@ public class PromotionController {
         if (promotion == null) {
             return "redirect:/promotion/list";
         }
+        List<Map<String, String>> hotelList = promotionService.getHotelList();
         
+        model.addAttribute("hotelList", hotelList);
         model.addAttribute("promo", promotion);
         return "js/promotion/edit"; 
     }

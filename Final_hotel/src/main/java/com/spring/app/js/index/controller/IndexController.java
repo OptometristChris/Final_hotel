@@ -45,6 +45,9 @@ public class IndexController {
         // 4. 다이닝 목록 (상위 3개) 가져오기
         List<DiningDTO> diningList = service.getMainDiningList();
 
+        // 퀵탭(Quick Tab) 검색용 호텔 목록 가져오기
+        List<Map<String, String>> hotelList = service.getHotelList();
+        
         // 뷰(HTML)로 전달
         // HTML에서 사용하는 th:each 명칭과 일치시켜야 합니다.
         model.addAttribute("mainBannerList", mainBannerList); // 슬라이더용
@@ -52,6 +55,8 @@ public class IndexController {
         model.addAttribute("roomList", roomList);
         model.addAttribute("diningList", diningList);
 
+        model.addAttribute("hotelList", hotelList);
+        
         return "js/index/index";
     }
     
@@ -71,7 +76,7 @@ public class IndexController {
 
         // 3. 객실 예약일 경우 처리 (기존 로직)
         String daterange = request.getParameter("daterange"); 
-        String bedType = request.getParameter("bedType");
+        String capacity = request.getParameter("capacity");
 
         // 날짜 파싱 (안전하게 처리)
         String checkIn = "";
@@ -86,7 +91,7 @@ public class IndexController {
         paraMap.put("hotelId", hotelId);
         paraMap.put("checkIn", checkIn);
         paraMap.put("checkOut", checkOut);
-        paraMap.put("bedType", bedType);
+        paraMap.put("capacity", capacity);
 
         // 필터용 호텔 목록
         List<Map<String, String>> hotelList = service.getHotelList(); 
