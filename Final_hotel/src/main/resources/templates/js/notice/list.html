@@ -67,10 +67,19 @@
         <h2 class="notice-title">공지 사항</h2>
 
         <div class="notice-tabs">
-            <a th:href="@{/notice/list(hotelId=0)}" class="tab-item" th:classappend="${hotelId == 0} ? 'active' : ''">전체</a>
-            <a th:href="@{/notice/list(hotelId=1)}" class="tab-item" th:classappend="${hotelId == 1} ? 'active' : ''">호텔 시엘</a>
-            <a th:href="@{/notice/list(hotelId=2)}" class="tab-item" th:classappend="${hotelId == 2} ? 'active' : ''">르 시엘</a>
-        </div>
+		    <a th:href="@{/notice/list(hotelId=0)}" 
+		       class="tab-item" 
+		       th:classappend="${hotelId == 0} ? 'active' : ''">전체</a>
+		
+		    <th:block th:each="hotel : ${hotelList}">
+		        <a th:href="@{/notice/list(hotelId=${hotel.HOTEL_ID})}" 
+		           class="tab-item" 
+		           th:classappend="${hotelId == #conversions.convert(hotel.HOTEL_ID, 'Integer')} ? 'active' : ''"
+		           th:text="${hotel.HOTEL_NAME}">
+		           호텔이름
+		        </a>
+		    </th:block>
+		</div>
         
         <div class="search-wrapper">
             <form th:action="@{/notice/list}" method="get" class="search-form">

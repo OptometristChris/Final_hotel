@@ -128,4 +128,12 @@
         ORDER BY is_top DESC, created_at DESC
     </select>
 
+	<select id="getHotelList" resultType="map">
+	    SELECT hotel_id AS HOTEL_ID, 
+	           hotel_name AS HOTEL_NAME 
+	    FROM tbl_hotel 
+	    WHERE active_yn = 'Y' AND approve_status = 'APPROVED' 
+	    ORDER BY hotel_id ASC
+	</select>
+
 </mapper>
