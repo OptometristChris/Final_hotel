@@ -173,35 +173,35 @@
 	
 	    <div class="row" th:if="${not #lists.isEmpty(diningList)}">
 	        <div th:each="dining : ${diningList}" class="col-md-4">
-	            <a th:href="@{/dining/detail/{id}(id=${dining.dining_id})}" class="dining-card">
+	            <a th:href="@{/dining/detail/{id}(id=${dining.DINING_ID})}" class="dining-card">
 	                
 	                <div class="img-wrapper shadow-sm">
-	                    <img th:src="@{/images/dining/{img}(img=${dining.main_img})}" 
-	                         th:alt="${dining.name}"
+	                    <img th:src="@{/images/dining/{img}(img=${dining.MAIN_IMG})}" 
+	                         th:alt="${dining.NAME}"
 	                         onerror="this.src='/final_hotel/images/dining/default_dining.jpg'">
 	                </div>
 	
 	                <div class="badge-container">
 					    <span class="badge-hotel" 
-						      th:text="${dining.fk_hotel_id == 1 ? 'CIEL' : (dining.fk_hotel_id == 2 ? 'LE CIEL' : 'LOTTE HOTEL WORLD')}">
+						      th:text="${dining.FK_HOTEL_ID == 1 ? 'CIEL' : (dining.FK_HOTEL_ID == 2 ? 'LE CIEL' : 'LOTTE HOTEL WORLD')}">
 						    호텔명
 						</span>
 					    
 					    <span class="badge-type" 
-					          th:text="${dining.d_type == 'dining' ? '레스토랑' : (dining.d_type == 'bar' ? '라운지 & 바' : dining.d_type)}">
+					          th:text="${dining.D_TYPE == 'dining' ? '레스토랑' : (dining.D_TYPE == 'bar' ? '라운지 & 바' : dining.d_type)}">
 					        타입
 					    </span>
 					</div>
 	
-	                <h3 class="res-name" th:text="${dining.name}">다이닝 명칭</h3>
+	                <h3 class="res-name" th:text="${dining.NAME}">다이닝 명칭</h3>
 	                
 	                <div class="info-row">
 	                    <span class="info-label">위치</span>
-	                    <span class="info-content" th:text="${dining.floor}">층수 정보</span>
+	                    <span class="info-content" th:text="${dining.FLOOR}">층수 정보</span>
 	                </div>
 	                <div class="info-row">
 	                    <span class="info-label">문의</span>
-	                    <span class="info-content" th:text="${dining.tel}">전화번호</span>
+	                    <span class="info-content" th:text="${dining.TEL}">전화번호</span>
 	                </div>
 	            </a>
 	        </div>
