@@ -204,11 +204,13 @@ public class SecurityConfig {
             "/product/list",
             "/room/**",
             "/js_images/**",
-            "/notice/**",
+            "/notice/list",
+            "/notice/detail/**",
             "/cs/**",
             "/hotel/location",
             
-            "/dining/**"
+            "/dining/**",
+            "/search"
            
         };
 

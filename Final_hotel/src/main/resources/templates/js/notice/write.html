@@ -94,14 +94,19 @@
           <h2 class="write-title"><i class="bi bi-pencil-square"></i> 공지사항 작성</h2>
           
           <form name="noticeFrm">
+          	 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
              <table class="table table-bordered shadow-sm">
                  <tr>
-                    <th>지점 선택</th>
+                    <th>담당 지점</th>
                     <td>
-                        <select name="fkHotelId" class="form-select select-hotel">
-                            <option value="1" th:selected="${hotelId == 1}">호텔 시엘 (본점)</option>
-                            <option value="2" th:selected="${hotelId == 2}">르 시엘 (프리미엄)</option>
-                        </select>
+                        <div class="hotel-badge">
+						    <i class="bi bi-geo-alt-fill mr-1"></i>
+						    <th:block th:each="h : ${hotelList}" th:if="${#strings.equals(myHotelId, h.HOTEL_ID)}">
+						        <span th:text="${h.HOTEL_NAME}">지점명</span>
+						    </th:block>
+						    
+						    <input type="hidden" name="fkHotelId" th:value="${myHotelId}" />
+						</div>
                     </td>
                  </tr>
                  <tr>

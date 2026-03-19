@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" 
       xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{js/layout/layout_main :: layout(~{::title}, ~{::link}, ~{::style}, ~{::script}, ~{::content})}">
 <head>
     <title>CIEL HOTEL - 공지사항 상세</title>
@@ -10,13 +11,13 @@
     <style>
         .detail-container { padding: 150px 0 100px; min-height: 800px; background-color: #fff; }
         
-        /* 헤더: 제목 중앙 정렬 및 가로선 강조 */
+        /* 헤더 스타일 */
         .detail-header { text-align: center; margin-bottom: 60px; padding-bottom: 40px; border-bottom: 2px solid #1a1a1a; }
         .detail-category { font-size: 0.9rem; color: #888; margin-bottom: 15px; letter-spacing: 1px; }
         .detail-title { font-size: 2.2rem; font-weight: 700; color: #1a1a1a; margin-bottom: 20px; line-height: 1.4; }
         .detail-date { font-size: 1rem; color: #666; font-family: 'Noto Sans KR', sans-serif; }
         
-        /* 본문 영역: 너비를 제한하여 안쪽으로 들여쓰기 효과 (이미지 느낌 반영) */
+        /* 본문 영역 */
         .content-wrapper { max-width: 900px; margin: 0 auto; padding: 0 20px; }
         .detail-content { line-height: 2; min-height: 400px; font-size: 1.1rem; color: #333; margin-bottom: 80px; word-break: break-all; }
         .detail-content img { max-width: 100%; height: auto; display: block; margin: 30px auto; } 
@@ -31,17 +32,14 @@
 
     <script th:inline="javascript">
         /*<![CDATA[*/
-        	
+        
         window.onload = function() {
-	        // 수정 완료 후 리다이렉트 되었을 때 컨트롤러가 보낸 메시지를 확인
-	        const msg = /*[[${message}]]*/ '';
-	        
-	        if(msg && msg !== '') {
-	            alert(msg);
-	        }
-    	};
-        	
-        	
+            const msg = /*[[${message}]]*/ '';
+            if(msg && msg !== '') {
+                alert(msg);
+            }
+        };
+        
         function deleteNotice() {
             if(confirm("정말로 이 게시물을 삭제하시겠습니까?")) {
                 const form = document.getElementById('deleteFrm');
@@ -63,14 +61,16 @@
         <div class="container">
             <div class="detail-header">
                 <div class="detail-category">
-                    <span th:text="${notice.fkHotelId == 1 ? '호텔 시엘' : '르 시엘'}">지점명</span>
+                    <th:block th:each="h : ${hotelList}" th:if="${#strings.equals(notice.fkHotelId, h.HOTEL_ID)}">
+                        <span th:text="${h.HOTEL_NAME}">지점명</span>
+                    </th:block>
                     <span style="margin: 0 10px;">|</span>
                     <span>공지사항</span>
                 </div>
                 <h2 class="detail-title">
-                    <span th:text="${notice.title}">공지사항 제목이 들어갑니다.</span>
+                    <span th:text="${notice.title}">공지사항 제목</span>
                 </h2>
-                <div class="detail-date" th:text="${#dates.format(notice.createdAt, 'yyyy. MM. dd')}">2026. 02. 26</div>
+                <div class="detail-date" th:text="${#dates.format(notice.createdAt, 'yyyy. MM. dd')}">날짜</div>
             </div>
         </div>
 
@@ -79,20 +79,30 @@
         </div>
 
         <div class="footer-group">
-		    <a th:href="@{/notice/list(hotelId=${notice.fkHotelId})}" class="btn-list">목록</a>
-		    
-		    <div class="admin-btns" sec:authorize="hasRole('ADMIN_BRANCH')">
-		        <button type="button" class="btn btn-light border" 
-		                th:onclick="|location.href='@{/notice/edit/{id}(id=${notice.noticeId}, hotelId=${notice.fkHotelId})}'|">수정</button>
-		        
-		        <button type="button" class="btn btn-light border text-danger" 
-		                onclick="deleteNotice()">삭제</button>
-		    </div>
-		    
-		    <form id="deleteFrm" th:action="@{/notice/delete}" method="post" style="display:none;" sec:authorize="hasRole('ADMIN_BRANCH')">
-		        <input type="hidden" name="noticeId" th:value="${notice.noticeId}">
-		    </form>
-	    </div>
+            <a th:href="@{/notice/list(hotelId=${notice.fkHotelId})}" class="btn-list">목록</a>
+            
+            <div class="admin-btns" 
+			     sec:authorize="hasRole('ADMIN_BRANCH')" 
+			     th:if="${#strings.equals(myHotelId, notice.fkHotelId)}">
+			    
+			    <button type="button" class="btn btn-light border" 
+			            th:onclick="|location.href='@{/notice/edit/{id}(id=${notice.noticeId}, hotelId=${notice.fkHotelId})}'|">
+			        수정
+			    </button>
+			    
+			    <button type="button" class="btn btn-light border text-danger" 
+			            onclick="deleteNotice()">
+			        삭제
+			    </button>
+			</div>
+			
+			<form id="deleteFrm" th:action="@{/notice/delete}" method="post" style="display:none;" 
+			      sec:authorize="hasRole('ADMIN_BRANCH')"
+			      th:if="${#strings.equals(myHotelId, notice.fkHotelId)}">
+			    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+			    <input type="hidden" name="noticeId" th:value="${notice.noticeId}">
+			</form>
+        </div>
         
     </div>
 </th:block>
