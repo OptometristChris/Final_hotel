@@ -28,5 +28,7 @@ public interface ReservationService {
 	// 비회원 예약 취소
 	int cancelGuestReservation(String reservationCode);
 
+	Map<String, Object> findMemberByEmail(String emailFromOauth);
+
 
 }

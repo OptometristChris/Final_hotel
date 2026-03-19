@@ -353,4 +353,10 @@ public class ReservationService_imple implements ReservationService {
 	    }
 	}
 
+	// 소셜로그인용
+	@Override
+	public Map<String, Object> findMemberByEmail(String emailFromOauth) {
+		return reservationDAO.findMemberByEmail(emailFromOauth);
+	}
+
 }

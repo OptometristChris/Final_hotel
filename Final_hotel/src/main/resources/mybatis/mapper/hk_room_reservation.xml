@@ -226,5 +226,17 @@
 	      AND TRUNC(r.CHECKIN_DATE) = TRUNC(SYSDATE + 1)
 	</select>
 	  
+	  
+	  <!-- 소셜로그인용 -->
+	  <select id="findMemberByEmail" parameterType="string" resultType="map">
+	    SELECT 
+	        MEMBER_NO,
+	        NAME,
+	        MOBILE,
+	        EMAIL
+	    FROM TBL_MEMBER_SECURITY
+	    WHERE LOWER(EMAIL) = LOWER(#{email, jdbcType=VARCHAR})
+	</select>
+	  
 
 </mapper>
