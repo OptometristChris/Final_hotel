@@ -37,5 +37,11 @@ public interface CsDAO {
 	// 어드민 답변 업데이트
 	int updateAnswer(Map<String, String> paraMap);
 
+	// FAQ 등록 구현
+	int insertFaq(Map<String, String> paraMap);
+
+	// FAQ 삭제 구현
+	int deleteFaq(String faqId);
+
 
 }

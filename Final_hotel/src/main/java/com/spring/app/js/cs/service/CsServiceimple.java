@@ -97,4 +97,20 @@ public class CsServiceimple implements CsService {
 	    
 	    return result;
 	}
+	
+	// FAQ 등록 구현
+    @Override
+    public int insertFaq(Map<String, String> paraMap) {
+        return dao.insertFaq(paraMap);
+    }
+
+    // FAQ 삭제 구현
+    @Override
+    public int deleteFaq(String faqId) {
+        return dao.deleteFaq(faqId);
+    }
+    
 }
+
+
+

@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -401,5 +402,78 @@ public class CsController {
         }
 
         return "redirect:/cs/qnaDetail?qnaId=" + paraMap.get("qnaId");
+    }
+    
+    // FAQ 작성 페이지 이동
+    @GetMapping("/faqWrite")
+    public String faqWrite(@RequestParam("hotelId") String hotelId, Model model) {
+    	
+    	List<Map<String, String>> hotelList = noticeService.getHotelList();
+    	
+    	String hotelName = "";
+        if (hotelList != null) {
+            for (Map<String, String> hotel : hotelList) {
+                // DB 컬럼명 대소문자 확인 필요 (보통 MyBatis 조회시 대문자 "HOTEL_ID" 혹은 소문자 "hotel_id")
+                String id = String.valueOf(hotel.get("HOTEL_ID") != null ? hotel.get("HOTEL_ID") : hotel.get("hotel_id"));
+                
+                if (id.equals(hotelId)) {
+                    hotelName = String.valueOf(hotel.get("HOTEL_NAME") != null ? hotel.get("HOTEL_NAME") : hotel.get("hotel_name"));
+                    break;
+                }
+            }
+        }
+    	
+        model.addAttribute("hotelId", hotelId);
+        model.addAttribute("hotelName", hotelName);
+        return "js/cs/faqWrite";
+    }
+
+    // FAQ 작성 완료 처리
+    @PostMapping("/faqWriteEnd")
+    public String faqWriteEnd(@RequestParam Map<String, String> paraMap, RedirectAttributes rttr) {
+        
+        // 1. 현재 로그인한 관리자 정보 가져오기 (Security 사용)
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (auth != null && auth.getPrincipal() instanceof CustomAdminDetails) {
+            CustomAdminDetails adminDetails = (CustomAdminDetails) auth.getPrincipal();
+            AdminDTO adminDto = adminDetails.getAdminDto();
+            
+            // 2. admin_no를 꺼내서 paraMap에 추가
+            // 주의: MyBatis Mapper에서 #{admin_no}로 쓴다면 키값도 "admin_no"여야 합니다.
+            paraMap.put("admin_no", String.valueOf(adminDto.getAdmin_no())); 
+        }
+        
+        // 3. 서비스 호출 (이제 paraMap 안에 admin_no가 포함되어 있습니다.)
+        int result = service.insertFaq(paraMap);
+        
+        if(result == 1) {
+            // 성공했을 때
+            rttr.addFlashAttribute("message", "FAQ가 성공적으로 등록되었습니다.");
+        } else {
+            // 실패했을 때 (DB 오류 등)
+            rttr.addFlashAttribute("message", "FAQ 등록에 실패했습니다. 다시 시도해주세요.");
+        }
+        
+        return "redirect:/cs/list?hotelId=" + paraMap.get("fk_hotel_id");
+    }
+
+    // FAQ 삭제 처리 (이전 답변에서 말씀드린 폼 전송용)
+    @PostMapping("/faqDelete")
+    public String faqDelete(@RequestParam("faqId") String faqId, 
+                            @RequestParam("hotelId") String hotelId, 
+                            RedirectAttributes rttr) {
+        
+        // 서비스 호출 (DB 삭제 로직)
+        int result = service.deleteFaq(faqId);
+        
+        if(result > 0) {
+            rttr.addFlashAttribute("message", "FAQ가 성공적으로 삭제되었습니다.");
+        } else {
+            // 이미 삭제되었거나 파라미터가 잘못 넘어온 경우
+            rttr.addFlashAttribute("message", "삭제에 실패했거나 이미 존재하지 않는 FAQ입니다.");
+        }
+        
+        return "redirect:/cs/list?hotelId=" + hotelId;
     }
 }

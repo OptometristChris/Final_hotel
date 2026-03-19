@@ -23,18 +23,24 @@
 
             /* FAQ 섹션 */
             .faq-section { margin-bottom: 80px; }
-            .section-label { font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+            .section-label-wrap { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+            .section-label { font-size: 1.2rem; font-weight: 600; display: flex; align-items: center; gap: 10px; }
             .section-label i { color: #d4af37; }
+            
             .faq-list { border-top: 2px solid #1a1a1a; border-bottom: 1px solid #eee; }
-            .faq-item { border-bottom: 1px solid #eee; }
-            .faq-question { padding: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: #fff; transition: 0.2s; }
+            .faq-item { border-bottom: 1px solid #eee; position: relative; }
+            .faq-question { padding: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: #fff; transition: 0.2s; padding-right: 60px; }
             .faq-question:hover { background: #f9f9f9; }
             .faq-q-text { font-weight: 500; display: flex; gap: 15px; }
             .faq-q-text .q-mark { color: #d4af37; font-weight: 700; }
             .faq-answer { padding: 25px 40px; background: #fcfcfc; display: none; border-top: 1px solid #f0f0f0; line-height: 1.6; color: #666; }
 
+            /* FAQ 삭제 버튼 */
+            .btn-faq-delete { position: absolute; right: 15px; top: 18px; z-index: 10; color: #ccc; border: none; background: none; font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
+            .btn-faq-delete:hover { color: #cc0000; }
+
             /* QnA 리스트 */
-            .qna-list-wrap { border-top: 2px solid #1a1a1a; }
+            .qna-list-wrap { border-top: 2px solid #1a1a1a; margin-top: 20px;}
             .qna-header { display: flex; padding: 15px 10px; background: #fcfcfc; border-bottom: 1px solid #ddd; font-weight: 600; font-size: 0.9rem; text-align: center; }
             .qna-item { display: flex; align-items: center; padding: 16px 10px; border-bottom: 1px solid #eee; text-decoration: none !important; color: #333; text-align: center; font-size: 0.95rem; }
             .qna-item:hover { background-color: #f9f9f9; }
@@ -55,8 +61,12 @@
             .search-input-box { position: relative; }
             .search-input-box input { width: 300px; height: 45px; border: 1px solid #ddd; padding: 0 45px 0 15px; outline: none; }
             .btn-search { position: absolute; right: 0; top: 0; width: 45px; height: 45px; background: none; border: none; cursor: pointer; }
-            .btn-write { background-color: #1a1a1a; color: #fff !important; padding: 12px 30px; text-decoration: none; font-size: 0.9rem; transition: 0.3s; border: none; cursor: pointer; }
+            
+            /* 공통 버튼 스타일 */
+            .btn-write { background-color: #1a1a1a; color: #fff !important; padding: 12px 30px; text-decoration: none; font-size: 0.9rem; transition: 0.3s; border: none; cursor: pointer; display: inline-block; }
             .btn-write:hover { background-color: #d4af37; }
+            .btn-faq-add { background-color: #fff; color: #b08d2b !important; border: 1px solid #b08d2b; padding: 8px 20px; font-size: 0.85rem; font-weight: 600; }
+            .btn-faq-add:hover { background-color: #b08d2b; color: #fff !important; }
 
             .pagination-container { display: flex; justify-content: center; margin-top: 40px; gap: 5px; }
             .page-box { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border: 1px solid #eee; text-decoration: none; color: #666; }
@@ -80,9 +90,23 @@
         </div>
 
         <div class="faq-section">
-            <div class="section-label"><i class="bi bi-chat-quote-fill"></i> 자주 묻는 질문 (FAQ)</div>
+            <div class="section-label-wrap">
+                <div class="section-label"><i class="bi bi-chat-quote-fill"></i> 자주 묻는 질문 (FAQ)</div>
+                <div th:if="${isAdmin and #strings.equals(hotelId, myHotelId)}">
+                    <a th:href="@{/cs/faqWrite(hotelId=${hotelId})}" class="btn-write btn-faq-add">
+                        <i class="bi bi-plus-lg"></i> FAQ 등록
+                    </a>
+                </div>
+            </div>
+            
             <div class="faq-list">
                 <div th:each="faq : ${faqList}" class="faq-item">
+                    <button type="button" class="btn-faq-delete" 
+                            th:if="${isAdmin and #strings.equals(hotelId, myHotelId)}"
+                            th:onclick="goDeleteFaq([[${faq.FAQ_ID}]], [[${hotelId}]])">
+                        <i class="bi bi-x-circle-fill"></i>
+                    </button>
+
                     <div class="faq-question">
                         <div class="faq-q-text">
                             <span class="q-mark">Q.</span>
@@ -92,7 +116,7 @@
                     </div>
                     <div class="faq-answer" th:utext="${faq.CONTENT}">답변 내용</div>
                 </div>
-                <div th:if="${#lists.isEmpty(faqList)}" class="text-center py-4 text-muted border-bottom">등록된 FAQ가 없습니다.</div>
+                <div th:if="${#lists.isEmpty(faqList)}" class="text-center py-5 text-muted border-bottom">등록된 FAQ가 없습니다.</div>
             </div>
         </div>
 
@@ -114,7 +138,7 @@
                    class="qna-item">
                     <div class="col-num" th:text="${totalCount - ((curPage-1) * 10) - status.index}">1</div>
                     <div class="col-title">
-                        <i th:if="${qna.IS_SECRET == 'Y'}" class="bi bi-lock-fill icon-lock"></i>
+                        <i th:if="${qna.IS_SECRET == 'Y' || qna.IS_SECRET == '1'}" class="bi bi-lock-fill icon-lock"></i>
                         <span th:text="${qna.TITLE}">문의 제목</span>
                     </div>
                     <div class="col-writer" th:text="${qna.WRITER_NAME}">작성자</div>
@@ -144,64 +168,66 @@
             </div>
 
             <div class="pagination-container" th:if="${totalPage > 0}">
-                <a class="page-box" th:href="@{/cs/list(hotelId=${hotelId}, curPage=1)}"><i class="bi bi-chevron-double-left"></i></a>
+                <a class="page-box" th:href="@{/cs/list(hotelId=${hotelId}, curPage=1, searchKeyword=${searchKeyword})}"><i class="bi bi-chevron-double-left"></i></a>
                 <th:block th:each="p : ${#numbers.sequence(1, totalPage)}">
                     <a class="page-box" th:classappend="${p == curPage} ? 'active'" 
-                       th:href="@{/cs/list(hotelId=${hotelId}, curPage=${p})}" th:text="${p}">1</a>
+                       th:href="@{/cs/list(hotelId=${hotelId}, curPage=${p}, searchKeyword=${searchKeyword})}" th:text="${p}">1</a>
                 </th:block>
-                <a class="page-box" th:href="@{/cs/list(hotelId=${hotelId}, curPage=${totalPage})}"><i class="bi bi-chevron-double-right"></i></a>
+                <a class="page-box" th:href="@{/cs/list(hotelId=${hotelId}, curPage=${totalPage}, searchKeyword=${searchKeyword})}"><i class="bi bi-chevron-double-right"></i></a>
             </div>
         </div>
     </div>
+
+    <form id="faqDeleteForm" th:action="@{/cs/faqDelete}" method="post">
+        <input type="hidden" name="faqId" id="delFaqId">
+        <input type="hidden" name="hotelId" id="delHotelId">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+    </form>
 </th:block>
 
 <th:block th:fragment="script">
     <script th:inline="javascript">
-        function checkAccess(isSecret, writerName, qnaId, qnaHotelId) {
-            const detailUrl = contextPath + "cs/qnaDetail?qnaId=" + qnaId;
+        // FAQ 삭제 함수
+        function goDeleteFaq(faqId, hotelId) {
+            if(confirm("이 자주 묻는 질문을 삭제하시겠습니까?")) {
+                document.getElementById("delFaqId").value = faqId;
+                document.getElementById("delHotelId").value = hotelId;
+                document.getElementById("faqDeleteForm").submit();
+            }
+        }
 
+        function checkAccess(isSecret, writerName, qnaId, qnaHotelId) {
+            const detailUrl = /*[[@{/cs/qnaDetail}]]*/ '/cs/qnaDetail';
             const isHq = /*[[${isHq}]]*/ false; 
             const isAdmin = /*[[${isAdmin}]]*/ false; 
             const myHotelId = String(/*[[${myHotelId}]]*/ '').trim(); 
             const loginId = /*[[${#authentication.name}]]*/ 'anonymousUser';
             const targetHotelId = String(qnaHotelId).trim();
 
-            // 1. 본사 관리자 (HQ)
-            if (isHq) {
-                location.href = detailUrl;
-                return;
-            }
+            const finalUrl = detailUrl + "?qnaId=" + qnaId;
 
-            // 2. 지점 관리자 (Branch)
+            if (isHq) { location.href = finalUrl; return; }
+
             if (isAdmin) {
-                // 내 지점의 글이라면 (비밀글 여부 상관없이)
-                if (myHotelId !== "null" && myHotelId !== "" && myHotelId === targetHotelId) {
-                    location.href = detailUrl;
+                if (myHotelId === targetHotelId) {
+                    location.href = finalUrl;
                 } else {
-                    // 타 지점 글인데 비밀글인 경우만 차단
-                    if (isSecret === 'Y' || isSecret === '1') {
-                        alert("타 지점의 비밀 문의사항은 확인할 수 없습니다.");
-                    } else {
-                        location.href = detailUrl;
-                    }
+                    if (isSecret === 'Y' || isSecret === '1') alert("타 지점의 비밀 문의사항은 확인할 수 없습니다.");
+                    else location.href = finalUrl;
                 }
                 return;
             }
 
-            // 3. 일반 사용자/게스트
             if (isSecret === 'Y' || isSecret === '1') {
-                if (loginId !== 'anonymousUser' && loginId === writerName) {
-                    location.href = detailUrl;
-                } else {
-                    alert("비밀글입니다. 작성자 본인만 확인 가능합니다.");
-                }
+                if (loginId !== 'anonymousUser' && loginId === writerName) location.href = finalUrl;
+                else alert("비밀글입니다. 작성자 본인만 확인 가능합니다.");
             } else {
-                location.href = detailUrl;
+                location.href = finalUrl;
             }
         }
 
         $(document).ready(function() {
-            // FAQ 아코디언 및 메시지 처리 (기존과 동일)
+            // FAQ 아코디언
             $('.faq-question').click(function() {
                 const $answer = $(this).next('.faq-answer');
                 const $icon = $(this).find('.bi-chevron-down');

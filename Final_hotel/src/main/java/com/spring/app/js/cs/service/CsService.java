@@ -27,4 +27,10 @@ public interface CsService {
 	
 	// 어드민 답변 등록
 	int updateQnaAnswer(Map<String, String> paraMap);
+
+	// faq 등록
+	int insertFaq(Map<String, String> paraMap);
+
+	// faq 삭제
+	int deleteFaq(String faqId);
 }
