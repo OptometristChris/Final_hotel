@@ -117,8 +117,53 @@ public class AdminRoomController {
 	public String registerRoom(@RequestParam Map<String, String> map,
 			@RequestParam("roomImage") MultipartFile roomImage, Authentication authentication) {
 
-		try {
+		try {		
+			
+			// ==========================
+			// 유효성 검사 (개선 버전)
+			// ==========================
 
+			// 객실명
+			String roomName = map.get("room_name");
+			if(roomName == null || roomName.trim().isEmpty()){
+			    throw new IllegalArgumentException("객실명 필수");
+			}
+
+			// 가격
+			String priceStr = map.get("base_price");
+			if(priceStr == null || !priceStr.trim().matches("\\d+")){
+			    throw new IllegalArgumentException("가격은 숫자만 입력");
+			}
+			int price = Integer.parseInt(priceStr.trim());
+			if(price <= 0){
+			    throw new IllegalArgumentException("가격은 0보다 커야함");
+			}
+
+			// 인원
+			String capacityStr = map.get("max_capacity");
+			if(capacityStr == null || !capacityStr.trim().matches("\\d+")){
+			    throw new IllegalArgumentException("수용 인원 숫자 입력");
+			}
+			int capacity = Integer.parseInt(capacityStr.trim());
+			if(capacity <= 0){
+			    throw new IllegalArgumentException("수용 인원은 1 이상");
+			}
+
+			// 객실 수
+			String totalStr = map.get("total_count");
+			if(totalStr == null || !totalStr.trim().matches("\\d+")){
+			    throw new IllegalArgumentException("객실 수 숫자 입력");
+			}
+			int total = Integer.parseInt(totalStr.trim());
+			if(total <= 0){
+			    throw new IllegalArgumentException("객실 수는 1 이상");
+			}
+
+			// 이미지
+			if(roomImage == null || roomImage.isEmpty()){
+			    throw new IllegalArgumentException("객실 이미지 필수");
+			}
+			
 			// 로그인한 관리자 정보 가져오기
 			CustomAdminDetails loginAdmin = (CustomAdminDetails) authentication.getPrincipal();
 
@@ -151,10 +196,18 @@ public class AdminRoomController {
 
 			roomService.saveRoom(paraMap);
 
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
 
-		}
+	        // 유효성 실패
+	        System.out.println("유효성 오류: " + e.getMessage());
+	        return "redirect:/admin/room/register";
+
+	    } catch (Exception e) {
+
+	        // 서버 오류
+	        e.printStackTrace();
+	        return "redirect:/admin/room/register";
+	    }
 
 		// 등록 후 객실 리스트 이동
 		return "redirect:/admin/room/branch/list";
