@@ -99,4 +99,10 @@ public class NoticeServiceimple implements NoticeService {
         return noticeDao.selectTopNotices(id);
     }
     
+	// 호텔 리스트
+    @Override
+    public List<Map<String, String>> getHotelList() {
+        return noticeDao.getHotelList(); // 매퍼의 id="getHotelList"를 호출
+    }
+    
 }

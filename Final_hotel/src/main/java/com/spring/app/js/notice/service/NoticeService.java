@@ -28,5 +28,9 @@ public interface NoticeService {
     // 위 5번(Map 방식)으로 대체하거나 필요시 유지하세요.
     List<NoticeDTO> getNoticeList(Long hotelId, String searchType, String keyword);
 
+    // 고정글(isTop = 'Y')만 별도로 조회
 	List<NoticeDTO> getTopNotices(Long hotelId);
+	
+	// 호텔 리스트
+	List<Map<String, String>> getHotelList();
 }
