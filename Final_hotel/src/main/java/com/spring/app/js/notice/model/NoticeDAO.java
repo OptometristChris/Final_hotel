@@ -23,4 +23,7 @@ public interface NoticeDAO {
 	
 	// 고정글(isTop = 'Y')만 별도로 조회 (모든 페이지 상단 노출용)
 	List<NoticeDTO> selectTopNotices(Long id);
+	
+	// 호텔 리스트
+	List<Map<String, String>> getHotelList();
 }

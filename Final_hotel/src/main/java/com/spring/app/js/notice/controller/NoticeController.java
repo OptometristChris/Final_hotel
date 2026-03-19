@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.spring.app.jh.security.domain.AdminDTO;
+import com.spring.app.jh.security.domain.CustomAdminDetails;
 import com.spring.app.js.notice.domain.NoticeDTO;
 import com.spring.app.js.notice.service.NoticeService;
 
@@ -24,7 +28,7 @@ public class NoticeController {
     @Autowired
     private NoticeService noticeService;
 
- // 1. 목록 및 검색 처리
+    // 1. 목록 및 검색 처리
     @GetMapping("/list")
     public String list(
             @RequestParam(value = "hotelId", defaultValue = "0") Long hotelId,
@@ -32,6 +36,10 @@ public class NoticeController {
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "curPage", defaultValue = "1") int curPage,
             Model model) {
+
+        // [추가] DB에서 호텔 리스트 가져오기 (탭 생성을 위함)
+        List<Map<String, String>> hotelList = noticeService.getHotelList();
+        model.addAttribute("hotelList", hotelList);
 
         int sizePerPage = 10;
         int startRow = (curPage - 1) * sizePerPage + 1;
@@ -44,20 +52,19 @@ public class NoticeController {
         paraMap.put("startRow", startRow);
         paraMap.put("endRow", endRow);
 
-        // [추가] 고정글 리스트 가져오기 (isTop = 'Y')
-        // 페이징과 관계없이 해당 지점(또는 전체)의 고정글을 항상 가져옵니다.
+        // 고정글 리스트 가져오기
         List<NoticeDTO> topNotices = noticeService.getTopNotices(hotelId);
         
-        // [수정] 일반글 리스트 가져오기 (isTop = 'N'만 가져오도록 SQL 수정 필요)
+        // 일반글 리스트 가져오기
         List<NoticeDTO> notices = noticeService.getNoticeList(paraMap);
         
-        // 2. 총 개수 가져오기 (isTop = 'N'인 데이터만 카운트하도록 SQL 수정 권장)
+        // 총 개수 가져오기
         int totalCount = noticeService.getTotalCount(paraMap);
         int totalPage = (int) Math.ceil((double) totalCount / sizePerPage);
 
         // 뷰로 전달할 데이터들
-        model.addAttribute("topNotices", topNotices); // 고정글 별도 전달
-        model.addAttribute("notices", notices);       // 일반글 전달
+        model.addAttribute("topNotices", topNotices);
+        model.addAttribute("notices", notices);       
         model.addAttribute("hotelId", hotelId);
         model.addAttribute("searchType", searchType);
         model.addAttribute("keyword", keyword);
@@ -72,67 +79,103 @@ public class NoticeController {
     public String detail(@PathVariable("id") Long id, 
                          @RequestParam(value = "hotelId", defaultValue = "0") Long hotelId, 
                          Model model) {
-        model.addAttribute("notice", noticeService.getNoticeDetail(id));
-        model.addAttribute("hotelId", hotelId); 
+        
+        NoticeDTO notice = noticeService.getNoticeDetail(id);
+        model.addAttribute("notice", notice);
+        model.addAttribute("hotelId", hotelId);
+        model.addAttribute("hotelList", noticeService.getHotelList());
+
+        // [추가] 로그인한 관리자의 지점 ID를 꺼내서 모델에 담기
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof CustomAdminDetails) {
+            AdminDTO adminDto = ((CustomAdminDetails) auth.getPrincipal()).getAdminDto();
+            model.addAttribute("myHotelId", adminDto.getFk_hotel_id());
+        }
+        
         return "js/notice/detail";
     }
     
     // 3. 작성 페이지
     @GetMapping("/write")
-    public String showWriteForm(@RequestParam(value = "hotelId", required = false, defaultValue = "1") Long hotelId, Model model) {
-        model.addAttribute("hotelId", hotelId);
+    public String showWriteForm(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (auth != null && auth.getPrincipal() instanceof CustomAdminDetails) {
+            CustomAdminDetails adminDetails = (CustomAdminDetails) auth.getPrincipal();
+            AdminDTO adminDto = adminDetails.getAdminDto();
+
+            if (adminDto != null) {
+                // 본사 관리자 차단 로직
+                boolean isHq = auth.getAuthorities().stream()
+                                   .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN_HQ"));
+                if (isHq) return "redirect:/notice/list?hotelId=0";
+
+                // 지점 리스트는 이미 noticeService.getHotelList() 등을 통해 model에 담긴다고 가정
+                model.addAttribute("hotelList", noticeService.getHotelList());
+                
+                // 핵심: 세션에 저장된 본인의 지점 ID만 전달
+                model.addAttribute("myHotelId", adminDto.getFk_hotel_id());
+            }
+        }
         return "js/notice/write";
     }
 
-    // 4. 작성 처리
     @PostMapping("/write")
     public String insertNotice(NoticeDTO dto) {
-        if(dto.getAdminNo() == null) {
-            dto.setAdminNo(2L); 
+        
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (auth != null && auth.getPrincipal() instanceof CustomAdminDetails) {
+            CustomAdminDetails adminDetails = (CustomAdminDetails) auth.getPrincipal();
+            AdminDTO adminDto = adminDetails.getAdminDto();
+            
+            // 1. 작성자 번호 강제 세팅
+            if (adminDto.getAdmin_no() != null) {
+                dto.setAdminNo(Long.valueOf(String.valueOf(adminDto.getAdmin_no()))); 
+            }
+            
+            // 2. [보안] 세션의 지점 ID로 무조건 고정 (사용자 조작 방지)
+            if (adminDto.getFk_hotel_id() != null) {
+                dto.setFkHotelId(Long.valueOf(String.valueOf(adminDto.getFk_hotel_id())));
+            }
         }
+
+        if(dto.getIsTop() == null) dto.setIsTop("N");
+
         noticeService.registerNotice(dto);
+        
         return "redirect:/notice/list?hotelId=" + dto.getFkHotelId();
     }
     
-    // 5. 수정 페이지
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable("id") Long id, Model model) {
+        model.addAttribute("hotelList", noticeService.getHotelList());
         NoticeDTO notice = noticeService.getNoticeDetail(id);
         model.addAttribute("notice", notice);
         model.addAttribute("hotelId", notice.getFkHotelId()); 
         return "js/notice/edit"; 
     }
 
-    // 6. 수정 처리
     @PostMapping("/edit")
     public String updateNotice(NoticeDTO dto, RedirectAttributes rttr) {
-    	int result = noticeService.updateNotice(dto);
-    	
-    	if(result > 0) {
-            rttr.addFlashAttribute("message", "수정 완료.");
-        } else {
-            rttr.addFlashAttribute("message", "수정 실패.");
+        // [보안 추가] 수정 시에도 본인 지점 ID로 강제 고정
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof CustomAdminDetails) {
+            CustomAdminDetails adminDetails = (CustomAdminDetails) auth.getPrincipal();
+            dto.setFkHotelId(Long.valueOf(String.valueOf(adminDetails.getAdminDto().getFk_hotel_id())));
         }
-    	
+
+        int result = noticeService.updateNotice(dto);
+        rttr.addFlashAttribute("message", result > 0 ? "수정 완료." : "수정 실패.");
         return "redirect:/notice/detail/" + dto.getNoticeId() + "?hotelId=" + dto.getFkHotelId();
     }
     
-    // 7. 삭제 처리
     @PostMapping("/delete")
     public String deleteNotice(@RequestParam("noticeId") Long noticeId, RedirectAttributes rttr) {
-        // 삭제 전 해당 글의 hotelId를 미리 가져오면 목록 이동 시 편리합니다.
         NoticeDTO notice = noticeService.getNoticeDetail(noticeId);
         Long hotelId = (notice != null) ? notice.getFkHotelId() : 0L;
-
         int result = noticeService.deleteNotice(noticeId);
-        
-        if(result > 0) {
-            rttr.addFlashAttribute("message", "공지사항이 성공적으로 삭제되었습니다.");
-        } else {
-            rttr.addFlashAttribute("message", "삭제에 실패하였습니다.");
-        }
-        
-        // 삭제 후 해당 지점 목록으로 이동하도록 개선
+        rttr.addFlashAttribute("message", result > 0 ? "성공적으로 삭제되었습니다." : "삭제 실패.");
         return "redirect:/notice/list?hotelId=" + hotelId;
     }
 }
