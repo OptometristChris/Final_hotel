@@ -32,7 +32,8 @@
             introduction, business_hours,
             tel, floor, main_img, store_imgs,
             food_imgs, menu_pdf, extra_info, fk_hotel_id,
-            open_time, close_time, available_times       
+            open_time, close_time, available_times,
+            max_total_capacity       
             FROM tbl_dining
         WHERE dining_id = #{dining_id}
     </select>
@@ -288,25 +289,30 @@
 	    WHERE res.dining_reservation_id = #{resId}
 	</select>
 	
+
 	<select id="checkAvailability" resultType="int">
-	    SELECT COUNT(*)
-	    FROM dining_tables t
-	    WHERE t.FK_DINING_ID = #{diningId}
-	      AND t.ACTIVE_YN = 'Y'
-	      AND t.MAX_CAPACITY >= #{totalGuests}
+	    <![CDATA[
+	    SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+	    FROM tbl_dining d
+	    WHERE d.dining_id = #{diningId}
+	      AND d.active_yn = 'Y'
+	      
 	      AND NOT EXISTS (
 	          SELECT 1 FROM tbl_dining_block b
-	          WHERE b.FK_DINING_ID = t.FK_DINING_ID
-	            AND b.BLOCK_DATE = #{resDate}
-	            AND (b.BLOCK_TIME = #{resTime} OR b.BLOCK_TIME = 'ALL')
+	          WHERE b.fk_dining_id = d.dining_id
+	            AND b.block_date = #{resDate}
+	            AND (b.block_time = 'ALL' OR b.block_time = #{resTime})
 	      )
-	      AND NOT EXISTS (
-	          SELECT 1 FROM dining_reservations r
-	          WHERE r.TABLE_ID = t.TABLE_ID
-	            AND r.RES_DATE = #{resDate}
-	            AND r.RES_TIME = #{resTime}
-	            AND r.STATUS != 'CANCELED'
-	      )
+	      
+	      AND (
+	          SELECT COALESCE(SUM(r.adult_count + r.child_count + r.infant_count), 0)
+	          FROM dining_reservations r
+	          WHERE r.dining_id = d.dining_id
+	            AND r.res_date = #{resDate}
+	            AND r.res_time = #{resTime}
+	            AND r.status != 'CANCELED' 
+	      ) + (TO_NUMBER(#{adult_count}) + TO_NUMBER(#{child_count}) + TO_NUMBER(#{infant_count})) <= d.max_total_capacity
+	    ]]>
 	</select>
 	
 	<select id="getBlockList" resultType="map">
@@ -322,11 +328,21 @@
 	    ORDER BY b.BLOCK_DATE DESC, b.BLOCK_TIME ASC
 	</select>
 	
-	<insert id="insertBlock">
+	<insert id="insertBlock" parameterType="map">
 	    INSERT INTO tbl_dining_block (
-	        BLOCK_ID, FK_DINING_ID, BLOCK_DATE, BLOCK_TIME, REASON
+	        BLOCK_ID, 
+	        FK_DINING_ID, 
+	        BLOCK_DATE, 
+	        BLOCK_TIME, 
+	        REASON, 
+	        CREATED_AT
 	    ) VALUES (
-	        SEQ_BLOCK_ID.NEXTVAL, #{fkDiningId}, #{blockDate}, #{blockTime}, #{reason}
+	        SEQ_BLOCK_ID.NEXTVAL, 
+	        #{fkDiningId}, 
+	        TO_DATE(#{blockDate}, 'YYYY-MM-DD'),
+	        #{blockTime}, 
+	        #{reason, jdbcType=VARCHAR},
+	        SYSDATE 
 	    )
 	</insert>
 	
@@ -345,5 +361,33 @@
 	          OR BLOCK_TIME = #{resTime}  
 	      )
 	</select>
+
+	<select id="getUnavailableTimeList" parameterType="map" resultType="string">
+	    SELECT 'ALL' as res_time
+	    FROM tbl_dining_block
+	    WHERE fk_dining_id = #{diningId} 
+	      AND block_date = #{resDate} 
+	      AND block_time = 'ALL'
+	    
+	    UNION
+	    
+	    SELECT block_time as res_time
+	    FROM tbl_dining_block
+	    WHERE fk_dining_id = #{diningId} 
+	      AND block_date = #{resDate} 
+	      AND block_time != 'ALL'
+	    
+	    UNION
+	    
+	    SELECT r.res_time
+	    FROM dining_reservations r
+	    JOIN tbl_dining d ON r.dining_id = d.dining_id
+	    WHERE r.dining_id = #{diningId} 
+	      AND r.res_date = #{resDate} 
+	      AND r.status != 'CANCELED'
+	    GROUP BY r.res_time, d.max_total_capacity
+	    HAVING SUM(r.adult_count + r.child_count + r.infant_count) >= d.max_total_capacity
+	</select>
+
 
 </mapper>
