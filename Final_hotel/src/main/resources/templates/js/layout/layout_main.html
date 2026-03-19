@@ -169,7 +169,7 @@
                         <li class="nav-item"><a class="nav-link" th:href="@{/promotion/list}">프로모션</a></li>
 						<th:block sec:authorize="!hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')">
                         	<li class="nav-item"><a class="nav-link" th:href="@{/shuttle/confirm/view}">객실 예약확인</a></li>
-							<li class="nav-item"><a class="nav-link" th:href="@{/}">다이닝 내역조회</a></li>
+							<li class="nav-item"><a class="nav-link" th:href="@{/dining/reservation_search}">다이닝 내역조회</a></li>
                         </th:block>
                         <li class="nav-item"><a class="nav-link" th:href="@{/hotel/location}">호텔위치</a></li>
                         <th:block th:if="${session.guestSession == null}" sec:authorize="hasAnyRole('ADMIN_HQ')">
