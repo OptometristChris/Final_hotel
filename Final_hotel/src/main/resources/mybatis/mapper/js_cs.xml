@@ -88,6 +88,16 @@
 		)
 	</insert>
 	
+	<update id="updateQna" parameterType="HashMap">
+	    UPDATE QUESTIONS
+	    SET FK_HOTEL_ID = #{fk_hotel_id},
+	        TITLE = #{title},
+	        CONTENT = #{content},
+	        IS_SECRET = #{is_secret},
+	        CREATED_AT = SYSDATE  
+	    WHERE QNA_ID = #{qnaId} AND STATUS = 'WAITING' 
+	</update>
+	
 	<delete id="deleteQna" parameterType="String">
         DELETE FROM QUESTIONS
         WHERE qna_id = #{qnaId}

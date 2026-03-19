@@ -22,6 +22,9 @@ public interface CsDAO {
     // QnA 작성
 	int insertQna(Map<String, String> paraMap);
 
+	// QnA 수정
+	int updateQna(Map<String, String> paraMap);
+	
 	// QnA 삭제
 	int deleteQna(String qnaId);
 
@@ -33,4 +36,6 @@ public interface CsDAO {
 
 	// 어드민 답변 업데이트
 	int updateAnswer(Map<String, String> paraMap);
+
+
 }

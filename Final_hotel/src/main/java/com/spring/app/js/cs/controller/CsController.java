@@ -122,7 +122,7 @@ public class CsController {
         // 로그인이나 비회원 예약 정보가 둘 다 없으면 로그인 페이지로
         if (!isMember && !isGuest) {
             mav.addObject("message", "로그인이 필요한 서비스입니다.");
-            mav.addObject("loc", "/security/login"); 
+            mav.addObject("loc", "javascript:history.back()"); 
             mav.setViewName("msg"); 
             return mav;
         }
@@ -242,6 +242,74 @@ public class CsController {
         return mav;
     }
 
+    /**
+     * [사용자] 1:1 문의 수정 페이지 이동
+     */
+    @GetMapping("/qnaUpdate")
+    public ModelAndView qnaUpdate(ModelAndView mav, 
+                                  @RequestParam("qnaId") String qnaId,
+                                  HttpSession session,
+                                  java.security.Principal principal) {
+        
+        Map<String, String> qna = service.getQnaDetail(qnaId);
+        
+        if (qna == null) {
+            mav.addObject("message", "존재하지 않는 게시물입니다.");
+            mav.addObject("loc", "javascript:history.back()");
+            mav.setViewName("msg");
+            return mav;
+        }
+
+        // 작성자 본인 확인 로직
+        String writerName = String.valueOf(qna.get("WRITER_NAME"));
+        boolean isMemberOwner = (principal != null && principal.getName().equals(writerName));
+        com.spring.app.jh.security.domain.Session_GuestDTO guest = 
+            (com.spring.app.jh.security.domain.Session_GuestDTO) session.getAttribute("Session_GuestDTO");
+        boolean isGuestOwner = (guest != null && guest.getGuestName().equals(writerName));
+
+        if (!isMemberOwner && !isGuestOwner) {
+            mav.addObject("message", "본인이 작성한 글만 수정할 수 있습니다.");
+            mav.addObject("loc", "javascript:history.back()");
+            mav.setViewName("msg");
+            return mav;
+        }
+
+        // 답변 완료 시 수정 불가
+        if (qna.get("ANS_CONTENT") != null) {
+            mav.addObject("message", "관리자 답변이 완료된 문의는 수정할 수 없습니다.");
+            mav.addObject("loc", "javascript:history.back()");
+            mav.setViewName("msg");
+            return mav;
+        }
+
+        mav.addObject("qna", qna);
+        mav.addObject("hotelList", noticeService.getHotelList()); // 호텔 리스트 반드시 포함
+        mav.setViewName("js/cs/qnaUpdate"); 
+        return mav;
+    }
+    
+    @PostMapping("/qnaUpdateEnd")
+    public String qnaUpdateEnd(@RequestParam Map<String, String> paraMap, RedirectAttributes rttr) {
+        
+        // DB에서 최신 정보를 다시 읽어와 답변 여부 최종 확인 (보안 강화)
+        Map<String, String> qna = service.getQnaDetail(paraMap.get("qnaId"));
+        
+        if(qna.get("ANS_CONTENT") != null) {
+            rttr.addFlashAttribute("message", "이미 답변이 등록되어 수정이 불가능합니다.");
+            return "redirect:/cs/qnaDetail?qnaId=" + paraMap.get("qnaId");
+        }
+
+        int n = service.updateQna(paraMap);
+        
+        if(n == 1) {
+            rttr.addFlashAttribute("message", "문의 내용이 수정되었습니다.");
+        } else {
+            rttr.addFlashAttribute("message", "수정에 실패했습니다.");
+        }
+
+        return "redirect:/cs/qnaDetail?qnaId=" + paraMap.get("qnaId");
+    }
+    
     /**
      * [사용자/관리자] 1:1 문의 삭제
      */

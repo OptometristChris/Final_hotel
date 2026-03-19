@@ -106,7 +106,7 @@
                 </div>
             </div>
 
-            <div class="qna-content-box" th:text="${qna['CONTENT']}">문의 내용</div>
+            <div class="qna-content-box" th:utext="${qna['CONTENT']}">문의 내용</div>
 
             <div class="answer-wrap" th:if="${qna['ANS_CONTENT'] != null}">
 			    <div class="answer-header">
@@ -177,11 +177,12 @@
             <div class="btn-group">
 			    <a th:href="@{/cs/list(hotelId=${qna['FK_HOTEL_ID']})}" class="btn-custom btn-list">목록으로</a>
 			
-			    <a th:if="${isMemberOwner or isGuestOwner}" 
-			       th:href="@{/cs/qnaUpdate(qnaId=${qna['QNA_ID']}, hotelId=${qna['FK_HOTEL_ID']})}" 
-			       class="btn-custom btn-list" style="border: 1px solid #1a1a1a; color: #1a1a1a;">
-			        수정하기
-			    </a>
+			    <th:block th:if="${(isMemberOwner or isGuestOwner) and qna['ANS_CONTENT'] == null}">
+			        <a th:href="@{/cs/qnaUpdate(qnaId=${qna['QNA_ID']}, hotelId=${qna['FK_HOTEL_ID']})}" 
+			           class="btn-custom btn-list" style="border: 1px solid #1a1a1a; color: #1a1a1a;">
+			            수정하기
+			        </a>
+			    </th:block>
 			
 			    <button type="button" 
 			            class="btn-custom btn-delete" 

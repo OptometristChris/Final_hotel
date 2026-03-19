@@ -48,11 +48,27 @@ public class CsServiceimple implements CsService {
         return dao.getQnaDetail(qnaId);
     }
 
+    // Qna 작성
 	@Override
 	public int insertQna(Map<String, String> paraMap) {
 		return dao.insertQna(paraMap);
 	}
+	
+	// Qna 수정
+	@Override
+	public int updateQna(Map<String, String> paraMap) {
+	    // 보안을 위해 DB에서 한 번 더 답변 여부를 확인합니다.
+	    Map<String, String> qna = dao.getQnaDetail(paraMap.get("qnaId"));
+	    
+	    // 답변(ANS_CONTENT)이 이미 존재한다면 수정을 막고 0을 반환합니다.
+	    if (qna != null && qna.get("ANS_CONTENT") != null) {
+	        return 0; 
+	    }
+	    
+	    return dao.updateQna(paraMap);
+	}
 
+	// Qna 삭제
 	@Override
 	public int deleteQna(String qnaId) {
 		return dao.deleteQna(qnaId);
