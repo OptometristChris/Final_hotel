@@ -32,6 +32,7 @@ public class ReservationService_imple implements ReservationService {
     private final AES256 aes256;
     
     private final ReservationMailService reservationMailService; // 추가 : 메일
+    private final SmsService smsService; // 추가 : sms
 
     // 결제 성공 후 db 저장하기
     @Override
@@ -143,6 +144,7 @@ public class ReservationService_imple implements ReservationService {
             reservationDAO.insertPayment(paraMap);
             System.out.println("✅ PAYMENT insert 완료");
             System.out.println("▶ payment_id(insert 후 paraMap) : " + paraMap.get("payment_id"));
+           
         } catch (Exception e) {
             System.out.println("❌ PAYMENT insert 중 예외 발생");
             e.printStackTrace();
@@ -173,6 +175,49 @@ public class ReservationService_imple implements ReservationService {
                 + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
                 + "-" + String.format("%04d", reservationId);
 
+        // ======================= SMS 발송 =======================
+        try {
+            System.out.println("========== SMS 발송 시작 ==========");
+
+            String phone = null;
+
+            // 회원
+            if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+                String encryptedPhone = userDetails.getMemberDto().getMobile();
+
+                if (encryptedPhone != null) {
+                    phone = aes256.decrypt(encryptedPhone);
+                }
+            }
+
+            // 비회원
+            if (phone == null) {
+                Session_GuestDTO guest = (Session_GuestDTO) session.getAttribute("guestSession");
+                if (guest != null) {
+                    phone = guest.getGuestPhone();
+                }
+            }
+
+            if (phone != null) {
+                phone = phone.replace("-", "");
+
+                String msg = "[호텔 예약 완료]\n"
+                           + name + "님\n"
+                           + "예약번호: " + reservationCode + "\n"
+                           + map.get("hotel_name") + "\n"
+                           + map.get("check_in") + " ~ " + map.get("check_out");
+
+                smsService.sendReservationSms(phone, msg);
+
+                System.out.println("✅ SMS 발송 완료");
+            }
+
+        } catch (Exception e) {
+            System.out.println("❌ SMS 발송 실패");
+            e.printStackTrace();
+        }
+        
         System.out.println("▶ reservationCode : " + reservationCode);
 
         // 회원일 경우만 이메일 전송
