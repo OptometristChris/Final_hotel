@@ -24,4 +24,13 @@ public interface CsDAO {
 
 	// QnA 삭제
 	int deleteQna(String qnaId);
+
+	// 어드민 답변 테이블 인서트
+	int insertAnswer(Map<String, String> paraMap);
+
+	// qna 테이블 상태 업데이트
+	int updateQnaStatus(Map<String, String> paraMap);
+
+	// 어드민 답변 업데이트
+	int updateAnswer(Map<String, String> paraMap);
 }

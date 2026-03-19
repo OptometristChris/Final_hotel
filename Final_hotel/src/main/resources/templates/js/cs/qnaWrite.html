@@ -17,6 +17,8 @@
             
             .form-control { 
                 border-radius: 0; border: 1px solid #ddd; padding: 12px 15px; font-size: 0.95rem;
+                height: 50px;          
+			    padding: 10px 15px;        
                 transition: border-color 0.3s;
             }
             .form-control:focus { border-color: #d4af37; box-shadow: none; outline: none; }
@@ -51,11 +53,16 @@
 
         <div class="write-form-wrap">
             <form id="qnaWriteFrm" name="qnaWriteFrm" th:action="@{/cs/qnaWriteEnd}" method="post">
-                <input type="hidden" name="fk_hotel_id" th:value="${hotelId}">
-                
-                <div class="hotel-badge">
-                    <i class="bi bi-building"></i> 
-                    <span th:text="${hotelId == '1' ? '호텔 시엘 (CIEL)' : '르 시엘 (LE CIEL)'}">선택된 호텔</span>
+                <div class="form-group">
+                    <label class="form-label">문의 지점</label>
+                    <select name="fk_hotel_id" id="fk_hotel_id" class="form-control w-100">
+                        <option th:each="h : ${hotelList}" 
+                                th:value="${h.HOTEL_ID}" 
+                                th:text="${h.HOTEL_NAME}"
+                                th:selected="${#strings.equals(hotelId, h.HOTEL_ID)}">
+                        </option>
+                    </select>
+                    <p class="info-text">문의하실 지점을 확인해 주세요.</p>
                 </div>
 
                 <div class="form-group">
@@ -64,39 +71,41 @@
                 </div>
 
                 <div class="form-group">
-				    <label class="form-label">작성자</label>
-				    
-				    <div sec:authorize="isAuthenticated()">
-				        <input type="text" name="writer_name" id="writer_name" 
-				               class="form-control w-100" 
-				               th:value="${#authentication.principal.username}" readonly>
-				        <p class="info-text"><i class="bi bi-info-circle"></i> 회원 계정 정보로 작성됩니다.</p>
-				    </div>
-				
-				    <div sec:authorize="isAnonymous()" th:if="${session.Session_GuestDTO != null}">
-				        <input type="text" name="writer_name" id="writer_name" 
-				               class="form-control w-100" 
-				               th:value="${session.Session_GuestDTO.guestName}" readonly>
-				        <p class="info-text"><i class="bi bi-info-circle"></i> 비회원 예약 정보(성함)로 작성됩니다.</p>
-				    </div>
-				
-				    <div sec:authorize="isAnonymous()" th:if="${session.Session_GuestDTO == null}">
-				        <input type="text" name="writer_name" id="writer_name" 
-				               class="form-control w-100" 
-				               placeholder="성함을 입력해주세요." required>
-				    </div>
-				</div>
-
-                <div class="form-group">
-                    <label class="form-label">문의 내용</label>
-                    <textarea name="content" id="content" class="form-control w-100" placeholder="내용을 상세히 입력해 주세요. (문의 유형, 예약번호 등)" required></textarea>
+                    <label class="form-label">작성자</label>
+                    
+                    <div sec:authorize="isAuthenticated()">
+                        <input type="text" name="writer_name" id="writer_name" 
+                               class="form-control w-100" 
+                               th:value="${#authentication.name}" readonly>
+                        <p class="info-text"><i class="bi bi-info-circle"></i> 회원 계정으로 작성됩니다.</p>
+                    </div>
+                
+                    <div sec:authorize="isAnonymous()" th:if="${session.Session_GuestDTO != null}">
+                        <input type="text" name="writer_name" id="writer_name" 
+                               class="form-control w-100" 
+                               th:value="${session.Session_GuestDTO.guestName}" readonly>
+                        <p class="info-text"><i class="bi bi-info-circle"></i> 비회원 예약 정보로 작성됩니다.</p>
+                    </div>
+                
+                    <div sec:authorize="isAnonymous()" th:if="${session.Session_GuestDTO == null}">
+                        <input type="text" name="writer_name" id="writer_name" 
+                               class="form-control w-100" 
+                               placeholder="성함을 입력해주세요." required>
+                    </div>
                 </div>
 
                 <div class="form-group">
-				    <label>
-				        <input type="checkbox" name="is_secret" value="1"> 비밀글로 문의하기
-				    </label>
-				</div>
+                    <label class="form-label">문의 내용</label>
+                    <textarea name="content" id="content" class="form-control w-100" placeholder="내용을 상세히 입력해 주세요." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="secret-wrap">
+                        <input type="checkbox" name="is_secret" value="1"> 
+                        <span>비밀글로 문의하기</span>
+                    </label>
+                    <p class="info-text">비밀글은 작성자와 관리자만 볼 수 있습니다.</p>
+                </div>
 
                 <div class="btn-group">
                     <a th:href="@{/cs/list(hotelId=${hotelId})}" class="btn-custom btn-cancel">취소</a>
@@ -114,24 +123,14 @@
             const writer = $("#writer_name").val().trim();
             const content = $("#content").val().trim();
 
-            if(title == "") {
-                alert("제목을 입력하세요.");
-                $("#title").focus();
-                return;
-            }
-            if(writer == "") {
-                alert("작성자를 입력하세요.");
-                $("#writer_name").focus();
-                return;
-            }
-            if(content == "") {
-                alert("내용을 입력하세요.");
-                $("#content").focus();
-                return;
-            }
+            if(title == "") { alert("제목을 입력하세요."); $("#title").focus(); return; }
+            if(writer == "") { alert("작성자를 입력하세요."); $("#writer_name").focus(); return; }
+            if(content == "") { alert("내용을 입력하세요."); $("#content").focus(); return; }
 
-            const frm = document.qnaWriteFrm;
-            frm.submit();
+            if(confirm("이 내용으로 문의를 등록하시겠습니까?")) {
+                const frm = document.qnaWriteFrm;
+                frm.submit();
+            }
         }
     </script>
 </th:block>

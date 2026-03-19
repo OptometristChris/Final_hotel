@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.app.js.cs.model.CsDAO;
 
@@ -55,5 +56,29 @@ public class CsServiceimple implements CsService {
 	@Override
 	public int deleteQna(String qnaId) {
 		return dao.deleteQna(qnaId);
+	}
+	
+	// 어드민 답변 등록
+	@Override
+	@Transactional
+	public int updateQnaAnswer(Map<String, String> paraMap) {
+	    // 1. 기존 답변이 있는지 확인 (상세조회 로직 재활용 가능)
+	    Map<String, String> qna = dao.getQnaDetail(paraMap.get("qnaId"));
+	    
+	    int result = 0;
+	    
+	    // ANS_CONTENT가 null이 아니면 이미 답변이 있는 상태 -> '수정'
+	    if (qna != null && qna.get("ANS_CONTENT") != null) {
+	        // 답변 테이블 업데이트 (또는 QNA 테이블의 답변 컬럼 업데이트)
+	        result = dao.updateAnswer(paraMap); 
+	    } 
+	    // 답변이 없는 상태 -> '최초 등록'
+	    else {
+	        int n1 = dao.insertAnswer(paraMap); 
+	        int n2 = dao.updateQnaStatus(paraMap); // 상태를 '답변완료'로 변경
+	        result = (n1 + n2 == 2) ? 1 : 0;
+	    }
+	    
+	    return result;
 	}
 }

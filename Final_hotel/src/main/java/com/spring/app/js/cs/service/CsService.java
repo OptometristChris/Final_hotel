@@ -21,4 +21,7 @@ public interface CsService {
 
 	// Qna 삭제
 	int deleteQna(String qnaId);
+	
+	// 어드민 답변 등록
+	int updateQnaAnswer(Map<String, String> paraMap);
 }
