@@ -209,7 +209,8 @@ public class SecurityConfig {
             "/cs/**",
             "/hotel/location",
             
-            "/dining/**"
+            "/dining/**",
+            "/search"
            
         };
 
