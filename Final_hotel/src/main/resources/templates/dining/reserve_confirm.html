@@ -100,9 +100,9 @@
 
                 <div class="info-section">
                     <div class="info-row">
-                        <span class="info-label">예약 업장</span>
-                        <span class="info-value" th:text="${res.diningName ?: 'DINING'}">업장명</span>
-                    </div>
+					    <span class="info-label">예약 업장</span>
+					    <span class="info-value">[[${res.diningName}]]</span>
+					</div>
                     <div class="info-row">
                         <span class="info-label">예약 일시</span>
                         <span class="info-value">[[${res.resDate}]] / [[${res.resTime}]]</span>

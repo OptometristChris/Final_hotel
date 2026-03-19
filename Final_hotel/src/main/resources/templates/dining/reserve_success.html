@@ -77,6 +77,10 @@
                 </div>
 
                 <table class="detail-table">
+                    <tr th:if="${res.diningName != null}">
+                        <th>예약 업장</th>
+                        <td th:text="${res.diningName}">레스토랑 이름</td>
+                    </tr>
                     <tr>
                         <th>예약 날짜</th>
                         <td th:text="${res.resDate} + ' ' + ${res.resTime}">2026-03-09 18:30</td>
@@ -89,10 +93,20 @@
                             유아 <span th:text="${res.infantCount}">0</span>
                         </td>
                     </tr>
-                    <tr th:if="${res.diningName != null}">
-                        <th>예약 장소</th>
-                        <td th:text="${res.diningName}">레스토랑 이름</td>
-                    </tr>
+                    <tr th:if="${dining != null}">
+				        <th>예약 장소(층)</th>
+				        <td th:text="${dining.floor}">매장 층수</td>
+				    </tr>
+				    <tr th:if="${dining != null}">
+				        <th>매장 연락처</th>
+				        <td th:text="${dining.tel}">02-123-4567</td>
+				    </tr>
+				
+				    <tr th:if="${dining != null}">
+				        <th>영업 시간</th>
+				        <td th:text="${dining.business_hours}">09:00 - 22:00</td>
+				    </tr>
+				    
                 </table>
 
                 <div class="mt-5">

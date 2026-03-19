@@ -22,13 +22,13 @@ public class DiningServiceImple implements DiningService {
 
     // 목록 조회 (필터링용 Map 포함)
     @Override
-    public List<DiningDTO> getDiningList(Map<String, Object> paraMap) {
+    public List<Map<String, Object>> getDiningList(Map<String, Object> paraMap) {
         return diningMapper.getDiningList(paraMap);
     }
 
     // 다이닝 매장 상세 조회
     @Override
-    public DiningDTO getDiningDetail(int dining_id) {
+    public DiningDTO getDiningDetail(Long dining_id) {
         return diningMapper.getDiningDetail(dining_id);
     }
     
@@ -69,7 +69,7 @@ public class DiningServiceImple implements DiningService {
 
     // 다이닝 매장 이름
 	@Override
-	public String getDiningName(int dining_id) {
+	public String getDiningName(long dining_id) {
 		return diningMapper.getDiningName(dining_id);
 	}
 
@@ -116,4 +116,45 @@ public class DiningServiceImple implements DiningService {
 	    return diningMapper.getReservationDetail(resId);
 	}
     
+	// 다이닝 목록 불러오기
+	@Override
+	public List<Map<String, Object>> getDiningList() {
+
+	    Map<String, Object> paraMap = new HashMap<>();
+	    return diningMapper.getDiningList(paraMap);
+	}
+	
+	// 예약 차단
+	@Override
+	public int insertBlock(Map<String, Object> paraMap) {
+	    return diningMapper.insertBlock(paraMap);
+	}
+
+	// 차단 내역 불러오기
+	@Override
+	public List<Map<String, Object>> getBlockList() {
+	    return diningMapper.getBlockList();
+	}
+
+	// 예약 차단 해제
+	@Override
+	public void deleteBlock(Long blockId) {
+	    diningMapper.deleteBlock(blockId);
+	}
+
+	// 예약 가능 여부 확인
+	@Override
+	public int checkAvailability(Map<String, Object> paraMap) {
+		return diningMapper.checkAvailability(paraMap);
+	}
+
+	@Override
+	public List<String> getUnavailableTimeList(Map<String, String> paraMap) {
+	    List<String> stopTimeList = diningMapper.getUnavailableTimeList(paraMap);
+	    return stopTimeList;
+	}
+	
+
+	
+
 }
