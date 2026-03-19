@@ -56,6 +56,21 @@ public class HotelService_imple implements HotelService {
     @Override
     public void saveHotel(Map<String, Object> paraMap) {
 
+        // ==========================
+        // 유효성 검사 : 2차 검증 (중요)
+        // ==========================
+        if(paraMap.get("hotel_name") == null){
+            throw new IllegalArgumentException("호텔명 없음");
+        }
+
+        if(paraMap.get("address") == null){
+            throw new IllegalArgumentException("주소 없음");
+        }
+
+        if(paraMap.get("latitude") == null || paraMap.get("longitude") == null){
+            throw new IllegalArgumentException("좌표 없음");
+        }
+    	
         // 1️. 기본값 세팅
         paraMap.put("active_yn", "Y");
 

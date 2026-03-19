@@ -5,47 +5,37 @@
 <meta charset="UTF-8">
 <title>객실 등록</title>
 
+<!-- Bootstrap 추가 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <style>
 
 /* ================= 페이지 기본 스타일 ================= */
 
 body{
-font-family: Arial;
-width:800px;
-margin:auto;
+font-family: 'Pretendard', sans-serif;
+background:#f5f7fb;
 }
 
-/* 라벨 */
-label{
-display:block;
-margin-top:15px;
-font-weight:bold;
+/* 카드 스타일 */
+.card{
+border:none;
+border-radius:14px;
+box-shadow:0 8px 20px rgba(0,0,0,0.06);
 }
 
-/* input 스타일 */
-input, select{
-width:100%;
-padding:8px;
-}
-
-/* 등록 버튼 */
-button{
-margin-top:20px;
-padding:10px;
-width:200px;
-cursor:pointer;
+/* 제목 */
+.title{
+font-weight:700;
+margin-bottom:20px;
 }
 
 /* 이미지 미리보기 */
-.preview{
-margin-top:15px;
-}
-
 .preview img{
-width:200px;
-height:130px;
+width:220px;
+height:140px;
 object-fit:cover;
-border-radius:6px;
+border-radius:8px;
 border:1px solid #ddd;
 }
 
@@ -55,7 +45,11 @@ border:1px solid #ddd;
 
 <body>
 
-<h2>객실 등록 신청</h2>
+<div class="container mt-5">
+
+<div class="card p-4">
+
+<h3 class="title">객실 등록 신청</h3>
 
 <!-- 
 중요
@@ -64,99 +58,176 @@ border:1px solid #ddd;
 
 <form th:action="@{/admin/room/register}"
       method="post"
-      enctype="multipart/form-data">
+      enctype="multipart/form-data"
+      id="roomForm">
 
 <!-- ================= 객실명 ================= -->
-<label>객실명</label>
-<input type="text" name="room_name" required>
+<div class="mb-3">
+<label class="form-label">객실명</label>
+<input type="text" name="room_name" class="form-control" required>
+</div>
 
 
 <!-- ================= 객실 등급 ================= -->
-<label>객실 등급</label>
-<select name="room_grade">
+<div class="mb-3">
+<label class="form-label">객실 등급</label>
+<select name="room_grade" class="form-select">
 <option value="STANDARD">STANDARD</option>
 <option value="DELUXE">DELUXE</option>
 <option value="SUITE">SUITE</option>
 </select>
+</div>
 
 
 <!-- ================= 침대 타입 ================= -->
-<label>침대 타입</label>
-<select name="bed_type">
+<div class="mb-3">
+<label class="form-label">침대 타입</label>
+<select name="bed_type" class="form-select">
 <option value="DOUBLE">DOUBLE</option>
 <option value="TWIN">TWIN</option>
 <option value="KING">KING</option>
 </select>
+</div>
 
 
 <!-- ================= 뷰 타입 ================= -->
-<label>뷰 타입</label>
-<select name="view_type">
+<div class="mb-3">
+<label class="form-label">뷰 타입</label>
+<select name="view_type" class="form-select">
 <option value="CITY">CITY</option>
 <option value="RIVER">RIVER</option>
 </select>
+</div>
 
 
 <!-- ================= 객실 크기 ================= -->
-<label>객실 크기 (㎡)</label>
-<input type="number" name="room_size">
+<div class="mb-3">
+<label class="form-label">객실 크기 (㎡)</label>
+<input type="number" name="room_size" class="form-control">
+</div>
 
 
 <!-- ================= 최대 인원 ================= -->
-<label>최대 인원</label>
-<input type="number" name="max_capacity">
+<div class="mb-3">
+<label class="form-label">최대 인원</label>
+<input type="number" name="max_capacity" class="form-control" required>
+</div>
 
 
 <!-- ================= 객실 수 ================= -->
-<label>객실 수</label>
-<input type="number" name="total_count">
+<div class="mb-3">
+<label class="form-label">객실 수</label>
+<input type="number" name="total_count" class="form-control" required>
+</div>
 
 
 <!-- ================= 기본 가격 ================= -->
-<label>기본 가격</label>
-<input type="number" name="base_price">
+<div class="mb-3">
+<label class="form-label">기본 가격</label>
+<input type="number" name="base_price" class="form-control" required>
+</div>
 
 
 <!-- ================= 객실 이미지 ================= -->
-<label>객실 이미지</label>
+<div class="mb-3">
+<label class="form-label">객실 이미지</label>
 <input type="file"
        name="roomImage"
+       id="roomImage"
        accept="image/*"
-       onchange="previewImage(event)">
+       class="form-control">
+</div>
 
 
 <!-- 이미지 미리보기 -->
-<div class="preview">
+<div class="preview mb-3">
 <img id="previewImg"
      src="/images/noimage.png">
 </div>
 
 
 <!-- ================= 등록 버튼 ================= -->
-<button type="submit">객실 등록</button>
+<button type="button" id="btnSubmit" class="btn btn-primary">
+객실 등록
+</button>
 
 </form>
+
+</div>
+
+</div>
 
 
 <script>
 
 /* ================= 이미지 미리보기 ================= */
 
-function previewImage(event){
+document.getElementById("roomImage").addEventListener("change", function(e){
 
-const reader = new FileReader();
+    const file = e.target.files[0];
 
-reader.onload = function(){
-document.getElementById("previewImg").src = reader.result;
-};
+    if(file){
+        const reader = new FileReader();
 
-reader.readAsDataURL(event.target.files[0]);
+        reader.onload = function(e){
+            document.getElementById("previewImg").src = e.target.result;
+        };
 
-}
+        reader.readAsDataURL(file);
+    }
+
+});
+
+
+/* ================= 프론트 유효성 검사 ================= */
+
+document.getElementById("btnSubmit").addEventListener("click", function(){
+
+    const form = document.getElementById("roomForm");
+
+    const roomName = form.room_name.value;
+    const price = form.base_price.value;
+    const capacity = form.max_capacity.value;
+    const total = form.total_count.value;
+    const image = document.getElementById("roomImage").value;
+
+    // 객실명
+    if(!roomName){
+        alert("객실명을 입력하세요");
+        return;
+    }
+
+    // 가격 숫자 체크
+    if(!price || isNaN(price) || price <= 0){
+        alert("가격은 0보다 큰 숫자여야 합니다");
+        return;
+    }
+
+    // 인원 체크
+    if(!capacity || capacity <= 0){
+        alert("최대 인원을 입력하세요");
+        return;
+    }
+
+    // 객실 수 체크
+    if(!total || total <= 0){
+        alert("객실 수를 입력하세요");
+        return;
+    }
+
+    // 이미지 필수
+    if(!image){
+        alert("객실 이미지를 선택하세요");
+        return;
+    }
+
+    // 최종 제출
+    form.submit();
+
+});
 
 </script>
 
 
 </body>
 </html>
-

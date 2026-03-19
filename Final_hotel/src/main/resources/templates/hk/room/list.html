@@ -555,6 +555,18 @@ function openCalendar(roomId) {
                         + String(end.getMonth()+1).padStart(2,'0') + "-"
                         + String(end.getDate()).padStart(2,'0');
 
+                    // 추가 (얼럿 여러번 뜨는거 여기로 위치 변경)
+                    const hasSoldOut = calendarData.some(day =>
+	                    day.AVAILABLE_COUNT === 0 &&
+	                    day.STAY_DATE >= start &&
+	                    day.STAY_DATE <= adjustedEnd
+	                );
+	
+	                if(hasSoldOut){
+	                    alert("선택한 날짜 중 예약 마감된 날짜가 있습니다.");
+	                    return;
+	                }
+                    
                     const nights = calculateNights(start, adjustedEnd);
 
                     if(nights <= 0){
@@ -615,13 +627,16 @@ function openCalendar(roomId) {
                         day.STAY_DATE < end
                     );
 
-                    if(hasSoldOut){
+                   /*  if(hasSoldOut){
                         alert("선택한 날짜 중 예약 마감된 날짜가 있습니다.");
-                        return false;
-                    }
+                        return false;} */
+                       
+                         // ❌ alert 제거 (예약 마감 얼럿 계속 뜨는거 수정)
+   						 return !hasSoldOut;
+                        
+                    },
 
-                    return true;
-                },
+            
 
                 events: events // 날짜별 가격 표시
             });                
