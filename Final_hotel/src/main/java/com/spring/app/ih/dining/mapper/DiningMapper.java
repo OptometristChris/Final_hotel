@@ -44,10 +44,14 @@ public interface DiningMapper {
 	// 관리자 - 예약 상세 정보 조회
 	DiningReservationDTO getReservationDetail(Long resId);
 
-	void insertBlock(Map<String, Object> params);
+	int insertBlock(Map<String, Object> paraMap);
 
 	List<Map<String, Object>> getBlockList();
 
 	void deleteBlock(Long blockId);
+	
+	int checkAvailability(Map<String, Object> paraMap);
+	
+	List<String> getUnavailableTimeList(Map<String, String> paraMap);
 	
 }

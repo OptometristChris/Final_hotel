@@ -126,8 +126,8 @@ public class DiningServiceImple implements DiningService {
 	
 	// 예약 차단
 	@Override
-	public void insertBlock(Map<String, Object> params) {
-	    diningMapper.insertBlock(params);
+	public int insertBlock(Map<String, Object> paraMap) {
+	    return diningMapper.insertBlock(paraMap);
 	}
 
 	// 차단 내역 불러오기
@@ -141,6 +141,20 @@ public class DiningServiceImple implements DiningService {
 	public void deleteBlock(Long blockId) {
 	    diningMapper.deleteBlock(blockId);
 	}
+
+	// 예약 가능 여부 확인
+	@Override
+	public int checkAvailability(Map<String, Object> paraMap) {
+		return diningMapper.checkAvailability(paraMap);
+	}
+
+	@Override
+	public List<String> getUnavailableTimeList(Map<String, String> paraMap) {
+	    List<String> stopTimeList = diningMapper.getUnavailableTimeList(paraMap);
+	    return stopTimeList;
+	}
+	
+
 	
 
 }

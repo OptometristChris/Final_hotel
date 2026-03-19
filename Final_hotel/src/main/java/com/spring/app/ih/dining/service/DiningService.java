@@ -37,12 +37,16 @@ public interface DiningService {
 	// 관리자용 예약 상세 조회
 	DiningReservationDTO getReservationDetail(Long resId);
 
-	void insertBlock(Map<String, Object> params);
+	int insertBlock(Map<String, Object> paraMap);
 
 	List<Map<String, Object>> getBlockList();
 
 	void deleteBlock(Long blockId);
 	
 	List<Map<String, Object>> getDiningList();
+	
+	int checkAvailability(Map<String, Object> paraMap);
+	
+	List<String> getUnavailableTimeList(Map<String, String> paraMap);
 	
 }
