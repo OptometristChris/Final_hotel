@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.spring.app.common.AES256;
 import com.spring.app.hk.reservation.service.ReservationService;
 import com.spring.app.jh.security.domain.CustomUserDetails;
 import com.spring.app.jh.security.domain.Session_GuestDTO;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class ReservationController {
 
 	private final ReservationService reservationService;
+	private final AES256 aes256; // 추가
 
 	// 예약 정보 입력 페이지 (객실 정보 조회, 숙박일 계산, 총 객실 기본요금 계산)
 	@GetMapping("/form")
@@ -61,6 +63,48 @@ public class ReservationController {
 			mobile = userDetails.getMemberDto().getMobile();
 			email = userDetails.getMemberDto().getEmail();
 			memberNo = userDetails.getMemberDto().getMemberNo();
+		}
+		
+		// ⭐ 소셜 로그인 추가 (네이버 / 카카오)
+		else if (auth != null && auth.getPrincipal() instanceof org.springframework.security.oauth2.core.user.OAuth2User oauthUser) {
+
+		    System.out.println("oauth 전체 = " + oauthUser.getAttributes());
+
+		    String emailFromOauth = null;
+
+		    // 네이버
+		    Map<String, Object> response = (Map<String, Object>) oauthUser.getAttributes().get("response");
+		    if (response != null) {
+		        emailFromOauth = (String) response.get("email");
+		    }
+
+		    // 카카오
+		    if (emailFromOauth == null) {
+		        Map<String, Object> kakaoAccount = (Map<String, Object>) oauthUser.getAttributes().get("kakao_account");
+
+		        if (kakaoAccount != null) {
+		            emailFromOauth = (String) kakaoAccount.get("email");
+		        }
+		    }
+
+		    if (emailFromOauth != null) {
+
+		        emailFromOauth = emailFromOauth.trim();
+		        
+		        try {
+		            emailFromOauth = aes256.encrypt(emailFromOauth); // 추가
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		        Map<String, Object> member = reservationService.findMemberByEmail(emailFromOauth);
+
+		        if (member != null) {
+		            name = (String) member.get("NAME");
+		            mobile = (String) member.get("MOBILE");
+		            email = (String) member.get("EMAIL");
+		            memberNo = ((Number) member.get("MEMBER_NO")).intValue();
+		        }
+		    }
 		}
 
 		// 2️⃣ 비회원 로그인 (세션 guestSession)

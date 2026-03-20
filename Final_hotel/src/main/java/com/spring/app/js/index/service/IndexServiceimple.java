@@ -53,4 +53,24 @@ public class IndexServiceimple implements IndexService {
 	public List<Map<String, String>> getHotelList() {
 		return inDao.getHotelList();
 	}
+	
+	// 호텔 이미지 가져오기
+	@Override
+	public List<Map<String, Object>> getHotelImages(String hotelId) {
+	    return inDao.getHotelImages(hotelId);
+	}
+	
+	// [추가] 특정 호텔의 기존 배너 정보 가져오기 (데이터 불러오기용)
+    @Override
+    public Map<String, Object> getBannerByHotelId(String hotelId) {
+        return inDao.getBannerByHotelId(hotelId);
+    }
+
+    // [변경] 메인 배너 저장 (등록/수정 통합 - Merge 쿼리 호출)
+    @Override
+    public int saveBanner(Map<String, String> paraMap) {
+        // 기존 insertBanner 대신 MyBatis의 saveBanner(MERGE INTO)를 호출합니다.
+        return inDao.saveBanner(paraMap);
+    }
+	
 }

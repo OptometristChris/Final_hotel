@@ -142,6 +142,25 @@ public class HotelController {
 
         try {
 
+        	// ==========================
+            //  추가. 필수값 검증 (유효성 검사)
+            // ==========================
+            if(map.get("hotel_name") == null || map.get("hotel_name").trim().isEmpty()){
+                return Map.of("result", 0, "msg", "호텔명 필수");
+            }
+
+            if(map.get("address") == null || map.get("address").trim().isEmpty()){
+                return Map.of("result", 0, "msg", "주소 필수");
+            }
+
+            if(latitude == null || longitude == null){
+                return Map.of("result", 0, "msg", "지도 위치 선택 필수");
+            }
+
+            if(mainImage == null || mainImage.isEmpty()){
+                return Map.of("result", 0, "msg", "대표 이미지 필수");
+            }
+        	
         	// 로그인한 관리자 정보 가져오기
         	CustomAdminDetails loginAdmin = (CustomAdminDetails) authentication.getPrincipal();
 

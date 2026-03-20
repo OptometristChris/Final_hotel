@@ -91,30 +91,35 @@
             
             // 상세 조회 함수
             function showDetail(resId) {
-            	const url = /*[[@{/admin/dining/detail}]]*/ "/admin/dining/detail";
-            	
-                $.ajax({
-                    url: url,
-                    type: "GET",
-                    data: { "resId": resId },
-                    success: function(data) {
-                        let html = `
-                            <div class="detail-row"><div class="detail-label">예약번호</div><div>${data.diningReservationId}</div></div>
-                            <div class="detail-row"><div class="detail-label">업장명</div><div>${data.diningName}</div></div>
-                            <div class="detail-row"><div class="detail-label">예약자</div><div>${data.guestName}</div></div>
-                            <div class="detail-row"><div class="detail-label">연락처</div><div>${data.guestPhone}</div></div>
-                            <div class="detail-row"><div class="detail-label">예약일시</div><div>${data.resDate} ${data.resTime}</div></div>
-                            <div class="detail-row"><div class="detail-label">인원</div><div>성인 ${data.adultCount}, 소아 ${data.childCount}, 유아 ${data.infantCount}</div></div>
-                            <div class="detail-row"><div class="detail-label">상태</div><div>${data.status}</div></div>
-                        `;
-                        $('#detailModalBody').html(html);
-
-                        const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
-                        detailModal.show();
-                    },
-                    error: function() { alert("정보를 불러오지 못했습니다."); }
-                });
-            }
+			    const url = /*[[@{/admin/dining/detail}]]*/ "/admin/dining/detail";
+			    
+			    $.ajax({
+			        url: url,
+			        type: "GET",
+			        data: { "resId": resId },
+			        success: function(data) {
+			            // 인원수 텍스트 미리 정리
+			            let peopleText = `성인 ${data.adultCount || 0}`;
+			            if (data.childCount > 0) peopleText += `, 소아 ${data.childCount}`;
+			            if (data.infantCount > 0) peopleText += `, 유아 ${data.infantCount}`;
+			
+			            let html = `
+			                <div class="detail-row"><div class="detail-label">예약번호</div><div>${data.diningReservationId}</div></div>
+			                <div class="detail-row"><div class="detail-label">업장명</div><div>${data.diningName}</div></div>
+			                <div class="detail-row"><div class="detail-label">예약자</div><div>${data.guestName}</div></div>
+			                <div class="detail-row"><div class="detail-label">연락처</div><div>${data.guestPhone}</div></div>
+			                <div class="detail-row"><div class="detail-label">예약일시</div><div>${data.resDate} ${data.resTime}</div></div>
+			                <div class="detail-row"><div class="detail-label">인원</div><div>${peopleText}</div></div>
+			                <div class="detail-row"><div class="detail-label">상태</div><div>${data.status}</div></div>
+			            `;
+			            $('#detailModalBody').html(html);
+			
+			            const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+			            detailModal.show();
+			        },
+			        error: function() { alert("정보를 불러오지 못했습니다."); }
+			    });
+			}
 
             function showManualModal() {
                 new bootstrap.Modal(document.getElementById('manualResModal')).show();
@@ -173,8 +178,16 @@
                                     <span th:text="${res.resDate}">날짜</span><br><span th:text="${res.resTime}">시간</span>
                                 </td>
                                 <td th:onclick="showDetail([[${res.diningReservationId}]])">
-                                    <small>성인</small> <span th:text="${res.adultCount}">0</span>
-                                </td>
+								    <small>성인</small> [[${res.adultCount}]]
+								    
+								    <th:block th:if="${res.childCount > 0}">
+								        / <small>소아</small> [[${res.childCount}]]
+								    </th:block>
+								    
+								    <th:block th:if="${res.infantCount > 0}">
+								        / <small>유아</small> [[${res.infantCount}]]
+								    </th:block>
+								</td>
                                 <td>
                                     <span th:if="${res.status == 'CONFIRMED'}" class="status-badge status-confirmed">예약확정</span>
                                     <span th:if="${res.status == 'VISITED'}" class="status-badge status-visited">방문완료</span>
@@ -197,14 +210,14 @@
         </div>
         
         <div class="text-end mb-3 mt-4 container">
-            <button type="button" class="btn btn-dark" onclick="showManualModal()" style="background: #9d815d; border: none;">+ 현장 예약 등록</button>
+            <button type="button" class="btn btn-dark" onclick="showManualModal()" style="background: #9d815d; border: none;">+ 현장 등록</button>
         </div>
         
         <div class="modal fade" id="manualResModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header" style="background: #f4f1ee;">
-                        <h5 class="modal-title fw-bold" style="color: #9d815d;">현장 예약 직접 등록</h5>
+                        <h5 class="modal-title fw-bold" style="color: #9d815d;">현장 직접 등록</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -228,7 +241,7 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+						<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="$('#detailModal').modal('hide')">닫기</button>
                         <button type="button" class="btn btn-dark btn-sm" onclick="submitManualRes()" style="background: #9d815d; border: none;">등록</button>
                     </div>
                 </div>
@@ -240,7 +253,7 @@
                 <div class="modal-content">
                     <div class="modal-header"><h5 class="modal-title fw-bold">예약 상세 정보</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
                     <div class="modal-body" id="detailModalBody"> 로딩 중... </div>
-                    <div class="modal-footer"><button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button></div>
+                    <div class="modal-footer"><button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">닫기</button></div>
                 </div>
             </div>
         </div>

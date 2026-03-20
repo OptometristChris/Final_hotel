@@ -64,4 +64,85 @@ public class AdminDiningController {
         System.out.println(">>> 가져온 데이터: " + detail);
         return detail; 
     }
+    
+    // 인원 합산
+    @PostMapping("/check")
+    @ResponseBody
+    public int check(@RequestParam Map<String, Object> paraMap) {
+       
+        System.out.println(">>> [Check] 넘어온 파라미터: " + paraMap);
+
+        try {
+            int total = Integer.parseInt(String.valueOf(paraMap.get("adult_count"))) 
+                      + Integer.parseInt(String.valueOf(paraMap.get("child_count")))
+                      + Integer.parseInt(String.valueOf(paraMap.get("infant_count")));
+            
+            paraMap.put("totalGuests", total);
+            
+            int result = diningservice.checkAvailability(paraMap);
+            System.out.println(">>> [Check] 서비스 결과값: " + result); // 0인지 1인지 확인
+            
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0; 
+        }
+    }
+    
+    // 다이닝 예약 관리
+    @GetMapping("/setting")
+    public String settingPage(Model model) {
+
+        List<Map<String, Object>> blockList = diningservice.getBlockList(); 
+        List<Map<String, Object>> diningList = diningservice.getDiningList(); 
+        
+        model.addAttribute("blockList", blockList);
+        model.addAttribute("diningList", diningList);
+        
+        return "dining/admin/control_setting";
+    }
+    
+    // 차단 등록
+    @PostMapping("/block/register")
+    @ResponseBody
+    public String registerBlock(@RequestParam Map<String, Object> paraMap) {
+        try {
+            
+            System.out.println(">>> 등록 요청 데이터: " + paraMap);
+
+            if(paraMap.get("fkDiningId") == null || paraMap.get("blockDate") == null || paraMap.get("blockTime") == null) {
+                return "empty_data";
+            }
+
+            int result = diningservice.insertBlock(paraMap);
+
+            if(result > 0) {
+                return "success";
+            } else {
+                return "fail";
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace(); 
+            return "error: " + e.getMessage();
+        }
+    }
+
+    // 차단 해제
+    @PostMapping("/block/delete")
+    @ResponseBody
+    public String deleteBlock(@RequestParam("blockId") Long blockId) {
+    	diningservice.deleteBlock(blockId);
+        return "success";
+    }
+    
+    // 차단 시간대 불러오기
+    @ResponseBody
+    @GetMapping("/getUnavailableSlots")
+    public List<String> getUnavailableSlots(@RequestParam Map<String, String> paraMap) {
+        List<String> unavailableList = diningservice.getUnavailableTimeList(paraMap);
+        return unavailableList;
+    }
+    
+
 }

@@ -67,6 +67,12 @@ public class ReservationDAO_imple implements ReservationDAO {
 	    return sqlsession.selectList("reservation.selectTomorrowCheckinForMail");
 	}
 
+	// 소셜 로그인용
+	@Override
+	public Map<String, Object> findMemberByEmail(String emailFromOauth) {
+		return sqlsession.selectOne("reservation.findMemberByEmail", emailFromOauth);
+	}
+
 	
 
 }

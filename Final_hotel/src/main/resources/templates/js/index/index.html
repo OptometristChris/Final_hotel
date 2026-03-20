@@ -16,7 +16,8 @@
         /* --- 메인 비주얼 슬라이더 --- */
         .main-visual { width: 100%; height: 100vh; position: relative; overflow: hidden; background-color: #000; }
         .main-slider, .slide-item { width: 100%; height: 100vh; }
-        .slide-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        /* 필터 처리로 배경 명도 색 낮추기 */
+        .slide-item img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.9); }
         
         .slick-arrow {
             position: absolute; top: 50%; transform: translateY(-50%); z-index: 1000 !important;
@@ -166,16 +167,20 @@
 <section>
     <div class="main-visual">
         <div class="main-slider">
-            <div class="slide-item-wrapper" th:each="banner : ${mainBannerList}">
-                <div class="slide-item">
-                    <img th:src="@{'/images/js/' + ${banner.image_url}}" th:alt="${banner.title}">
-                </div>
-                <div class="room-info-overlay position-absolute" style="bottom: 25%; left: 5%; z-index: 10;">
-                    <h6 class="text-white font-weight-bold mb-2" style="opacity:0.9; font-size: 1.5rem; letter-spacing: 2px;" th:text="${banner.title}">HOTEL NAME</h6>
-                    <h5 class="text-white font-weight-bold mb-0" style="font-size: 3.5rem; line-height: 1.2; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);" th:utext="${banner.subtitle}">카피 문구</h5>
-                </div>
-            </div>
-        </div>
+		    <div class="slide-item-wrapper" th:each="banner : ${mainBannerList}">
+		        <div class="slide-item">
+		            <img th:with="fileName=${banner.image_url}"
+		                 th:src="${#strings.contains(fileName, '/file_images/') 
+		                          ? '/final_hotel' + fileName 
+		                          : '/final_hotel/file_images/hotel/' + fileName}" 
+		                 th:alt="${banner.title}">
+		        </div>
+		        <div class="room-info-overlay position-absolute" style="bottom: 15%; left: 5%; z-index: 10;">
+		            <h6 class="text-white font-weight-bold mb-2" style="opacity:0.9; font-size: 1.5rem; letter-spacing: 2px;" th:text="${banner.title}">HOTEL NAME</h6>
+		            <h5 class="text-white font-weight-bold mb-0" style="font-size: 3.5rem; line-height: 1.2; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);" th:utext="${banner.subtitle}">카피 문구</h5>
+		        </div>
+		    </div>
+		</div>
         
 <!--    하단 날씨 부분 나중에 공공데이터 사용하여 추가      
         <div class="slider-progress-container">

@@ -3,7 +3,7 @@
 
 <mapper namespace="com.spring.app.js.index.model.IndexDAO">
 
-    <select id="getMainBannerList" resultType="com.spring.app.js.promotion.domain.PromotionDTO">
+    <select id="getMainBannerList" resultType="PromotionDTO">
 	    SELECT 
 	        B.banner_id, 
 	        B.title, 
@@ -50,21 +50,22 @@
         ]]>
     </select>
 
-    <select id="getPromoCardList" resultType="com.spring.app.js.promotion.domain.PromotionDTO">
+    <select id="getPromoCardList" resultType="PromotionDTO">
 	    SELECT 
 	        B.banner_id,
 	        B.fk_promotion_id AS promotion_id,
 	        B.title, 
 	        B.image_url,                  
-	        B.benefits,             -- DB에 컬럼 추가 후 정상 작동함
+	        B.benefits,             
 	        M.price,                
-	        M.end_date,             
+	        TO_CHAR(M.end_date, 'YYYY-MM-DD') AS end_date, -- 날짜 포맷팅             
 	        M.discount_rate         
 	    FROM PROMOTION_BANNER B
 	    LEFT JOIN PROMOTION_MASTER M ON B.fk_promotion_id = M.promotion_id
 	    WHERE B.active_yn = 'Y' 
 	      AND B.banner_type = 'CARD'
-	      AND (M.is_active = 1 OR M.is_active IS NULL)
+	      AND M.is_active = 1
+	      AND SYSDATE BETWEEN M.start_date AND M.end_date 
 	    ORDER BY DBMS_RANDOM.VALUE
 	</select>
 
@@ -110,5 +111,63 @@
 	    ORDER BY hotel_id ASC
 	</select>
 
+	<select id="getHotelImages" parameterType="String" resultType="map">
+	    SELECT 
+	        image_id AS IMAGE_ID,
+	        image_url AS IMAGE_URL,
+	        is_main AS IS_MAIN,
+	        sort_order AS SORT_ORDER
+	    FROM HOTEL_IMAGE
+	    WHERE fk_hotel_id = #{hotelId}
+	    ORDER BY is_main DESC, sort_order ASC
+	</select>
+	
+	<insert id="insertBanner" parameterType="map">
+	    INSERT INTO PROMOTION_BANNER (
+	        banner_id,
+	        fk_hotel_id,
+	        banner_type,
+	        title,
+	        subtitle,
+	        image_url,    sort_order,
+	        active_yn
+	    ) VALUES (
+	        SEQ_PROMO_BANNER_ID.NEXTVAL,
+	        #{fk_hotel_id},
+	        #{banner_type},
+	        #{title},
+	        #{subtitle},
+	        #{image_url},
+	        #{sort_order},
+	        'Y'
+	    )
+	</insert>
+	
+	<select id="getBannerByHotelId" parameterType="String" resultType="map">
+	    SELECT 
+	        banner_id, 
+	        title, 
+	        subtitle, 
+	        image_url, 
+	        sort_order
+	    FROM PROMOTION_BANNER
+	    WHERE fk_hotel_id = #{hotelId}
+	      AND banner_type = 'MAIN'
+	</select>
+	
+	<update id="saveBanner" parameterType="map">
+	    MERGE INTO PROMOTION_BANNER B
+	    USING DUAL ON (B.fk_hotel_id = #{fk_hotel_id} AND B.banner_type = 'MAIN')
+	    WHEN MATCHED THEN
+	        UPDATE SET 
+	            title = #{title},
+	            subtitle = #{subtitle},
+	            image_url = #{image_url},
+	            sort_order = #{sort_order},
+	            active_yn = 'Y'
+	    WHEN NOT MATCHED THEN
+	        INSERT (banner_id, fk_hotel_id, banner_type, title, subtitle, image_url, sort_order, active_yn)
+	        VALUES (SEQ_PROMO_BANNER_ID.NEXTVAL, #{fk_hotel_id}, 'MAIN', #{title}, #{subtitle}, #{image_url}, #{sort_order}, 'Y')
+	</update>
 
 </mapper>

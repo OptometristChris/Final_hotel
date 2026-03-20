@@ -14,9 +14,9 @@ import java.util.Map;
 @Mapper 
 public interface DiningMapper {
     
-	List<DiningDTO> getDiningList(Map<String, Object> paraMap);
+	List<Map<String, Object>> getDiningList(Map<String, Object> paraMap);
 
-    DiningDTO getDiningDetail(@Param("dining_id") int dining_id);
+    DiningDTO getDiningDetail(@Param("dining_id") Long dining_id);
     
     int registerReservation(DiningReservationDTO reservationDTO, String impUid, Session_MemberDTO member);
 
@@ -24,7 +24,7 @@ public interface DiningMapper {
 
 	int insertPayment(Map<String, Object> payMap);
 
-	String getDiningName(int dining_id);
+	String getDiningName(long dining_id);
 
     List<DiningReservationDTO> findNonMemberReservations(
         @Param("name") String name, @Param("email") String email,  @Param("password") String password);
@@ -43,4 +43,15 @@ public interface DiningMapper {
 	
 	// 관리자 - 예약 상세 정보 조회
 	DiningReservationDTO getReservationDetail(Long resId);
+
+	int insertBlock(Map<String, Object> paraMap);
+
+	List<Map<String, Object>> getBlockList();
+
+	void deleteBlock(Long blockId);
+	
+	int checkAvailability(Map<String, Object> paraMap);
+	
+	List<String> getUnavailableTimeList(Map<String, String> paraMap);
+	
 }

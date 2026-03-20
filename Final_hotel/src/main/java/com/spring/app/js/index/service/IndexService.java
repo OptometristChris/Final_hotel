@@ -26,4 +26,13 @@ public interface IndexService {
 
 	// 호텔 리스트 
 	List<Map<String, String>> getHotelList();
+
+	// 호텔 이미지 가져오기
+	List<Map<String, Object>> getHotelImages(String hotelId);
+
+	// [신설] 특정 호텔의 기존 배너 정보 가져오기 (배너 관리 - 데이터 불러오기용)
+    Map<String, Object> getBannerByHotelId(String hotelId);
+
+    // [변경] 메인 배너 저장 (등록/수정 통합 - Merge 쿼리 호출용)
+    int saveBanner(Map<String, String> paraMap);
 }

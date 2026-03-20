@@ -48,7 +48,7 @@ public class DiningController {
 
     	// System.out.println(">>> 넘어온 파라미터 : " + paraMap);
     	
-        List<DiningDTO> diningList = diningService.getDiningList(paraMap);
+        List<Map<String, Object>> diningList = diningService.getDiningList(paraMap);
         
         model.addAttribute("diningList", diningList);
         model.addAttribute("selectedHotel", paraMap.get("hotel_id"));
@@ -59,7 +59,7 @@ public class DiningController {
     
     
     @GetMapping("/detail/{dining_id}") // http://localhost:9081/final_hotel/dining/detail/1
-    public String diningDetail(@PathVariable("dining_id") int dining_id, Model model) {
+    public String diningDetail(@PathVariable("dining_id") long dining_id, Model model) {
         
         // 한 개의 식당 정보 가져오기
         DiningDTO dining = diningService.getDiningDetail(dining_id);
@@ -68,7 +68,7 @@ public class DiningController {
     }
     
     @GetMapping("/reserve/{dining_id}")
-    public String showReservationPage(@PathVariable("dining_id") int dining_id, 
+    public String showReservationPage(@PathVariable("dining_id") long dining_id, 
                                       HttpSession session, 
                                       Model model) {
         
@@ -116,6 +116,11 @@ public class DiningController {
     @PostMapping("/reserve/confirm")
     public String reserveConfirm(DiningReservationDTO reservationDTO, HttpSession session, Model model) {
 
+    	Long dining_id = reservationDTO.getDiningId(); 
+    	String diningName = diningService.getDiningName(dining_id);
+    	
+    	reservationDTO.setDiningName(diningName);
+    	
         session.setAttribute("tempReservation", reservationDTO);
         
         int adultPrice = 20000;
@@ -150,9 +155,14 @@ public class DiningController {
         int result = diningService.registerReservation(reservationDTO, impUid, member);
         
         if(result > 0) {
+        	
+        	DiningDTO diningDetail = diningService.getDiningDetail(reservationDTO.getDiningId());
+        	
             session.removeAttribute("tempReservation");
             
             model.addAttribute("res", reservationDTO);
+            model.addAttribute("dining", diningDetail);
+            
             return "dining/reserve_success"; 
         } else {
             return "common/error";

@@ -29,4 +29,13 @@ public interface IndexDAO {
 
 	// 호텔 리스트
 	List<Map<String, String>> getHotelList();
+
+	// 호텔 이미지 가져오기
+	List<Map<String, Object>> getHotelImages(String hotelId);
+
+	// [추가] 특정 호텔의 기존 배너 정보 가져오기 (배너 수정 시 데이터 바인딩용)
+    Map<String, Object> getBannerByHotelId(String hotelId);
+
+    // [변경] 배너 저장 (MERGE INTO를 통한 등록/수정 통합)
+    int saveBanner(Map<String, String> paraMap);
 }
