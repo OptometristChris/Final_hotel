@@ -5,7 +5,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>지점관리자 대시보드 | CIEL</title>
+  <title th:text="${(hotelName != null ? hotelName : '호텔 시엘(잠실)') + ' 관리자 대시보드 | CIEL'}">호텔 시엘(잠실) 관리자 대시보드 | CIEL</title>
 
   <link rel="stylesheet" href="">
 
@@ -55,25 +55,6 @@
       font-size:28px;
       font-weight:900;
       letter-spacing:-0.02em;
-    }
-
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 10px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:#fff;
-      font-size:12px;
-      font-weight:900;
-      color:var(--text);
-      line-height:1;
-    }
-
-    .chip.muted{
-      color:var(--muted);
-      font-weight:800;
     }
 
     .userChip{
@@ -159,48 +140,8 @@
       color:var(--text);
     }
 
-    .heroTop{
-      padding:14px 16px 12px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      border-bottom:1px solid var(--line);
-      background:#fff;
-    }
-
-    .filters{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-
-    .pill{
-      padding:8px 10px;
-      border-radius:999px;
-      background:#fff;
-      border:1px solid var(--line);
-      font-size:12px;
-      font-weight:900;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      color:var(--text);
-    }
-
-    .pill select{
-      border:none;
-      background:transparent;
-      font-weight:900;
-      outline:none;
-      color:var(--text);
-      font-size:12px;
-      cursor:pointer;
-    }
-
     .heroBody{
-      padding:14px 16px 16px;
+      padding:18px 16px 16px;
       background:
         radial-gradient(1000px 240px at 10% 0%, rgba(0,0,0,.04), transparent 60%),
         linear-gradient(135deg, rgba(17,17,17,.92), rgba(17,17,17,.78));
@@ -272,6 +213,19 @@
       background:rgba(255,255,255,.12);
       border-color:rgba(255,255,255,.22);
       color:#fff;
+    }
+
+    .pill{
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      font-size:12px;
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      color:var(--text);
+      background:#fff;
     }
 
     .quickActions{
@@ -531,8 +485,6 @@
        hotelId=(${a} != null and ${a.fk_hotel_id} != null ? ${a.fk_hotel_id} : 1),
 
        hotelName=(${hotelName} != null ? ${hotelName} : '호텔 시엘(잠실)'),
-       periodLabel=(${periodLabel} != null ? ${periodLabel} : '오늘'),
-       alertCount=(${alertCount} != null ? ${alertCount} : 0),
 
        occupancyRate=(${kpi_occupancy} != null ? ${kpi_occupancy} : 0),
        kpiBefore=(${kpiBefore} != null ? ${kpiBefore} : 0),
@@ -558,7 +510,7 @@
   <div class="dash-wrap">
 
     <div class="topbar">
-      <h1>지점관리자 대시보드</h1>
+      <h1 th:text="|${hotelName} 관리자 대시보드|">호텔 시엘(잠실) 관리자 대시보드</h1>
 
       <div class="userChip">
         <div class="u" th:text="${#strings.substring(adminName,0,1)}">M</div>
@@ -574,36 +526,7 @@
 
     <form id="logout-form" th:action="@{/security/logout}" method="post" style="display:none;"></form>
 
-    <div style="display:flex; gap:8px; flex-wrap:wrap; margin:0 0 14px;">
-      <span class="chip" th:text="${adminType}">BRANCH</span>
-      <span class="chip muted" th:text="|호텔ID: ${hotelId}|">호텔ID: 1</span>
-    </div>
-
     <section class="card hero">
-      <div class="heroTop">
-        <div class="filters">
-          <div class="pill">
-            🏨 지점
-            <select>
-              <option th:text="${hotelName}">호텔 시엘(잠실)</option>
-              <option th:if="${hotelOptions != null}" th:each="h : ${hotelOptions}" th:text="${h}">르시엘(잠실)</option>
-              <option th:unless="${hotelOptions != null}">르시엘(잠실)</option>
-            </select>
-          </div>
-
-          <div class="pill">
-            📅 기간
-            <select>
-              <option th:selected="${periodLabel=='오늘'}">오늘</option>
-              <option th:selected="${periodLabel=='이번 주'}">이번 주</option>
-              <option th:selected="${periodLabel=='이번 달'}">이번 달</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="pill">🔔 알림 <b style="margin-left:6px" th:text="${alertCount}">0</b></div>
-      </div>
-
       <div class="heroBody">
         <div class="heroStats">
           <div class="occupancy">
