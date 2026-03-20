@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,6 +63,61 @@ public class ReservationService_imple implements ReservationService {
             System.out.println("▶ [회원 로그인] memberNo : " + memberNo);
             System.out.println("▶ [회원 로그인] email    : " + email);
             System.out.println("▶ [회원 로그인] name     : " + name);
+        }
+        
+     // ⭐ 소셜 로그인 처리 추가
+        else if (authentication != null && authentication.getPrincipal() instanceof OAuth2User oauthUser) {
+
+            System.out.println("OAuth 로그인 감지");
+
+            String emailFromOauth = null;
+
+            // 네이버
+            Map<String, Object> response = (Map<String, Object>) oauthUser.getAttributes().get("response");
+            if (response != null) {
+                emailFromOauth = (String) response.get("email");
+            }
+
+            // 카카오
+            if (emailFromOauth == null) {
+                Map<String, Object> kakaoAccount = (Map<String, Object>) oauthUser.getAttributes().get("kakao_account");
+                if (kakaoAccount != null) {
+                    emailFromOauth = (String) kakaoAccount.get("email");
+                }
+            }
+
+            
+            if (emailFromOauth != null) {
+
+                emailFromOauth = emailFromOauth.trim();
+
+                Map<String, Object> member = null;
+
+                try {
+                    // 1️⃣ 암호화해서 조회 시도
+                    String encryptedEmail = aes256.encrypt(emailFromOauth);
+                    member = reservationDAO.findMemberByEmail(encryptedEmail);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // 2️⃣ 그래도 없으면 → 그냥 생성
+                if (member == null) {
+
+                    System.out.println("회원 없음 → 자동 생성");
+
+                    reservationDAO.insertSocialMember(emailFromOauth); // 평문 저장
+
+                    member = reservationDAO.findMemberByEmail(emailFromOauth);
+                }
+
+                // 3️⃣ 값 세팅
+                if (member != null) {
+                    memberNo = ((Number) member.get("MEMBER_NO")).intValue();
+                    email = (String) member.get("EMAIL");
+                    name = (String) member.get("NAME");
+                }
+            }
         }
 
         // 2️. 비회원 로그인

@@ -35,5 +35,8 @@ public interface ReservationDAO {
 	// 소셜로그인용
 	Map<String, Object> findMemberByEmail(String emailFromOauth);
 
+	// 암호화 조회 후 없으면 회원 생성
+	void insertSocialMember(String emailFromOauth);
+
 
 }

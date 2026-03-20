@@ -202,17 +202,56 @@ public class ReservationController {
 	@GetMapping("/mypage")
 	public String myReservationList(Authentication auth, Model model) {
 
-		// 로그인 사용자 정보 가져오기
-		CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-		int memberNo = userDetails.getMemberDto().getMemberNo();
+	    Integer memberNo = null;
 
-		// 예약 목록 조회
-		List<Map<String, Object>> reservationList = reservationService.selectMyReservationList(memberNo);
+	    // 1️⃣ 일반 로그인
+	    if (auth.getPrincipal() instanceof CustomUserDetails userDetails) {
+	        memberNo = userDetails.getMemberDto().getMemberNo();
+	    }
 
-		// 화면에 전달
-		model.addAttribute("reservationList", reservationList);
+	    // 2️⃣ 소셜 로그인
+	    else if (auth.getPrincipal() instanceof org.springframework.security.oauth2.core.user.OAuth2User oauthUser) {
 
-		return "hk/reservation/reservationList";
+	        String email = null;
+
+	        Map<String, Object> response = (Map<String, Object>) oauthUser.getAttributes().get("response");
+	        if (response != null) {
+	            email = (String) response.get("email");
+	        }
+
+	        if (email == null) {
+	            Map<String, Object> kakao = (Map<String, Object>) oauthUser.getAttributes().get("kakao_account");
+	            if (kakao != null) {
+	                email = (String) kakao.get("email");
+	            }
+	        }
+
+	        if (email != null) {
+	            try {
+	                email = aes256.encrypt(email.trim());
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	            }
+
+	            Map<String, Object> member = reservationService.findMemberByEmail(email);
+
+	            if (member != null) {
+	                memberNo = ((Number) member.get("MEMBER_NO")).intValue();
+	            }
+	        }
+	    }
+
+	    // ❗ 로그인 안된 경우
+	    if (memberNo == null) {
+	        return "redirect:/security/login";
+	    }
+
+	    List<Map<String, Object>> reservationList =
+	            reservationService.selectMyReservationList(memberNo);
+
+	    model.addAttribute("reservationList", reservationList);
+
+	    return "hk/reservation/reservationList";
 	}
 
 	// ======================================
