@@ -2,6 +2,7 @@ package com.spring.app.ih.dining.mapper;
 
 import com.spring.app.ih.dining.model.DiningDTO;
 import com.spring.app.ih.dining.model.DiningReservationDTO;
+import com.spring.app.ih.dining.model.ShopReservationStatDTO;
 import com.spring.app.jh.security.domain.MemberDTO;
 import com.spring.app.jh.security.domain.Session_MemberDTO;
 
@@ -35,6 +36,8 @@ public interface DiningMapper {
 
 	List<DiningReservationDTO> findAllReservationsAdmin(Map<String, Object> paraMap);
 
+	int getTotalReservationCount(Map<String, Object> paraMap);
+	
 	Map<String, Object> getAdminDashboardCounts();
 
 	int updateReservationStatusAdmin(@Param("resId") Long resId, @Param("status") String status);
@@ -53,5 +56,15 @@ public interface DiningMapper {
 	int checkAvailability(Map<String, Object> paraMap);
 	
 	List<String> getUnavailableTimeList(Map<String, String> paraMap);
+
+	List<ShopReservationStatDTO> getTodayShopStats();
+	
+	int updateMaxCapacity(Map<String, Object> paraMap);
+	
+    int updateSlotCapacity(Map<String, Object> paraMap);
+    
+    List<ShopReservationStatDTO> getDiningConfig(@Param("diningId") String diningId);
+	
+	
 	
 }

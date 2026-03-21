@@ -202,30 +202,50 @@
 	    WHERE DINING_RESERVATION_ID = #{id}
     </update>
     
-    <select id="findAllReservationsAdmin" parameterType="map" resultType="DiningReservationDTO">
-	    SELECT 
-	        R.dining_reservation_id as diningReservationId,
-	        (SELECT D.NAME FROM TBL_DINING D WHERE D.DINING_ID = R.dining_id) as diningName,
-	        R.guest_name as guestName,
-	        R.guest_phone as guestPhone,
-	        R.res_date as resDate,
-	        R.res_time as resTime,
-	        R.adult_count as adultCount,
-	        R.child_count as childCount,
-	        R.infant_count as infantCount,
-	        R.status as status,
-	        R.fk_member_no as fkMemberNo,
-	        R.created_at as createdAt
-	    FROM dining_reservations R
+    <select id="getTotalReservationCount" parameterType="map" resultType="int">
+	    SELECT COUNT(*)
+	    FROM dining_reservations
 	    <where>
 	        <if test="keyword != null and keyword != ''">
-	            AND (R.guest_name LIKE '%' || #{keyword} || '%' OR R.guest_phone LIKE '%' || #{keyword} || '%')
+	            AND (guest_name LIKE '%' || #{keyword} || '%' OR guest_phone LIKE '%' || #{keyword} || '%')
 	        </if>
 	        <if test="status != null and status != ''">
-	            AND R.status = #{status}
+	            AND status = #{status}
 	        </if>
 	    </where>
-	    ORDER BY R.res_date DESC, R.res_time DESC
+	</select>
+	
+	<select id="findAllReservationsAdmin" parameterType="map" resultType="DiningReservationDTO">
+	    SELECT *
+	    FROM (
+	        SELECT rownum AS rno, T.*
+	        FROM (
+	            SELECT 
+	                R.dining_reservation_id as diningReservationId,
+	                (SELECT D.NAME FROM TBL_DINING D WHERE D.DINING_ID = R.dining_id) as diningName,
+	                R.guest_name as guestName,
+	                R.guest_phone as guestPhone,
+	                R.res_date as resDate,
+	                R.res_time as resTime,
+	                R.adult_count as adultCount,
+	                R.child_count as childCount,
+	                R.infant_count as infantCount,
+	                R.status as status,
+	                R.fk_member_no as fkMemberNo,
+	                R.created_at as createdAt
+	            FROM dining_reservations R
+	            <where>
+	                <if test="keyword != null and keyword != ''">
+	                    AND (R.guest_name LIKE '%' || #{keyword} || '%' OR R.guest_phone LIKE '%' || #{keyword} || '%')
+	                </if>
+	                <if test="status != null and status != ''">
+	                    AND R.status = #{status}
+	                </if>
+	            </where>
+	            ORDER BY R.res_date DESC, R.res_time DESC
+	        ) T
+	    )
+	    WHERE rno BETWEEN #{startRow} AND #{endRow}
 	</select>
 	
 	<select id="getAdminDashboardCounts" resultType="map">
@@ -283,12 +303,11 @@
 	        res.status, 
 	        res.special_requests AS specialRequests,
 	        res.created_at AS createdAt,
-	        d.name AS diningName  
+	        res.fk_member_no AS fkMemberNo,  d.name AS diningName  
 	    FROM dining_reservations res
 	    JOIN tbl_dining d ON res.dining_id = d.dining_id
 	    WHERE res.dining_reservation_id = #{resId}
 	</select>
-	
 
 	<select id="checkAvailability" resultType="int">
 	    <![CDATA[
@@ -388,6 +407,43 @@
 	    GROUP BY r.res_time, d.max_total_capacity
 	    HAVING SUM(r.adult_count + r.child_count + r.infant_count) >= d.max_total_capacity
 	</select>
-
+	
+	<select id="getTodayShopStats" resultType="com.spring.app.ih.dining.model.ShopReservationStatDTO">
+	    SELECT 
+	        d.dining_id AS "diningId",       d.name AS "shopName",
+	        COUNT(res.dining_reservation_id) AS "totalCount",
+	        COUNT(CASE WHEN res.status = 'VISITED' THEN 1 END) AS "visitedCount",
+	        NVL(SUM(res.adult_count + res.child_count + res.infant_count), 0) AS "currentPeople",
+	        d.max_total_capacity AS "maxCapacity"
+	    FROM tbl_dining d
+	    LEFT JOIN dining_reservations res 
+	      ON d.dining_id = res.dining_id 
+	     AND res.res_date = TRUNC(SYSDATE)
+	     AND res.status != 'CANCELED'
+	    GROUP BY d.dining_id, d.name, d.max_total_capacity
+	    ORDER BY d.dining_id ASC
+	</select>
+	
+	<update id="updateMaxCapacity">
+	    UPDATE tbl_dining SET max_total_capacity = #{maxCapacity} WHERE dining_id = #{diningId}
+	</update>
+	
+	<update id="updateSlotCapacity">
+	    UPDATE tbl_dining_time_slot SET max_slot_capacity = #{maxSlotCapacity} WHERE slot_id = #{slotId}
+	</update>
+	
+	<select id="getDiningConfig" resultType="com.spring.app.ih.dining.model.ShopReservationStatDTO">
+	    SELECT 
+	        d.dining_id as diningId,
+	        d.name as shopName,
+	        d.max_total_capacity as maxTotal,
+	        s.slot_id as slotId,
+	        s.res_time as resTime,
+	        s.max_slot_capacity as slotCapacity
+	    FROM tbl_dining d
+	    LEFT JOIN tbl_dining_time_slot s ON d.dining_id = s.dining_id
+	    WHERE d.dining_id = #{diningId}
+	    ORDER BY s.res_time ASC
+	</select>
 
 </mapper>

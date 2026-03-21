@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.spring.app.ih.dining.model.DiningDTO;
 import com.spring.app.ih.dining.model.DiningReservationDTO;
+import com.spring.app.ih.dining.model.ShopReservationStatDTO;
 import com.spring.app.jh.security.domain.MemberDTO;
 import com.spring.app.jh.security.domain.Session_MemberDTO;
 
@@ -28,6 +29,8 @@ public interface DiningService {
 
 	List<DiningReservationDTO> getAllReservationsAdmin(Map<String, Object> paraMap);
 	
+	int getTotalReservationCount(Map<String, Object> paraMap);
+	
 	Map<String, Object> getDashboardCounts();
 
 	int registerManual(DiningReservationDTO dto);
@@ -48,5 +51,15 @@ public interface DiningService {
 	int checkAvailability(Map<String, Object> paraMap);
 	
 	List<String> getUnavailableTimeList(Map<String, String> paraMap);
+	
+	List<ShopReservationStatDTO> getTodayShopStats();
+
+	int updateMaxCapacity(Map<String, Object> paraMap);
+
+	int updateSlotCapacity(Map<String, Object> paraMap);
+
+	List<ShopReservationStatDTO> getDiningConfig(String diningId);
+	
+	
 	
 }

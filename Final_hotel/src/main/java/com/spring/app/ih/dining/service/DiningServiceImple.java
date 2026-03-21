@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.spring.app.ih.dining.mapper.DiningMapper;
 import com.spring.app.ih.dining.model.DiningDTO;
 import com.spring.app.ih.dining.model.DiningReservationDTO;
+import com.spring.app.ih.dining.model.ShopReservationStatDTO;
 import com.spring.app.jh.security.domain.MemberDTO;
 import com.spring.app.jh.security.domain.Session_MemberDTO;
 
@@ -102,6 +103,11 @@ public class DiningServiceImple implements DiningService {
     }
 
     @Override
+    public int getTotalReservationCount(Map<String, Object> paraMap) {
+        return diningMapper.getTotalReservationCount(paraMap);
+    }
+    
+    @Override
     public int updateReservationStatusAdmin(Long resId, String status) {
         return diningMapper.updateReservationStatusAdmin(resId, status);
     }
@@ -154,7 +160,26 @@ public class DiningServiceImple implements DiningService {
 	    return stopTimeList;
 	}
 	
+	@Override
+	public List<ShopReservationStatDTO> getTodayShopStats() {
+	    return diningMapper.getTodayShopStats();
+	}
+	
+	@Override
+    public List<ShopReservationStatDTO> getDiningConfig(String diningId) {
+        return diningMapper.getDiningConfig(diningId);
+    }
 
+    @Override
+    public int updateMaxCapacity(Map<String, Object> paraMap) {
+        return diningMapper.updateMaxCapacity(paraMap);
+    }
+
+    @Override
+    public int updateSlotCapacity(Map<String, Object> paraMap) {
+        return diningMapper.updateSlotCapacity(paraMap);
+    }
+	
 	
 
 }

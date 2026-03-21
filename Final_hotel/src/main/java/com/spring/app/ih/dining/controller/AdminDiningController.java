@@ -1,5 +1,6 @@
 package com.spring.app.ih.dining.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.spring.app.ih.dining.model.DiningReservationDTO;
+import com.spring.app.ih.dining.model.ShopReservationStatDTO;
 import com.spring.app.ih.dining.service.DiningService;
 
 @Controller
@@ -24,14 +26,38 @@ public class AdminDiningController {
 
     @GetMapping("/dashboard")
     public String adminDashboard(Model model, @RequestParam Map<String, Object> paraMap) {
-        // 대시보드 상단 카운트
+   
+        int currentPage = Integer.parseInt((String) paraMap.getOrDefault("page", "1"));
+        int sizePerPage = 10; 
+        
+        int startRow = (currentPage - 1) * sizePerPage + 1;
+        int endRow = currentPage * sizePerPage;
+        
+        paraMap.put("startRow", startRow);
+        paraMap.put("endRow", endRow);
+
         Map<String, Object> counts = diningservice.getDashboardCounts();
         model.addAttribute("counts", counts);
         
-        // 예약 목록 조회 
         List<DiningReservationDTO> resList = diningservice.getAllReservationsAdmin(paraMap);
         model.addAttribute("resList", resList);
         
+    	List<ShopReservationStatDTO> shopCounts = diningservice.getTodayShopStats();
+        model.addAttribute("shopCounts", shopCounts);
+     
+        int totalCount = diningservice.getTotalReservationCount(paraMap); 
+        int totalPage = (int) Math.ceil((double) totalCount / sizePerPage);
+        
+        int pageBarSize = 5;
+        int startPage = ((currentPage - 1) / pageBarSize) * pageBarSize + 1;
+        int endPage = Math.min(startPage + pageBarSize - 1, totalPage);
+
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPage", totalPage);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("paraMap", paraMap); 
+
         return "dining/admin/admin_dashboard"; 
     }
 
@@ -142,6 +168,36 @@ public class AdminDiningController {
     public List<String> getUnavailableSlots(@RequestParam Map<String, String> paraMap) {
         List<String> unavailableList = diningservice.getUnavailableTimeList(paraMap);
         return unavailableList;
+    }
+    
+    @PostMapping("/updateMaxCapacity")
+    @ResponseBody
+    public String updateMaxCapacity(@RequestParam("diningId") String diningId, 
+                                    @RequestParam("maxCapacity") int maxCapacity) {
+        Map<String, Object> paraMap = new HashMap<>();
+        paraMap.put("diningId", diningId);
+        paraMap.put("maxCapacity", maxCapacity);
+        
+        int n = diningservice.updateMaxCapacity(paraMap);
+        return (n == 1) ? "success" : "fail";
+    }
+    
+    @PostMapping("/updateSlotCapacity")
+    @ResponseBody
+    public String updateSlotCapacity(@RequestParam("slotId") String slotId, 
+                                     @RequestParam("maxSlotCapacity") int maxSlotCapacity) {
+        Map<String, Object> paraMap = new HashMap<>();
+        paraMap.put("slotId", slotId);
+        paraMap.put("maxSlotCapacity", maxSlotCapacity);
+        
+        int n = diningservice.updateSlotCapacity(paraMap);
+        return (n == 1) ? "success" : "fail";
+    } 
+    
+    @GetMapping("/getConfig")
+    @ResponseBody
+    public List<ShopReservationStatDTO> getDiningConfig(@RequestParam("diningId") String diningId) {
+        return diningservice.getDiningConfig(diningId); 
     }
     
 
