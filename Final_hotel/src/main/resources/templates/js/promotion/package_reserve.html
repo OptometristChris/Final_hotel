@@ -81,8 +81,15 @@
 
             <div class="section" style="margin-bottom: 60px;">
                 <h3 class="section-title"><span>2</span> 적용 가능 객실 선택</h3>
-                <div class="room-selection-list">
-				    <th:block th:each="room : ${roomList}">
+                <div class="room-selection-list"> 
+                
+                	<div th:if="${#lists.isEmpty(roomList)}" 
+			             style="text-align: center; padding: 50px 0; color: #999; border: 1px dashed #ddd; border-radius: 8px;">
+			            <i class="bi bi-exclamation-circle" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+			            예약 가능한 객실이 없습니다.
+			        </div>
+                
+				    <th:block th:unless="${#lists.isEmpty(roomList)}" th:each="room : ${roomList}">
 				        <label class="room-card" th:for="'room_' + ${room.ROOM_TYPE_ID}">
 				            <input type="radio" name="room_type_id" th:id="'room_' + ${room.ROOM_TYPE_ID}" 
 				                   th:value="${room.ROOM_TYPE_ID}" th:data-price="${room.BASE_PRICE}"

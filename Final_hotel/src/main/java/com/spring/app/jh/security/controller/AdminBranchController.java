@@ -46,29 +46,32 @@ public class AdminBranchController {
 	@GetMapping("dashboard")
 	public String dashboard(HttpSession session, Model model) {
 
-        Session_AdminDTO sad = (Session_AdminDTO) session.getAttribute("sessionAdminDTO");
+	    Session_AdminDTO sad = (Session_AdminDTO) session.getAttribute("sessionAdminDTO");
 
-        if (sad == null || sad.getFk_hotel_id() == null) {
-            return "redirect:/admin/login";
-        }
+	    if (sad == null || sad.getFk_hotel_id() == null) {
+	        return "redirect:/admin/login";
+	    }
 
-        int hotelId = sad.getFk_hotel_id();
+	    int hotelId = sad.getFk_hotel_id();
 
-        AdminDashboardKpiDTO kpi = adminDashboardService.getBranchDashboardKpi(hotelId);
-        MonthlyReservationSummaryDTO monthlySummary = adminDashboardService.getBranchMonthlyReservationSummary(hotelId);
+	    AdminDashboardKpiDTO kpi = adminDashboardService.getBranchDashboardKpi(hotelId);
+	    MonthlyReservationSummaryDTO monthlySummary = adminDashboardService.getBranchMonthlyReservationSummary(hotelId);
 
+	    model.addAttribute("kpi_occupancy", kpi.getOccupancyRate());
+	    model.addAttribute("kpi_sales", kpi.getMonthlySales());
+	    model.addAttribute("kpi_cancelRate", kpi.getCancelRate());
+	    model.addAttribute("kpi_revpar", kpi.getRevpar());
 
-        model.addAttribute("kpi_occupancy", kpi.getOccupancyRate());
-        model.addAttribute("kpi_sales", kpi.getMonthlySales());
-        model.addAttribute("kpi_cancelRate", kpi.getCancelRate());
-        model.addAttribute("kpi_revpar", kpi.getRevpar());
-        
-        model.addAttribute("monthlySummary", monthlySummary);
-        model.addAttribute("todayReservationCount", adminDashboardService.getBranchTodayReservationCount(hotelId));
-        model.addAttribute("todayCancelCount", adminDashboardService.getBranchTodayCancelCount(hotelId));
+	    model.addAttribute("monthlySummary", monthlySummary);
+	    model.addAttribute("todayReservationCount", adminDashboardService.getBranchTodayReservationCount(hotelId));
+	    model.addAttribute("todayCancelCount", adminDashboardService.getBranchTodayCancelCount(hotelId));
 
-        return "admin/branch/branch_dashboard";
-    }
+	    // 추가
+	    model.addAttribute("qnaList", adminDashboardService.getBranchPendingQnaTopList(hotelId));
+	    model.addAttribute("reservationList", adminDashboardService.getBranchTodayOperationReservationList(hotelId));
+
+	    return "admin/branch/branch_dashboard";
+	}
 
 
 	

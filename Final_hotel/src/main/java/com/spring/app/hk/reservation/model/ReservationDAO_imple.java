@@ -73,6 +73,13 @@ public class ReservationDAO_imple implements ReservationDAO {
 		return sqlsession.selectOne("reservation.findMemberByEmail", emailFromOauth);
 	}
 
+	// 암호화 조회 후 없으면 생성
+	@Override
+	public void insertSocialMember(String emailFromOauth) {
+		sqlsession.insert("reservation.insertSocialMember", emailFromOauth);
+		
+	}
+
 	
 
 }

@@ -100,13 +100,21 @@ public class PromotionController {
             return mav;
         }
 
-        List<Map<String, String>> hotelList = promotionService.getHotelList();
-        mav.addObject("hotelList", hotelList);
+     // --- [추가] 로그인한 관리자의 정보 및 지점 ID 추출 ---
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Integer loginHotelId = null;
+        
+        if (auth != null && auth.getPrincipal() instanceof CustomAdminDetails) {
+            CustomAdminDetails adminDetails = (CustomAdminDetails) auth.getPrincipal();
+            AdminDTO adminDto = adminDetails.getAdminDto();
+            if (adminDto != null) {
+                loginHotelId = adminDto.getFk_hotel_id(); // 관리자의 소속 지점 ID
+            }
+        }
+        mav.addObject("loginHotelId", loginHotelId); // 뷰에서 비교용으로 사용
         
         // ★ 비활성 프로모션 접근 제어 로직 추가 ★
         if (promo.getIs_active() == 0) {
-            // 현재 로그인한 사용자의 권한 확인
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             boolean isAdmin = auth.getAuthorities().stream()
                                  .anyMatch(a -> a.getAuthority().equals("ADMIN_BRANCH") || 
                                                 a.getAuthority().equals("ROLE_ADMIN_BRANCH"));

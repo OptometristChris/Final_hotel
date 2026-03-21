@@ -166,42 +166,43 @@
 		    </div>
 
             <div class="btn-area">
-		    <div style="display: flex; justify-content: center; gap: 15px; max-width: 850px; margin: 0 auto;">
-		        
-		        <a th:href="@{/promotion/reserve(promoId=${promo.promotion_id})}" 
-		           class="btn-reserve" 
-		           style="flex: 1.5; display: flex; align-items: center; justify-content: center; height: 60px;">
-		            이 패키지로 예약하기
-		        </a>
-		        
-		        <div th:if="${promo != null}" sec:authorize="hasAnyRole('ADMIN_BRANCH', 'ROLE_ADMIN_BRANCH', 'ROLE_ADMIN', 'ADMIN')" 
-		             style="flex: 1; display: flex; gap: 10px;">
-		            
-		            <button type="button" 
-		                    th:onclick="|location.href='@{/promotion/edit(promoId=${promo.promotion_id})}'|"
-		                    style="flex: 1; height: 60px; background: #2e7d32; border: 1px solid #2e7d32; color: #fff; font-weight: 700; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px;"
-		                    onmouseover="this.style.background='#1b5e20'; this.style.borderColor='#1b5e20';"
-		                    onmouseout="this.style.background='#2e7d32'; this.style.borderColor='#2e7d32';">
-		                <i class="bi bi-pencil-square"></i> 수정
-		            </button>
-		
-		            <button type="button" 
-		                    th:onclick="goDelete([[${promo.promotion_id}]], [[${promo.fk_hotel_id}]])"
-		                    style="flex: 1; height: 60px; background: #fff; border: 1px solid #e74c3c; color: #e74c3c; font-weight: 700; cursor: pointer; transition: all 0.3s ease;"
-		                    onmouseover="this.style.background='#e74c3c'; this.style.color='#fff';"
-		                    onmouseout="this.style.background='#fff'; this.style.color='#e74c3c';">
-		                삭제
-		            </button>
-		        </div>
-		    </div>
-		    
-		    <a th:href="@{/promotion/list(hotelId=${promo.fk_hotel_id})}" 
-		       style="display:block; margin-top:35px; color:#888; text-decoration:none; font-size: 0.95rem; transition: 0.3s;"
-		       onmouseover="this.style.color='#1a1a1a';"
-		       onmouseout="this.style.color='#888';">
-		        ← 다른 프로모션 보기
-		    </a>
-		</div>
+			    <div style="display: flex; justify-content: center; align-items: stretch; gap: 15px; max-width: 900px; margin: 0 auto;">
+			        
+			        <a th:href="@{/promotion/reserve(promoId=${promo.promotion_id})}" 
+			           class="btn-reserve" 
+			           style="flex: 2; display: flex; align-items: center; justify-content: center; height: 60px; margin: 0;">
+			            이 패키지로 예약하기
+			        </a>
+			        
+			        <div th:if="${promo != null} and (${#authorization.expression('hasRole(''ROLE_ADMIN_HQ'')')} or ${loginHotelId == promo.fk_hotel_id})" 
+			             sec:authorize="hasAnyRole('ROLE_ADMIN_HQ', 'ROLE_ADMIN_BRANCH', 'ADMIN_BRANCH')" 
+			             style="flex: 1; display: flex; gap: 10px;">
+			            
+			            <button type="button" 
+			                    th:onclick="|location.href='@{/promotion/edit(promoId=${promo.promotion_id})}'|"
+			                    style="flex: 1; height: 60px; min-width: 80px; background: #2e7d32; border: 1px solid #2e7d32; color: #fff; font-weight: 700; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 0 15px;"
+			                    onmouseover="this.style.background='#1b5e20';"
+			                    onmouseout="this.style.background='#2e7d32';">
+			                <i class="bi bi-pencil-square"></i> 수정
+			            </button>
+			        
+			            <button type="button" 
+			                    th:onclick="goDelete([[${promo.promotion_id}]], [[${promo.fk_hotel_id}]])"
+			                    style="flex: 1; height: 60px; min-width: 80px; background: #fff; border: 1px solid #e74c3c; color: #e74c3c; font-weight: 700; cursor: pointer; transition: all 0.3s ease; padding: 0 15px;"
+			                    onmouseover="this.style.background='#e74c3c'; this.style.color='#fff';"
+			                    onmouseout="this.style.background='#fff'; this.style.color='#e74c3c';">
+			                삭제
+			            </button>
+			        </div>
+			    </div>
+			    
+			    <a th:href="@{/promotion/list(hotelId=${promo.fk_hotel_id})}" 
+			       style="display:block; margin-top:35px; color:#888; text-decoration:none; font-size: 0.95rem; transition: 0.3s;"
+			       onmouseover="this.style.color='#1a1a1a';"
+			       onmouseout="this.style.color='#888';">
+			        ← 다른 프로모션 보기
+			    </a>
+			</div>
 
     <div class="footer-pusher"></div>
 </th:block>

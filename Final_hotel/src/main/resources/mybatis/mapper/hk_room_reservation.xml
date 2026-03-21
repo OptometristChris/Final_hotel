@@ -237,6 +237,14 @@
 	    FROM TBL_MEMBER_SECURITY
 	    WHERE LOWER(EMAIL) = LOWER(#{email, jdbcType=VARCHAR})
 	</select>
+	
+	
+	<!-- 암호화 조회 후 없으면 회원 생성 -->
+	<insert id="insertSocialMember" parameterType="string">
+	    INSERT INTO MEMBER (MEMBER_NO, EMAIL, NAME)
+	    VALUES (MEMBER_SEQ.NEXTVAL, #{_parameter}, '소셜사용자')
+	</insert>
+	
 	  
 
 </mapper>

@@ -320,21 +320,43 @@ public class MemberController {
             model.addAttribute("snsName", snsName);
         }
 
+        boolean isKakaoWithoutEmail =
+                memberDto != null
+                && "KAKAO".equalsIgnoreCase(memberDto.getSocialProvider())
+                && (memberDto.getEmail() == null || memberDto.getEmail().trim().isEmpty());
+
+        model.addAttribute("isKakaoWithoutEmail", isKakaoWithoutEmail);
+
+        boolean showKakaoEmailReminderOnce = Boolean.TRUE.equals(session.getAttribute("showKakaoEmailReminderOnce"));
+        model.addAttribute("showKakaoEmailReminderOnce", showKakaoEmailReminderOnce);
+
+        if (showKakaoEmailReminderOnce) {
+            session.removeAttribute("showKakaoEmailReminderOnce"); // 1회만
+        }
+
         return "security/member/mypage";
-        // templates/security/member/mypage.html
     }
 
 
     // 회원정보 수정 폼 페이지
     @PreAuthorize("hasRole('USER')")
     @GetMapping("member/profileEdit")
-    public String profileEditForm(HttpSession session, Model model) {
+    public String profileEdit(HttpSession session, Model model) {
 
         Integer memberNo = resolveMemberNo(session);
-        if(memberNo == null) return "redirect:/security/login";
+        if (memberNo == null) {
+            return "redirect:/security/login";
+        }
 
-        MemberDTO memberDto = memberService.findByMemberNo(memberNo);
-        model.addAttribute("memberDto", memberDto);
+        MemberDTO memberdto = memberService.findByMemberNo(memberNo);
+        model.addAttribute("memberdto", memberdto);
+
+        boolean canEditEmail =
+                memberdto != null
+                && "KAKAO".equalsIgnoreCase(memberdto.getSocialProvider())
+                && (memberdto.getEmail() == null || memberdto.getEmail().trim().isEmpty());
+
+        model.addAttribute("canEditEmail", canEditEmail);
 
         return "security/member/profileEditForm";
     }
@@ -352,9 +374,16 @@ public class MemberController {
             return "redirect:/security/login";
         }
 
-        memberdto.setMemberNo(memberNo);   // ★ 핵심: 수정 대상 회원 PK 세팅
+        MemberDTO originMember = memberService.findByMemberNo(memberNo);
 
-        int result = memberService.update_member_profile(memberdto);
+        boolean canEditEmail =
+                originMember != null
+                && "KAKAO".equalsIgnoreCase(originMember.getSocialProvider())
+                && (originMember.getEmail() == null || originMember.getEmail().trim().isEmpty());
+
+        memberdto.setMemberNo(memberNo);   // ★ 수정 대상 회원 PK 세팅
+
+        int result = memberService.update_member_profile(memberdto, canEditEmail);
         model.addAttribute("result", result);
 
         return "security/member/profileEditResult";
