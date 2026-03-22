@@ -235,7 +235,7 @@
       border-radius:16px;
       padding:12px;
       display:grid;
-      grid-template-columns:repeat(4, 1fr);
+      grid-template-columns:repeat(5, 1fr);
       gap:10px;
       backdrop-filter:blur(6px);
     }
@@ -563,8 +563,13 @@
           </button>
 
           <button class="qaBtn" type="button" th:onclick="|location.href='@{/admin/reservation/manage}'|">
-            <div class="dot">🛏️</div>
+            <div class="dot">🛋️</div>
             <div class="txt"><b>예약 관리</b></div>
+          </button>
+          
+          <button class="qaBtn" type="button" th:onclick="|location.href='@{/}'|">
+            <div class="dot">🍽️</div>
+            <div class="txt"><b>다이닝 관리</b></div>
           </button>
 
           <button class="qaBtn" type="button" th:onclick="|location.href='@{/notice/list}'|">
