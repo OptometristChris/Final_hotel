@@ -469,11 +469,18 @@
 	
 	<update id="updateDiningDetails" parameterType="DiningDTO">
 	    UPDATE tbl_dining
-	    SET 
+	    <set>
 	        business_hours = #{business_hours},
 	        tel = #{tel},
+	        introduction = #{introduction},
 	        description = #{description},
-	        extra_info = #{extra_info}
+	        extra_info = #{extra_info},
+	        
+	        <if test="main_img != null">main_img = #{main_img},</if>
+	        <if test="store_imgs != null">store_imgs = #{store_imgs},</if>
+	        <if test="food_imgs != null">food_imgs = #{food_imgs},</if>
+	        <if test="menu_pdf != null">menu_pdf = #{menu_pdf}</if>
+	    </set>
 	    WHERE 
 	        dining_id = #{dining_id}
 	</update>
