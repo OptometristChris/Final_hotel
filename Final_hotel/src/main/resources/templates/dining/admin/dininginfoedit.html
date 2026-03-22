@@ -79,12 +79,18 @@
 	                <div class="form-section">
 	                    <h4 class="section-title">콘텐츠 관리</h4>
 	                    <div class="form-group">
-	                        <label for="description">상세 소개 (Intro)</label>
+	                        <label for="description">한 줄 소개 (Simple Intro)</label>
 	                        <textarea id="description" name="description" class="form-control" rows="4" 
 	                                  th:text="${dining.description}"></textarea>
 	                        <small class="text-muted">페이지 상단에 노출되는 소개글입니다.</small>
 	                    </div>
 	                    
+	                    <div class="form-group mt-3">
+						    <label for="introduction">매장 소개 (Intro)</label>
+						    <input type="text" id="introduction" name="introduction" class="form-control" 
+						           th:value="${dining.introduction}" placeholder="매장을 한 줄로 표현해주세요.">
+						</div>
+							                    
 	                    <div class="form-group mt-4">
 	                        <label for="extra_info">추가 정보 (Extra Info)</label>
 	                        <textarea id="extra_info" name="extra_info" class="form-control" rows="8" 
@@ -97,6 +103,18 @@
 					        <input type="file" name="attach_img" class="form-control" accept="image/*" />
 					        <small class="text-muted" th:text="'현재 파일: ' + ${dining.main_img}"></small>
 					    </div>
+					    
+					    <div class="form-group mb-3">
+						    <label>매장 이미지 (여러 장 선택 가능)</label>
+						    <input type="file" name="attach_store" class="form-control" accept="image/*" multiple />
+						    <small class="text-muted" th:text="'현재 파일: ' + ${dining.store_imgs}"></small>
+						</div>
+						
+						<div class="form-group mb-3">
+						    <label>음식 이미지 (여러 장 선택 가능)</label>
+						    <input type="file" name="attach_food" class="form-control" accept="image/*" multiple />
+						    <small class="text-muted" th:text="'현재 파일: ' + ${dining.food_imgs}"></small>
+						</div>
 					
 					    <div class="form-group mb-3">
 					        <label>메뉴 PDF 파일</label>

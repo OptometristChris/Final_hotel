@@ -1,12 +1,19 @@
 package com.spring.app.ih.dining.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.OutputStream;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,12 +21,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.spring.app.ih.dining.model.DiningDTO;
 import com.spring.app.ih.dining.model.DiningReservationDTO;
 import com.spring.app.ih.dining.model.ShopReservationStatDTO;
 import com.spring.app.ih.dining.service.DiningService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/admin/dining")
@@ -28,6 +39,7 @@ public class AdminDiningController {
     @Autowired
     private DiningService diningservice;
 
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("/dashboard")
     public String adminDashboard(Model model, @RequestParam Map<String, Object> paraMap) {
    
@@ -66,6 +78,7 @@ public class AdminDiningController {
     }
 
     // AJAX를 이용한 상태 변경 처리
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/updateStatus")
     @ResponseBody
     public String updateStatus(@RequestParam("resId") Long resId, @RequestParam("status") String status) {
@@ -75,6 +88,7 @@ public class AdminDiningController {
         return (n==1) ? "success" : "fail";
     }
     
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/registerManual")
     @ResponseBody
     public String registerManual(DiningReservationDTO dto) {
@@ -86,6 +100,7 @@ public class AdminDiningController {
     }
     
     // 예약 상세 조회
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("/detail")
     @ResponseBody 
     public DiningReservationDTO getReservationDetail(@RequestParam("resId") Long resId) {
@@ -96,6 +111,7 @@ public class AdminDiningController {
     }
     
     // 인원 합산
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @ResponseBody
     public int check_backup(@RequestParam Map<String, Object> paraMap) {
         try {
@@ -110,6 +126,7 @@ public class AdminDiningController {
     }
     
     // 다이닝 예약 관리
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("/setting")
     public String settingPage(Model model) {
 
@@ -123,6 +140,7 @@ public class AdminDiningController {
     }
     
     // 차단 등록
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/block/register")
     @ResponseBody
     public String registerBlock(@RequestParam Map<String, Object> paraMap) {
@@ -149,6 +167,7 @@ public class AdminDiningController {
     }
 
     // 차단 해제
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/block/delete")
     @ResponseBody
     public String deleteBlock(@RequestParam("blockId") Long blockId) {
@@ -157,6 +176,7 @@ public class AdminDiningController {
     }
     
     // 차단 시간대 불러오기
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @ResponseBody
     @GetMapping("/getUnavailableSlots")
     public List<String> getUnavailableSlots(@RequestParam Map<String, String> paraMap) {
@@ -164,6 +184,7 @@ public class AdminDiningController {
         return unavailableList;
     }
     
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/updateMaxCapacity")
     @ResponseBody
     public String updateMaxCapacity(@RequestParam("diningId") String diningId, 
@@ -176,6 +197,7 @@ public class AdminDiningController {
         return (n == 1) ? "success" : "fail";
     }
     
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/updateSlotCapacity")
     @ResponseBody
     public String updateSlotCapacity(@RequestParam("slotId") String slotId, 
@@ -188,18 +210,21 @@ public class AdminDiningController {
         return (n == 1) ? "success" : "fail";
     } 
     
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("/getConfig")
     @ResponseBody
     public List<ShopReservationStatDTO> getDiningConfig(@RequestParam("diningId") String diningId) {
         return diningservice.getDiningConfig(diningId); 
     }
     
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("/getTodayShopResList")
     @ResponseBody
     public List<Map<String, Object>> getTodayShopResList(@RequestParam("diningId") String diningId) {
         return diningservice.getTodayShopResList(diningId); 
     }
     
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/check")
     @ResponseBody
     public int checkAvailability(@RequestParam Map<String, Object> params) {
@@ -222,6 +247,7 @@ public class AdminDiningController {
         }
     }
     
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("/list")
     public String adminDiningList(Model model) {
     	Map<String, Object> paraMap = new HashMap<>();
@@ -230,6 +256,7 @@ public class AdminDiningController {
         return "dining/admin/list"; 
     }
     
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("/editdetail")
     public String showEditForm(@RequestParam("dining_id") Long dining_id, Model model) {
         DiningDTO dining = diningservice.getDiningDetail(dining_id);
@@ -238,17 +265,109 @@ public class AdminDiningController {
         return "dining/admin/dininginfoedit"; 
     }
     
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/editdetail")
-    public String updateDiningInfo(@ModelAttribute DiningDTO diningDTO, RedirectAttributes redirectAttributes) {
-        int result = diningservice.updateDiningDetails(diningDTO);
-        
-        if(result > 0) {
-            redirectAttributes.addFlashAttribute("msg", "매장 정보가 성공적으로 수정되었습니다.");
+    public String updateDiningInfo(
+            @ModelAttribute DiningDTO diningDTO, 
+            @RequestParam(value="attach_img", required=false) MultipartFile attach_img,   // 메인 대표이미지 (1장)
+            @RequestParam(value="attach_pdf", required=false) MultipartFile attach_pdf,   // PDF (1장)
+            @RequestParam(value="attach_store", required=false) MultipartFile[] attach_store, // 매장사진 (여러장)
+            @RequestParam(value="attach_food", required=false) MultipartFile[] attach_food,   // 음식사진 (여러장)
+            HttpServletRequest request,
+            RedirectAttributes redirectAttributes) throws Exception {
+
+        String pdfPath = "C:/Users/user/git/Final_hotel/Final_hotel/src/main/resources/static/files/menu/";
+        String imgPath = "C:/Users/user/git/Final_hotel/Final_hotel/src/main/resources/static/images/dining/";
+        String diningPath = "C:/Users/user/git/Final_hotel/Final_hotel/src/main/resources/static/images/dining/";
+        String foodPath = "C:/Users/user/git/Final_hotel/Final_hotel/src/main/resources/static/images/dining/";
+
+        if (attach_pdf != null && !attach_pdf.isEmpty()) {
+            String pdfFileName = System.currentTimeMillis() + "_" + attach_pdf.getOriginalFilename();
+            File targetPdf = new File(pdfPath, pdfFileName);
+            
+            if(!targetPdf.getParentFile().exists()) targetPdf.getParentFile().mkdirs();
+            
+            byte[] bytes = attach_pdf.getBytes();
+            java.nio.file.Files.write(targetPdf.toPath(), bytes);
+            
+            diningDTO.setMenu_pdf(pdfFileName);
+        }
+
+        if (attach_img != null && !attach_img.isEmpty()) {
+            String imgFileName = System.currentTimeMillis() + "_" + attach_img.getOriginalFilename();
+            File targetImg = new File(imgPath, imgFileName);
+            
+            if(!targetImg.getParentFile().exists()) targetImg.getParentFile().mkdirs();
+            
+            byte[] bytes = attach_img.getBytes();
+            java.nio.file.Files.write(targetImg.toPath(), bytes);
+            
+            diningDTO.setMain_img(imgFileName); 
         } else {
-            redirectAttributes.addFlashAttribute("msg", "수정에 실패했습니다. 다시 시도해주세요.");
+            diningDTO.setMain_img(null); 
         }
         
+        
+        if (attach_store != null && attach_store.length > 0 && !attach_store[0].isEmpty()) {
+            List<String> storeFileNames = new ArrayList<>();
+            for (MultipartFile file : attach_store) {
+                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                java.nio.file.Files.write(Paths.get(diningPath + fileName), file.getBytes());
+                storeFileNames.add(fileName);
+            }
+            diningDTO.setStore_imgs(String.join(",", storeFileNames)); 
+        } else {
+            diningDTO.setStore_imgs(null); 
+        }
+
+        if (attach_food != null && attach_food.length > 0 && !attach_food[0].isEmpty()) {
+            List<String> foodFileNames = new ArrayList<>();
+            for (MultipartFile file : attach_food) {
+                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                java.nio.file.Files.write(Paths.get(foodPath + fileName), file.getBytes());
+                foodFileNames.add(fileName);
+            }
+            diningDTO.setFood_imgs(String.join(",", foodFileNames));
+        } else {
+            diningDTO.setFood_imgs(null);
+        }
+
+        diningservice.updateDiningDetails(diningDTO);
+        redirectAttributes.addFlashAttribute("msg", "성공적으로 수정되었습니다.");
+        
         return "redirect:/dining/detail/" + diningDTO.getDining_id();
+    }
+    
+    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
+    @GetMapping("/download")
+    public void downloadFile(@RequestParam("fileName") String fileName, 
+                             HttpServletRequest request, 
+                             HttpServletResponse response) {
+
+        String root = request.getSession().getServletContext().getRealPath("resources");
+        String path = root + File.separator + "uploadFiles" + File.separator + fileName;
+
+        File file = new File(path);
+
+        if (file.exists()) {
+            try {
+                response.setContentType("application/octet-stream");
+                
+                String encodedFileName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
+                response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"");
+                response.setContentLength((int) file.length());
+
+                try (FileInputStream fis = new FileInputStream(file);
+                     OutputStream os = response.getOutputStream()) {
+                    org.springframework.util.FileCopyUtils.copy(fis, os);
+                    os.flush();
+                }
+            } catch (Exception e) {
+                System.out.println("파일 다운로드 중 오류 발생: " + e.getMessage());
+            }
+        } else {
+            System.out.println("파일이 존재하지 않습니다: " + path);
+        }
     }
     
     

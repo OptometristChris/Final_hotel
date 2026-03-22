@@ -1,13 +1,16 @@
 package com.spring.app.ih.dining.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.OutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,11 +23,15 @@ import com.spring.app.jh.security.domain.MemberDTO;
 import com.spring.app.jh.security.domain.Session_MemberDTO;
 import com.spring.app.jh.security.service.MemberService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 
 @Controller // 뷰 페이지 없이 데이터를 직접 출력해줍니다.
 @RequestMapping("/dining")
@@ -35,6 +42,9 @@ public class DiningController {
     
     @Autowired
     private MemberService memberService;
+    
+    @Autowired
+    ResourceLoader resourceLoader; 
 
     @GetMapping("/all") // http://localhost:9081/final_hotel/dining/all
     public String getAll(
@@ -229,6 +239,29 @@ public class DiningController {
     public String cancelReservation(@RequestParam("id") Long id) {
     	diningService.updateStatus(id);
         return "redirect:/dining/reservation_search"; // 취소 후 조회 페이지로 리다이렉트
+    }
+    
+    @GetMapping("/downloadMenu")
+    public void downloadMenu(@RequestParam("fileName") String fileName, HttpServletResponse response) throws IOException {
+        
+        String savePath = "C:/Users/user/git/Final_hotel/Final_hotel/src/main/resources/static/files/menu/";
+        File file = new File(savePath + fileName);
+
+        if (!file.exists()) {
+            System.out.println("파일을 찾을 수 없습니다: " + savePath + fileName);
+            return;
+        }
+
+        response.setContentType("application/pdf");
+        response.setContentLength((int) file.length());
+        String encodedName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedName + "\"");
+
+        try (FileInputStream fis = new FileInputStream(file);
+             OutputStream out = response.getOutputStream()) {
+            org.springframework.util.FileCopyUtils.copy(fis, out);
+            out.flush();
+        }
     }
     
 }
