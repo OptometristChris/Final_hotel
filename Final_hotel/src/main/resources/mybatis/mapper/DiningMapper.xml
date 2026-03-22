@@ -478,29 +478,29 @@
 	        dining_id = #{dining_id}
 	</update>
 
-<select id="getAdminDiningList" resultType="DiningDTO" parameterType="HashMap">
-    SELECT 
-        dining_id, 
-        name, 
-        d_type, 
-        description,
-        tel, 
-        floor, 
-        main_img, 
-        fk_hotel_id, 
-        business_hours,
-        available_times
-    FROM tbl_dining
-    <where>
-        <if test="hotel_id != null and hotel_id != ''">
-            AND fk_hotel_id = #{hotel_id}
-        </if>
-        <if test="d_type != null and d_type != ''">
-            AND UPPER(d_type) = UPPER(#{d_type})
-        </if>
-    </where>
-    ORDER BY dining_id ASC
-</select>
+	<select id="getAdminDiningList" resultType="DiningDTO" parameterType="HashMap">
+	    SELECT 
+	        dining_id, 
+	        name, 
+	        d_type, 
+	        description,
+	        tel, 
+	        floor, 
+	        main_img, 
+	        fk_hotel_id, 
+	        business_hours,
+	        available_times
+	    FROM tbl_dining
+	    <where>
+	        <if test="hotel_id != null and hotel_id != ''">
+	            AND fk_hotel_id = #{hotel_id}
+	        </if>
+	        <if test="d_type != null and d_type != ''">
+	            AND UPPER(d_type) = UPPER(#{d_type})
+	        </if>
+	    </where>
+	    ORDER BY dining_id ASC
+	</select>
 
 
 </mapper>

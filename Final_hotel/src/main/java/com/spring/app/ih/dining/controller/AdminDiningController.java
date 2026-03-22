@@ -233,6 +233,7 @@ public class AdminDiningController {
     @GetMapping("/editdetail")
     public String showEditForm(@RequestParam("dining_id") Long dining_id, Model model) {
         DiningDTO dining = diningservice.getDiningDetail(dining_id);
+        if (dining == null) { return "redirect:/admin/dining/list";}
         model.addAttribute("dining", dining);
         return "dining/admin/dininginfoedit"; 
     }
