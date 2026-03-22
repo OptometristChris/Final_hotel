@@ -23,7 +23,15 @@ public class WebConfig implements WebMvcConfigurer {
 		// 만약에 없으면 static 을 검색한다.(static/images/쉐보레.jpg)
 		// 그리고 스프링시큐리티 설정파일인 com.spring.app.security.config.SecurityConfig 에서 excludeUri 에 "/images/**" 을 추가해 주어야 한다. 
 		
-		
-		
+		// 다이닝 매장 및 음식 이미지 경로 
+        registry.addResourceHandler("/images/dining/**")
+                .addResourceLocations("file:///C:/Users/user/git/Final_hotel/Final_hotel/src/main/resources/static/images/dining/");
+
+        registry.addResourceHandler("/images/food/**")
+                .addResourceLocations("file:///C:/Users/user/git/Final_hotel/Final_hotel/src/main/resources/static/images/food/");
+
+        registry.addResourceHandler("/files/menu/**")
+                .addResourceLocations("file:///C:/Users/user/git/Final_hotel/Final_hotel/src/main/resources/static/files/menu/");
+	
 	}
 }
