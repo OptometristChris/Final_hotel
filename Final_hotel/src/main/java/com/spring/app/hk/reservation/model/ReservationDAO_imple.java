@@ -12,8 +12,20 @@ public class ReservationDAO_imple implements ReservationDAO {
 
     @Autowired
     private SqlSessionTemplate sqlsession;
-
-    // payment 테이블에 insert
+ 
+    // 예약 페이지 내 객실 기본 정보 조회
+   	@Override
+   	public Map<String, Object> getRoomInfo(int room_type_id) {
+   		return sqlsession.selectOne("reservation.getRoomInfo", room_type_id);
+   	}
+  	
+   	// 소셜 로그인용
+ 	@Override
+ 	public Map<String, Object> findMemberByEmail(String emailFromOauth) {
+ 		return sqlsession.selectOne("reservation.findMemberByEmail", emailFromOauth);
+ 	}
+   	
+   	// payment 테이블에 insert
     @Override
     public int insertPayment(Map<String, Object> paraMap) {
         return sqlsession.insert("reservation.insertPayment", paraMap);
@@ -29,13 +41,7 @@ public class ReservationDAO_imple implements ReservationDAO {
     @Override
     public Map<String, Object> findByReservationCode(String reservationCode) {
         return sqlsession.selectOne("reservation.findByReservationCode", reservationCode);
-    }
-
-    // 예약 페이지 내 객실 기본 정보 조회
-	@Override
-	public Map<String, Object> getRoomInfo(int room_type_id) {
-		return sqlsession.selectOne("reservation.getRoomInfo", room_type_id);
-	}
+    }  
 
 	// 마이페이지 예약 목록 조회
 	@Override
@@ -67,19 +73,12 @@ public class ReservationDAO_imple implements ReservationDAO {
 	    return sqlsession.selectList("reservation.selectTomorrowCheckinForMail");
 	}
 
-	// 소셜 로그인용
-	@Override
-	public Map<String, Object> findMemberByEmail(String emailFromOauth) {
-		return sqlsession.selectOne("reservation.findMemberByEmail", emailFromOauth);
-	}
-
+	
 	// 암호화 조회 후 없으면 생성
 	@Override
 	public void insertSocialMember(String emailFromOauth) {
 		sqlsession.insert("reservation.insertSocialMember", emailFromOauth);
 		
-	}
-
-	
+	}	
 
 }

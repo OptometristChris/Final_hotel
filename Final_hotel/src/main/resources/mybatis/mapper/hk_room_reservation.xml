@@ -18,6 +18,19 @@
 	    WHERE r.ROOM_TYPE_ID = #{value}	
 	</select>
 
+	 <!-- 소셜로그인용 -->
+	  <select id="findMemberByEmail" parameterType="string" resultType="map">
+	    SELECT 
+	        MEMBER_NO,
+	        NAME,
+	        MOBILE,
+	        EMAIL
+	    FROM TBL_MEMBER_SECURITY
+	    WHERE LOWER(EMAIL) = LOWER(#{email, jdbcType=VARCHAR})
+	</select>
+
+
+
 	<!-- payment 테이블에 insert -->
     <insert id="insertPayment" parameterType="map" useGeneratedKeys="false">
 	    <selectKey keyProperty="payment_id" resultType="long" order="BEFORE">
@@ -227,16 +240,7 @@
 	</select>
 	  
 	  
-	  <!-- 소셜로그인용 -->
-	  <select id="findMemberByEmail" parameterType="string" resultType="map">
-	    SELECT 
-	        MEMBER_NO,
-	        NAME,
-	        MOBILE,
-	        EMAIL
-	    FROM TBL_MEMBER_SECURITY
-	    WHERE LOWER(EMAIL) = LOWER(#{email, jdbcType=VARCHAR})
-	</select>
+
 	
 	
 	<!-- 암호화 조회 후 없으면 회원 생성 -->
