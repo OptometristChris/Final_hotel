@@ -4,26 +4,22 @@
 <mapper namespace="com.spring.app.ih.dining.mapper.DiningMapper">
 
 	<select id="getDiningList" resultType="map" parameterType="HashMap">
-	    SELECT 
-	        dining_id as "DINING_ID", 
-	        name as "NAME", 
-	        d_type as "D_TYPE", 
-	        description as "DESCRIPTION",
-	        tel as "TEL", 
-	        floor as "FLOOR", 
-	        main_img as "MAIN_IMG", 
-	        fk_hotel_id as "FK_HOTEL_ID", 
-	        business_hours as "BUSINESS_HOURS",
-	        available_times as "AVAILABLE_TIMES"  FROM tbl_dining
-	    <where>
-	        <if test="hotel_id != null and hotel_id != ''">
-	            AND fk_hotel_id = #{hotel_id}
-	        </if>
-	        <if test="d_type != null and d_type != ''">
-	            AND UPPER(d_type) = UPPER(#{d_type})
-	        </if>
-	    </where>
-	    ORDER BY dining_id ASC
+
+		SELECT
+			dining_id as "DINING_ID", name as "NAME", d_type as "D_TYPE",
+			description as "DESCRIPTION", tel as "TEL", floor as "FLOOR",
+			main_img as "MAIN_IMG", fk_hotel_id as "FK_HOTEL_ID", 
+			business_hours as "BUSINESS_HOURS",
+			available_times as "AVAILABLE_TIMES" FROM tbl_dining
+		<where>
+			<if test="hotel_id != null and hotel_id != ''">
+				AND fk_hotel_id = #{hotel_id}
+			</if>
+			<if test="d_type != null and d_type != ''">
+				AND UPPER(d_type) = UPPER(#{d_type})
+			</if>
+		</where>
+			ORDER BY dining_id ASC
 	</select>
 	
     <select id="getDiningDetail" resultType="DiningDTO">
@@ -37,7 +33,7 @@
             FROM tbl_dining
         WHERE dining_id = #{dining_id}
     </select>
-    
+
     <insert id="registerReservation" parameterType="DiningReservationDTO">
 	    INSERT INTO dining_reservations (
 	        dining_reservation_id,
@@ -470,6 +466,41 @@
 	           AND status IN ('CONFIRMED', 'VISITED')) as available_seat
 	    FROM DUAL
 	</select>
+	
+	<update id="updateDiningDetails" parameterType="DiningDTO">
+	    UPDATE tbl_dining
+	    SET 
+	        business_hours = #{business_hours},
+	        tel = #{tel},
+	        description = #{description},
+	        extra_info = #{extra_info}
+	    WHERE 
+	        dining_id = #{dining_id}
+	</update>
+
+<select id="getAdminDiningList" resultType="DiningDTO" parameterType="HashMap">
+    SELECT 
+        dining_id, 
+        name, 
+        d_type, 
+        description,
+        tel, 
+        floor, 
+        main_img, 
+        fk_hotel_id, 
+        business_hours,
+        available_times
+    FROM tbl_dining
+    <where>
+        <if test="hotel_id != null and hotel_id != ''">
+            AND fk_hotel_id = #{hotel_id}
+        </if>
+        <if test="d_type != null and d_type != ''">
+            AND UPPER(d_type) = UPPER(#{d_type})
+        </if>
+    </where>
+    ORDER BY dining_id ASC
+</select>
 
 
 </mapper>

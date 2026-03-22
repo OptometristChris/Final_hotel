@@ -190,6 +190,17 @@ public class DiningServiceImple implements DiningService {
         int available = diningMapper.getAvailableSeatCount(params);
         return Math.max(available, 0); 
     }
+
+    @Override
+    @Transactional 
+    public int updateDiningDetails(DiningDTO diningDTO) {
+        return diningMapper.updateDiningDetails(diningDTO);
+    }
     
+    @Override
+    public List<DiningDTO> getAdminDiningList(Map<String, Object> paraMap) {
+        return diningMapper.getAdminDiningList(paraMap);
+    }
+
 
 }

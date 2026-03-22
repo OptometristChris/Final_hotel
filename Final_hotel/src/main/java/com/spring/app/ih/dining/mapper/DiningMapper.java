@@ -69,6 +69,8 @@ public interface DiningMapper {
 
 	int getAvailableSeatCount(Map<String, Object> params);
 	
+	int updateDiningDetails(DiningDTO diningDTO);
 	
+	List<DiningDTO> getAdminDiningList(Map<String, Object> paraMap);
 	
 }
