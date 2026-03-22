@@ -60,6 +60,14 @@ public interface DiningService {
 
 	List<ShopReservationStatDTO> getDiningConfig(String diningId);
 	
+	List<Map<String, Object>> getTodayShopResList(String diningId);
+	
+	int getAvailableSeatCount(Map<String, Object> params);
+
+	int updateDiningDetails(DiningDTO diningDTO);
+	
+	List<DiningDTO> getAdminDiningList(Map<String, Object> paraMap);
+	
 	
 	
 }

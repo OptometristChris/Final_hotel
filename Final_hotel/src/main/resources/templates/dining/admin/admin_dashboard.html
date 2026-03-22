@@ -258,6 +258,35 @@
 	            }
 	        }
 	        
+	        function filterByShop(diningId) {
+	            const url = /*[[@{/admin/dining/getTodayShopResList}]]*/ "/admin/dining/getTodayShopResList";
+	            
+	            $.ajax({
+	                url: url,
+	                type: "GET",
+	                data: { "diningId": diningId },
+	                success: function(list) {
+	                    let html = '';
+	                    if(!list || list.length === 0) {
+	                        html = '<tr><td colspan="4" class="py-4 text-center">오늘 예약 내역이 없습니다.</td></tr>';
+	                    } else {
+	                        list.forEach((res, index) => {
+	                            html += `
+	                                <tr>
+	                                    <td>${index + 1}</td>
+	                                    <td>${res.guestName}</td>
+	                                    <td>${res.resTime}</td>
+	                                    <td><span class="status-badge status-confirmed">${res.status}</span></td>
+	                                </tr>`;
+	                        });
+	                    }
+	                    $('#shopTodayResBody').html(html);
+	                    new bootstrap.Modal(document.getElementById('shopTodayResModal')).show();
+	                },
+	                error: function() { alert("데이터를 불러오지 못했습니다."); }
+	            });
+	        }
+	        
 	        /*]]>*/
 	    </script>
 	</th:block>
@@ -427,6 +456,34 @@
                 </div>
             </div>
         </div>
+
+		<div class="modal fade" id="shopTodayResModal" tabindex="-1" aria-hidden="true">
+		    <div class="modal-dialog modal-lg modal-dialog-centered">
+		        <div class="modal-content">
+		            <div class="modal-header" style="background: #f4f1ee;">
+		                <h5 class="modal-title fw-bold" style="color: #9d815d;">오늘의 업장 예약 현황</h5>
+		                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+		            </div>
+		            <div class="modal-body">
+		                <table class="table text-center align-middle">
+		                    <thead class="table-light">
+		                        <tr>
+		                            <th>No</th>
+		                            <th>예약자명</th>
+		                            <th>예약시간</th>
+		                            <th>상태</th>
+		                        </tr>
+		                    </thead>
+		                    <tbody id="shopTodayResBody">
+		                        </tbody>
+		                </table>
+		            </div>
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">닫기</button>
+		            </div>
+		        </div>
+		    </div>
+		</div>
 
         <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">

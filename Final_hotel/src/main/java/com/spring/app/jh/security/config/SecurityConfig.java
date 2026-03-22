@@ -210,6 +210,9 @@ public class SecurityConfig {
             "/hotel/location",
             
             "/dining/**",
+            "/images/dining/**",
+            "/images/food/**",
+            "/files/menu/**",
             "/search"
            
         };
@@ -278,6 +281,7 @@ public class SecurityConfig {
                              "/fullcalendar_5.10.1/**",
                              "/Highcharts-10.3.1/**",
                              "/images/**",
+                             "/files/**",
                              "/jquery-ui-1.13.1.custom/**",
                              "/js/**",
                              "/smarteditor/**",

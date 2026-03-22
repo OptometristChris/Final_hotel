@@ -169,7 +169,10 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label">GUESTS</label>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+						        <label class="fw-bold m-0"><i class="bi bi-people me-2"></i>인원 선택</label>
+						        <span id="seatCountMsg" class="small fw-bold"></span>
+						    </div>
                             <div class="row g-2 text-center">
                                 <div class="col-4">
                                     <small class="text-muted mb-1 d-block">성인</small>
@@ -289,61 +292,79 @@
 	        
 	        // 실시간 예약 가능 여부 체크
 	        function validateAvailability() {
-	            const diningId = $('#diningId').val(); 
-	            const resDate = $('#selectedDate').val();
-	            const resTime = $('input[name="resTime"]:checked').val();
-	            
+			    const resDate = $('#selectedDate').val();
+			    const resTime = $('input[name="resTime"]:checked').val();
+			    
+			    const adult = parseInt($('#adult_count').val()) || 0;
+			    const child = parseInt($('#child_count').val()) || 0;
+			    const infant = parseInt($('#infant_count').val()) || 0;
+			    const requested = adult + child + infant; // 사용자가 요청한 총 인원
+			
+			    if (resDate && resTime) {
+			        $.ajax({
+			            url: "/final_hotel/admin/dining/check",
+			            type: "POST",
+			            data: {
+			                "diningId": "[[${dining.dining_id}]]",
+			                "resDate": resDate,
+			                "resTime": resTime,
+			                "adult_count": adult,
+			                "child_count": child,
+			                "infant_count": infant
+			            },
+			            beforeSend: function(xhr) {
+			                const token = $("meta[name='_csrf']").attr("content");
+			                const header = $("meta[name='_csrf_header']").attr("content");
+			                if(token && header) xhr.setRequestHeader(header, token);
+			            },
+			            success: function(result) {
+			                const availableSeat = parseInt(result); // 서버에서 온 실제 잔여석 숫자
+			                const $msgSpan = $('#seatCountMsg');
+			
+			                if (availableSeat === -1) {
+			                    $msgSpan.text(" (조회 오류)").css("color", "red");
+			                } else if (availableSeat <= 0) {
+			                    $msgSpan.text(" (예약 마감)").css("color", "red");
+			                } else if (availableSeat < requested) {
+			                    // 잔여석은 있지만 내 인원보다 적을 때
+			                    $msgSpan.text(" (잔여 " + availableSeat + "석 / 부족)").css("color", "red");
+			                } else {
+			                    // 예약 가능할 때
+			                    $msgSpan.text(" (" + availableSeat + "석 예약 가능)").css("color", "#9d815d");
+			                }
+			                checkFormValidity(); // 메시지 업데이트 후 버튼 활성화 여부 다시 체크
+			            }
+			        });
+			    }
+			}
+
+	        $('#adult_count, #child_count, #infant_count').on('input change', function() {
+	            const maxCap = parseInt("[[${dining.max_total_capacity}]]"); // 매장 전체 정원
 	            const adult = parseInt($('#adult_count').val()) || 0;
 	            const child = parseInt($('#child_count').val()) || 0;
 	            const infant = parseInt($('#infant_count').val()) || 0;
-	
-	            if (resDate && resTime) {
-	                $.ajax({
-	                    url: "/final_hotel/admin/dining/check",
-	                    type: "POST",
-	                    data: {
-	                        "diningId": "[[${dining.dining_id}]]",
-	                        "resDate": resDate,
-	                        "resTime": resTime,
-	                        "adult_count": adult,
-	                        "child_count": child,
-	                        "infant_count": infant
-	                    },
-	                    success: function(result) {
-	                        // result가 0이면 관리자가 막았거나 인원 초과
-	                        if (result == 0) {
-	                            alert("죄송합니다. 해당 시간은 예약이 마감되었거나 이용이 불가합니다.");
-	                            $('input[name="resTime"]:checked').prop('checked', false);
-	                            checkFormValidity(); // 버튼 다시 비활성화
-	                        } else {
-	                            checkFormValidity(); // 예약 가능하면 버튼 활성화 체크
-	                        }
-	                    },
-	                    error: function() {
-	                        alert("예약 가능 여부 확인 중 오류가 발생했습니다.");
-	                    }
-	                });
-	            }
-	        }
-	        
-	        $('#adult_count, #child_count, #infant_count').on('input change', function() {
-	            const maxCap = parseInt("[[${dining.max_total_capacity}]]");
-	            const total = (parseInt($('#adult_count').val()) || 0) + 
-	                          (parseInt($('#child_count').val()) || 0) + 
-	                          (parseInt($('#infant_count').val()) || 0);
+	            const total = adult + child + infant;
 
 	            if (total > maxCap) {
-	                alert("죄송합니다. 해당 업장의 최대 수용 인원은 " + maxCap + "명입니다.");
-	                $(this).val(0); // 혹은 최대치로 강제 조정
+	                alert("죄송합니다. 해당 업장의 일일 최대 수용 인원은 " + maxCap + "명입니다.");
+	                $(this).val(0); 
+	                $('#btnSubmit').prop('disabled', true);
 	                return;
 	            }
 
-	            // 인원수가 적절하다면 서버에 잔여석 확인 요청
 	            if($('input[name="resTime"]:checked').length > 0) {
 	                validateAvailability();
 	            }
 	        });
-	
+	        
+	        function updateSeatMsg(count) {
+	            if(count > 0) {
+	                $('#seatCountMsg').text("(현재 " + count + "석 남음)").css("color", "green");
+	            } else {
+	                $('#seatCountMsg').text("(예약 마감)").css("color", "red");
+	            }
+	        }
+	     
 	        // 폼 유효성 체크
 	        function checkFormValidity() {
 	            var isDateSelected = $('#selectedDate').val() !== "";
@@ -375,12 +396,10 @@
 	        
 	        $('#agreeTerms').on('change', checkFormValidity);
 	        
-	        // 시간을 클릭하면 실시간 체크 함수 실행
 	        $('input[name="resTime"]').on('click', function() {
 	            validateAvailability();
 	        });
 	
-	        // 인원수가 바뀌어도 체크 실행
 	        $('#adult_count, #child_count, #infant_count').on('change', function() {
 	            if($('input[name="resTime"]:checked').length > 0) {
 	                validateAvailability();
@@ -388,29 +407,27 @@
 	        });
 	    });
 	
-	    // 예약 버튼 클릭 시 실행되는 함수
-	    function goReserve() {
-	    	
-	    	// 비회원 비밀번호 등 최종 유효성 검사
-	        var $pwInput = $('input[name="resPassword"]');
-	        if($pwInput.length > 0 && $pwInput.val().length !== 4) {
-	            alert("조회용 비밀번호 4자리를 정확히 입력해주세요.");
-	            $pwInput.focus();
-	            return;
-	        }
-	        
-		    if(!confirm("입력하신 정보로 예약을 확정하시겠습니까?")) return;
+	    // 예약 버튼 클릭 함수
+		function goReserve() {
+		    var $pwInput = $('input[name="resPassword"]');
+		    if($pwInput.length > 0 && $pwInput.val().length !== 4) {
+		        alert("조회용 비밀번호 4자리를 정확히 입력해주세요.");
+		        $pwInput.focus();
+		        return;
+		    }
 		
-		    // console.log("선택된 식당 ID:", $('#diningId').val());
-		    // console.log("선택된 날짜:", $('#selectedDate').val());
+		    const adult = parseInt($('#adult_count').val()) || 0;
+		    const child = parseInt($('#child_count').val()) || 0;
+		    const infant = parseInt($('#infant_count').val()) || 0;
+		    const requested = adult + child + infant;
 		
 		    const pMap = {
-	    		"diningId": $('#diningId').val(), 
-	    	    "resDate": $('#selectedDate').val(),
-	    	    "resTime": $('input[name="resTime"]:checked').val(),
-	    	    "adult_count": $('#adult_count').val() || 0,
-	    	    "child_count": $('#child_count').val() || 0,
-	    	    "infant_count": $('#infant_count').val() || 0
+		        "diningId": $('#diningId').val(), 
+		        "resDate": $('#selectedDate').val(),
+		        "resTime": $('input[name="resTime"]:checked').val(),
+		        "adult_count": adult,
+		        "child_count": child,
+		        "infant_count": infant
 		    };
 		
 		    $.ajax({
@@ -423,16 +440,20 @@
 		            if(token && header) xhr.setRequestHeader(header, token);
 		        },
 		        success: function(result) {
-		            console.log("서버 응답 결과:", result);
-		            if (result == 1) {
-		                $('#resForm').attr('action', '/final_hotel/dining/reserve/confirm');
-		                $('#resForm').submit();
+		            const availableSeat = parseInt(result);
+
+		            if (availableSeat >= requested) {
+		                if(confirm("입력하신 정보로 예약을 확정하시겠습니까?")) {
+		                    $('#resForm').attr('action', '/final_hotel/dining/reserve/confirm');
+		                    $('#resForm').submit();
+		                }
+		            } else if (availableSeat === -1) {
+		                alert("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
 		            } else {
-		                alert("죄송합니다. 예약이 마감되었습니다.");
+		                alert("죄송합니다. 현재 해당 시간대는 최대 " + (availableSeat < 0 ? 0 : availableSeat) + "명까지 예약이 가능하여 예약이 불가합니다.");
 		            }
 		        },
 		        error: function(xhr) {
-		            console.log("에러 상태코드:", xhr.status);
 		            alert("통신 오류가 발생했습니다. 상태코드: " + xhr.status);
 		        }
 		    });
