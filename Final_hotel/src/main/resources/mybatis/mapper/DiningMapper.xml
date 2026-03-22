@@ -508,6 +508,44 @@
 	    </where>
 	    ORDER BY dining_id ASC
 	</select>
+	
+	<select id="getDailyStatistics" resultType="map">
+	    <![CDATA[
+	    SELECT 
+	        TO_CHAR(R.RES_DATE, 'YYYY-MM-DD') AS RES_DATE,
+	        COUNT(R.DINING_RESERVATION_ID) AS DAILY_COUNT,
+	        SUM(
+	            CASE 
+	                WHEN R.DINING_ID = '1' THEN (R.ADULT_COUNT * 100000) + (R.CHILD_COUNT * 50000)
+	                WHEN R.DINING_ID = '2' THEN (R.ADULT_COUNT * 70000) + (R.CHILD_COUNT * 40000) /* 2번으로 수정! */
+	                WHEN R.DINING_ID = '3' THEN (R.ADULT_COUNT * 80000) + (R.CHILD_COUNT * 30000)
+	                WHEN R.DINING_ID = '4' THEN (R.ADULT_COUNT * 80000) + (R.CHILD_COUNT * 20000)
+	                ELSE NVL(P.AMOUNT, 0)
+	            END
+	        ) AS DAILY_REVENUE
+	    FROM DINING_RESERVATIONS R
+	    LEFT JOIN DINING_PAYMENTS P ON R.DINING_RESERVATION_ID = P.DINING_RES_NO
+	    WHERE R.DINING_ID = #{diningId, jdbcType=VARCHAR}
+	      AND R.STATUS = 'VISITED'
+	      AND R.RES_DATE >= TRUNC(SYSDATE) - 7
+	    GROUP BY TO_CHAR(R.RES_DATE, 'YYYY-MM-DD')
+	    ORDER BY TO_CHAR(R.RES_DATE, 'YYYY-MM-DD') ASC
+	    ]]>
+	</select>
+	
+	<select id="getTimeSlotStatistics" resultType="map">
+	    SELECT 
+	        RES_TIME, 
+	        COUNT(*) AS TIME_COUNT
+	    FROM DINING_RESERVATIONS
+	    WHERE DINING_ID = #{diningId}
+	      AND STATUS = 'VISITED'
+	      AND RES_DATE >= TRUNC(SYSDATE) - 7
+	    GROUP BY RES_TIME
+	    ORDER BY RES_TIME ASC
+	</select>
+
+
 
 
 </mapper>

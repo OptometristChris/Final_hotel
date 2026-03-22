@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.app.ih.dining.model.DiningDTO;
 import com.spring.app.ih.dining.model.DiningReservationDTO;
 import com.spring.app.ih.dining.model.ShopReservationStatDTO;
@@ -34,12 +36,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/admin/dining")
+@PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')") 
 public class AdminDiningController {
 
     @Autowired
     private DiningService diningservice;
 
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("/dashboard")
     public String adminDashboard(Model model, @RequestParam Map<String, Object> paraMap) {
    
@@ -78,7 +80,6 @@ public class AdminDiningController {
     }
 
     // AJAX를 이용한 상태 변경 처리
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/updateStatus")
     @ResponseBody
     public String updateStatus(@RequestParam("resId") Long resId, @RequestParam("status") String status) {
@@ -88,7 +89,6 @@ public class AdminDiningController {
         return (n==1) ? "success" : "fail";
     }
     
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/registerManual")
     @ResponseBody
     public String registerManual(DiningReservationDTO dto) {
@@ -100,7 +100,6 @@ public class AdminDiningController {
     }
     
     // 예약 상세 조회
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("/detail")
     @ResponseBody 
     public DiningReservationDTO getReservationDetail(@RequestParam("resId") Long resId) {
@@ -111,7 +110,6 @@ public class AdminDiningController {
     }
     
     // 인원 합산
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @ResponseBody
     public int check_backup(@RequestParam Map<String, Object> paraMap) {
         try {
@@ -126,7 +124,6 @@ public class AdminDiningController {
     }
     
     // 다이닝 예약 관리
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("/setting")
     public String settingPage(Model model) {
 
@@ -140,7 +137,6 @@ public class AdminDiningController {
     }
     
     // 차단 등록
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/block/register")
     @ResponseBody
     public String registerBlock(@RequestParam Map<String, Object> paraMap) {
@@ -167,7 +163,6 @@ public class AdminDiningController {
     }
 
     // 차단 해제
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/block/delete")
     @ResponseBody
     public String deleteBlock(@RequestParam("blockId") Long blockId) {
@@ -176,7 +171,6 @@ public class AdminDiningController {
     }
     
     // 차단 시간대 불러오기
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @ResponseBody
     @GetMapping("/getUnavailableSlots")
     public List<String> getUnavailableSlots(@RequestParam Map<String, String> paraMap) {
@@ -184,7 +178,6 @@ public class AdminDiningController {
         return unavailableList;
     }
     
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/updateMaxCapacity")
     @ResponseBody
     public String updateMaxCapacity(@RequestParam("diningId") String diningId, 
@@ -197,7 +190,6 @@ public class AdminDiningController {
         return (n == 1) ? "success" : "fail";
     }
     
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/updateSlotCapacity")
     @ResponseBody
     public String updateSlotCapacity(@RequestParam("slotId") String slotId, 
@@ -210,21 +202,18 @@ public class AdminDiningController {
         return (n == 1) ? "success" : "fail";
     } 
     
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("/getConfig")
     @ResponseBody
     public List<ShopReservationStatDTO> getDiningConfig(@RequestParam("diningId") String diningId) {
         return diningservice.getDiningConfig(diningId); 
     }
     
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("/getTodayShopResList")
     @ResponseBody
     public List<Map<String, Object>> getTodayShopResList(@RequestParam("diningId") String diningId) {
         return diningservice.getTodayShopResList(diningId); 
     }
     
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/check")
     @ResponseBody
     public int checkAvailability(@RequestParam Map<String, Object> params) {
@@ -247,7 +236,6 @@ public class AdminDiningController {
         }
     }
     
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("/list")
     public String adminDiningList(Model model) {
     	Map<String, Object> paraMap = new HashMap<>();
@@ -256,7 +244,6 @@ public class AdminDiningController {
         return "dining/admin/list"; 
     }
     
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("/editdetail")
     public String showEditForm(@RequestParam("dining_id") Long dining_id, Model model) {
         DiningDTO dining = diningservice.getDiningDetail(dining_id);
@@ -265,7 +252,6 @@ public class AdminDiningController {
         return "dining/admin/dininginfoedit"; 
     }
     
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @PostMapping("/editdetail")
     public String updateDiningInfo(
             @ModelAttribute DiningDTO diningDTO, 
@@ -338,7 +324,6 @@ public class AdminDiningController {
         return "redirect:/dining/detail/" + diningDTO.getDining_id();
     }
     
-    @PreAuthorize("hasAnyRole('ADMIN_HQ','ADMIN_BRANCH')")
     @GetMapping("/download")
     public void downloadFile(@RequestParam("fileName") String fileName, 
                              HttpServletRequest request, 
@@ -370,6 +355,41 @@ public class AdminDiningController {
         }
     }
     
+    @GetMapping("/main")
+    public String adminMain() {
+        return "dining/admin/main";
+    }
+    
+
+    @GetMapping("/statistics")
+    public String viewStatistics(@RequestParam(value="diningId", required=false) String diningId, Model model) {
+        
+    	List<Map<String, Object>> diningList = diningservice.getDiningList(); 
+    	
+        model.addAttribute("diningList", diningList);
+        
+        if((diningId == null || diningId.isEmpty()) && !diningList.isEmpty()) {
+            diningId = String.valueOf(diningList.get(0).get("DINING_ID"));
+        }
+
+        List<Map<String, Object>> statsList = diningservice.getDailyStatistics(diningId);
+        
+        List<Map<String, Object>> timeStats = diningservice.getTimeSlotStatistics(diningId);
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            model.addAttribute("statsJson", mapper.writeValueAsString(statsList));
+            model.addAttribute("timeStatsJson", mapper.writeValueAsString(timeStats));
+        } catch (JsonProcessingException e) {
+            model.addAttribute("statsJson", "[]");
+            model.addAttribute("timeStatsJson", "[]");
+        }
+
+        model.addAttribute("diningList", diningList);
+        model.addAttribute("selectedDiningId", diningId);
+        
+        return "dining/admin/statistics";
+    }
     
 
 }

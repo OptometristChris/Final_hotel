@@ -202,5 +202,14 @@ public class DiningServiceImple implements DiningService {
         return diningMapper.getAdminDiningList(paraMap);
     }
 
+    @Override
+    public List<Map<String, Object>> getDailyStatistics(String diningId) {
+        return diningMapper.getDailyStatistics(diningId);
+    }
 
+    @Override
+    public List<Map<String, Object>> getTimeSlotStatistics(String diningId) {
+        return diningMapper.getTimeSlotStatistics(diningId);
+    }
+    
 }

@@ -73,4 +73,8 @@ public interface DiningMapper {
 	
 	List<DiningDTO> getAdminDiningList(Map<String, Object> paraMap);
 	
+	List<Map<String, Object>> getDailyStatistics(String diningId);
+	
+	List<Map<String, Object>> getTimeSlotStatistics(String diningId);
+	
 }
