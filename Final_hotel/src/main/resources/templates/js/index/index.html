@@ -278,7 +278,7 @@
                 <div class="dining-card overflow-hidden rounded mb-3" style="height: 250px;"
                      th:onclick="|location.href='@{/dining/detail/{id}(id=${dining.dining_id})}'|">
                     <img th:src="@{'/images/dining/' + ${dining.main_img}}" class="img-fluid w-100 h-100" 
-                         style="object-fit: cover; transition: 0.5s;" onerror="this.src='/images/js/noimage.png'">
+                         style="object-fit: cover; transition: 0.5s;">
                 </div>
                 <p class="mb-1 font-weight-bold small text-muted" th:text="${dining.fk_hotel_id == 1 ? 'Ciel Hotel' : 'Le Ciel'}">지점명</p>
                 <p class="font-weight-bold" style="font-size: 1.2rem;" th:text="${dining.name}">식당명</p>
