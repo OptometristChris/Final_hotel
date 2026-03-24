@@ -97,6 +97,7 @@
 	                        <div class="detail-row"><div class="detail-label">예약일시</div><div>${data.resDate} ${data.resTime}</div></div>
 	                        <div class="detail-row"><div class="detail-label">인원</div><div>${peopleText}</div></div>
 	                        <div class="detail-row"><div class="detail-label">상태</div><div>${data.status}</div></div>
+	                        <div class="detail-row"><div class="detail-label">요청사항</div><div>${data.specialRequests}</div></div>
 	                    `;
 	                    $('#detailModalBody').html(html);
 	                    new bootstrap.Modal(document.getElementById('detailModal')).show();
