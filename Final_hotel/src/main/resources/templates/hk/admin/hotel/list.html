@@ -122,7 +122,7 @@ onclick="filterHotel('REJECTED')">반려</button> -->
 
 <!-- ================= 운영중 호텔 ================= -->
 
-<h4 class="mb-3">
+<h4 class="mb-3" id="approvedTitle">
 전체 숙소 리스트
 </h4>
 
@@ -173,7 +173,7 @@ onclick="filterHotel('REJECTED')">반려</button> -->
 
 <!-- ================= 비활성 호텔 ================= -->
 
-<h4 class="mt-5 mb-3">
+<h4 class="mt-5 mb-3" id="inactiveTitle">
 비활성 호텔
 </h4>
 
@@ -306,7 +306,11 @@ onclick="filterHotel('REJECTED')">반려</button> -->
 
 </div>
 
-
+<div class="text-center" style="margin-top:80px; margin-bottom:60px;">
+    <a href="/final_hotel/admin/hq/dashboard" class="btn btn-dark px-4 py-2">
+        관리자 메인으로 이동
+    </a>
+</div>
 
 <script>
 
@@ -316,12 +320,17 @@ function filterHotel(status){
 
 const cards = document.querySelectorAll(".hotel-card-item");
 
+const approvedTitle = document.getElementById("approvedTitle");
+const inactiveTitle = document.getElementById("inactiveTitle");
+
 cards.forEach(card=>{
 
 const hotelStatus = card.dataset.status;
 
 if(status === "ALL"){
 card.style.display="block";
+approvedTitle.style.display="block";
+inactiveTitle.style.display="block";
 }
 else if(hotelStatus === status){
 card.style.display="block";
@@ -331,6 +340,16 @@ card.style.display="none";
 }
 
 })
+
+/* 제목 제어 */
+if(status === "APPROVED"){
+approvedTitle.style.display="block";
+inactiveTitle.style.display="none";
+}
+else if(status === "INACTIVE"){
+approvedTitle.style.display="none";
+inactiveTitle.style.display="block";
+}
 
 }
 

@@ -35,6 +35,26 @@ public class ReservationService_imple implements ReservationService {
     private final ReservationMailService reservationMailService; // 추가 : 메일
     private final SmsService smsService; // 추가 : sms
 
+    // 예약 페이지 내 객실 기본 정보 조회
+ 	@Override
+ 	public Map<String, Object> getRoomInfo(int room_type_id) {
+
+ 	    Map<String, Object> roomInfo = reservationDAO.getRoomInfo(room_type_id);
+
+ 	    if (roomInfo == null) {
+ 	        throw new IllegalArgumentException("해당 객실이 존재하지 않습니다.");
+ 	    }
+
+ 	    return roomInfo;
+ 	}
+    
+	// 소셜로그인용
+	@Override
+	public Map<String, Object> findMemberByEmail(String emailFromOauth) {
+		return reservationDAO.findMemberByEmail(emailFromOauth);
+	}
+
+ 	
     // 결제 성공 후 db 저장하기
     @Override
     public String saveReservation(Map<String, String> map, HttpSession session) {
@@ -309,18 +329,7 @@ public class ReservationService_imple implements ReservationService {
 	}
 
 
-	// 예약 페이지 내 객실 기본 정보 조회
-	@Override
-	public Map<String, Object> getRoomInfo(int room_type_id) {
-
-	    Map<String, Object> roomInfo = reservationDAO.getRoomInfo(room_type_id);
-
-	    if (roomInfo == null) {
-	        throw new IllegalArgumentException("해당 객실이 존재하지 않습니다.");
-	    }
-
-	    return roomInfo;
-	}
+	
 
 
 	// 마이페이지 예약 목록 조회
@@ -409,10 +418,5 @@ public class ReservationService_imple implements ReservationService {
 	    }
 	}
 
-	// 소셜로그인용
-	@Override
-	public Map<String, Object> findMemberByEmail(String emailFromOauth) {
-		return reservationDAO.findMemberByEmail(emailFromOauth);
-	}
 
 }
