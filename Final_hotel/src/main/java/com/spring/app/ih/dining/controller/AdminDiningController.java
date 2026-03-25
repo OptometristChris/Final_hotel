@@ -275,11 +275,13 @@ public class AdminDiningController {
             HttpServletRequest request,
             RedirectAttributes redirectAttributes) throws Exception {
 
-        String pdfPath = "C:/Users/user/git/Final_hotel/Final_hotel/src/main/resources/static/files/menu/";
-        String imgPath = "C:/Users/user/git/Final_hotel/Final_hotel/src/main/resources/static/images/dining/";
-        String diningPath = "C:/Users/user/git/Final_hotel/Final_hotel/src/main/resources/static/images/dining/";
-        String foodPath = "C:/Users/user/git/Final_hotel/Final_hotel/src/main/resources/static/images/dining/";
-
+        String rootPath = request.getSession().getServletContext().getRealPath("/");
+        
+        String pdfPath = rootPath + "static/files/menu/";
+        String imgPath = rootPath + "static/images/dining/";
+        String diningPath = rootPath + "static/images/dining/";
+        String foodPath = rootPath + "static/images/dining/";
+        
         if (attach_pdf != null && !attach_pdf.isEmpty()) {
             String pdfFileName = System.currentTimeMillis() + "_" + attach_pdf.getOriginalFilename();
             File targetPdf = new File(pdfPath, pdfFileName);

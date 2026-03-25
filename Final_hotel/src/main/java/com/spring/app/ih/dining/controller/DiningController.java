@@ -244,20 +244,23 @@ public class DiningController {
     @GetMapping("/downloadMenu")
     public void downloadMenu(@RequestParam("fileName") String fileName, HttpServletResponse response) throws IOException {
         
-        String savePath = "C:/Users/user/git/Final_hotel/Final_hotel/src/main/resources/static/files/menu/";
-        File file = new File(savePath + fileName);
-
-        if (!file.exists()) {
-            System.out.println("파일을 찾을 수 없습니다: " + savePath + fileName);
+       Resource resource = resourceLoader.getResource("classpath:static/files/menu/" + fileName);
+       
+       if (!resource.exists()) {
+            System.out.println("파일을 찾을 수 없습니다: " + fileName);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
+        File file = resource.getFile(); 
+
         response.setContentType("application/pdf");
         response.setContentLength((int) file.length());
+
         String encodedName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedName + "\"");
 
-        try (FileInputStream fis = new FileInputStream(file);
+        try (InputStream fis = resource.getInputStream(); 
              OutputStream out = response.getOutputStream()) {
             org.springframework.util.FileCopyUtils.copy(fis, out);
             out.flush();
