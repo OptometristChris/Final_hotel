@@ -272,7 +272,7 @@
 	
 	
 	<!-- ===============================
-     7. 상세 페이지 로그인 기반 추천 객실 조회
+     7. 상세 페이지 추천 객실 조회
 	    같은 호텔
 		현재 객실 제외
 		가격순
@@ -315,13 +315,49 @@
 	
 	</select>
 	
+	<!-- ===============================
+     최근 본 객실 조회
+     =============================== -->
+	<select id="selectRecentRooms"
+        parameterType="int"
+        resultType="RoomTypeDTO">
+
+	    SELECT *
+	    FROM (
+	        SELECT 
+	            rt.room_type_id,
+	            rt.room_name,
+	            rt.room_grade,
+	            rt.bed_type,
+	            rt.view_type,
+	            rt.base_price,
+	            ri.image_url,
+	            MAX(rvh.viewed_at) AS viewed_at
+	        FROM room_view_history rvh
 	
+	        JOIN room_type rt
+	          ON rvh.room_type_id = rt.room_type_id
 	
+	        LEFT JOIN room_image ri
+	          ON rt.room_type_id = ri.room_type_id
+	          AND ri.is_main = 'Y'
 	
+	        WHERE rvh.member_no = #{value}
 	
+	        GROUP BY
+	            rt.room_type_id,
+	            rt.room_name,
+	            rt.room_grade,
+	            rt.bed_type,
+	            rt.view_type,
+	            rt.base_price,
+	            ri.image_url
 	
+	        ORDER BY viewed_at DESC
+	    )
+	    WHERE ROWNUM &lt;= 5
 	
-	
+	</select>
 	
 	
 </mapper>

@@ -28,8 +28,15 @@ public interface RoomTypeService {
 	// 상세 페이지 로그인 기반 조회기록 저장
 	void insertViewHistory(Integer memberNo, Long roomId);
 
-	// 상세 페이지 로그인 기반 추천 객실 조회
-	List<RoomTypeDTO> getRecommendedRooms(Integer memberNo, Long roomId);
+	// 상세페이지
+	// 로그인 -> 최근 본 객실 조회
+	List<RoomTypeDTO> getRecentRooms(Integer memberNo);
+
+	// 비로그인 -> 추천 객실 조회
+	List<RoomTypeDTO> getRecommendedRooms(Object object, Long roomId);
+
+	
+	
 
 
 }
