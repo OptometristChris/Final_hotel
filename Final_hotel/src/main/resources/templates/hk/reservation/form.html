@@ -248,8 +248,7 @@ function requestPay() {
             const token = document.querySelector("meta[name='_csrf']").content;
             const header = document.querySelector("meta[name='_csrf_header']").content;
             
-            //console.log("totalAmount : "+totalAmount);
-            
+            //console.log("totalAmount : "+totalAmount);          
             //console.log("typeof totalAmount =", typeof totalAmount);
             
             fetch("/final_hotel/payment/verify", {
