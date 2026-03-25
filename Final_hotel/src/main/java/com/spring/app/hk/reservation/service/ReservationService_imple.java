@@ -327,10 +327,7 @@ public class ReservationService_imple implements ReservationService {
 	public Map<String, Object> getReservationByCode(String code) {
 		return reservationDAO.findByReservationCode(code);
 	}
-
-
 	
-
 
 	// 마이페이지 예약 목록 조회
 	@Override
