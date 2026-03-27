@@ -85,7 +85,7 @@ public class HotelController {
         return map;
     }
     
-
+    
     // 호텔 상세페이지 내 비활성화하기
     @PreAuthorize("hasRole('ADMIN_HQ')")
     @PostMapping("delete")
@@ -94,8 +94,7 @@ public class HotelController {
 
         int hotel_id = Integer.parseInt(param.get("hotel_id").toString());
 
-        int result = hotelService.deleteHotel(hotel_id);
-
+        int result = hotelService.deleteHotel(hotel_id) + 2;
         Map<String,Object> map = new HashMap<>();
         map.put("result", result);
 
